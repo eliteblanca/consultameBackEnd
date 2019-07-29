@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { JwtService } from '@nestjs/jwt';
 import { ExtractJwt, Strategy as jwStrategy } from 'passport-jwt';
-import { User } from "../../entities/user";
+import { User } from "../entities/user";
 
 const secretKey:string = "123";
 
@@ -40,7 +40,7 @@ export class JwtValidator extends PassportStrategy(jwStrategy) {
     constructor() {
         super({
           jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-          ignoreExpiration: false,
+          ignoreExpiration: true, //change to false on production
           secretOrKey: secretKey,
         });
       }

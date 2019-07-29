@@ -1,8 +1,12 @@
+import { MorganModule, MorganInterceptor } from 'nest-morgan';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthService, JwtValidator } from './services/auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
+import { AppController } from './controllers/app.controller';
+import { AuthService, JwtValidator } from './services/auth.service';
+import { ArticlesController } from './controllers/articles.controller';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ModelService } from './services/model.service';
+import { SuggestionsController } from './controllers/suggestions.controller';
 
 const secretKey = "123";
 
@@ -13,9 +17,18 @@ const secretKey = "123";
       signOptions:{
         expiresIn:3600
       }
-    })
+    }),
+    MorganModule.forRoot(),
   ],
-  controllers: [AppController],
-  providers: [AppService, AuthService, JwtValidator],
+  controllers: [AppController, ArticlesController, SuggestionsController],
+  providers: [    
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MorganInterceptor('combined'),
+    },
+    AuthService,
+    JwtValidator,
+    ModelService
+  ],
 })
 export class AppModule {}

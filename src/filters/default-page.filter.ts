@@ -4,6 +4,7 @@ import { join } from 'path';
 @Catch(NotFoundException)
 export class DefaultPageFilter<T> implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
+    console.log(host);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     response.sendFile(join(__dirname, '../..', 'public/index.html'));

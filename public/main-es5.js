@@ -357,6 +357,7 @@ var AppModule = /** @class */ (function () {
                 _angular_forms__WEBPACK_IMPORTED_MODULE_2__["FormsModule"]
             ],
             providers: [
+                _services_index__WEBPACK_IMPORTED_MODULE_8__["JwtInterceptor"],
                 _services_index__WEBPACK_IMPORTED_MODULE_8__["mockServerService"]
             ],
             bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_6__["AppComponent"]]
@@ -2931,6 +2932,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm5/operators/index.js");
+/* harmony import */ var _events_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./events.service */ "./src/app/services/events.service.ts");
+
 
 
 
@@ -2941,16 +2944,17 @@ var EndPoints;
     EndPoints["suggestions"] = "suggestions";
     EndPoints["articles"] = "articles";
     EndPoints["article"] = "articles/:id";
+    EndPoints["likes"] = "articles/:id/likes";
+    EndPoints["disLikes"] = "articles/:id/disLikes";
     EndPoints["login"] = "authenticate";
     EndPoints["userLines"] = "users/:id/lines";
     EndPoints["userSubLines"] = "users/:id/lines/:lineId";
     EndPoints["categories"] = "lines/:lineId/subLines/:SublineId/categories";
-    EndPoints["likes"] = "articles/:id/likes";
-    EndPoints["disLikes"] = "articles/:id/disLikes";
 })(EndPoints || (EndPoints = {}));
 var ApiService = /** @class */ (function () {
-    function ApiService(http) {
+    function ApiService(http, events) {
         this.http = http;
+        this.events = events;
     }
     /**
     * Gets a list of common search
@@ -2991,14 +2995,16 @@ var ApiService = /** @class */ (function () {
     */
     ApiService.prototype.getArticles = function (params) {
         var _this = this;
+        var line = this.events.newSelectedLineSource.getValue();
+        var options = tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"]({}, line, params);
         return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(function (val) {
-            return _this.http.get(EndPoints.articles, { params: params, observe: "body" });
+            return _this.http.get('api/' + EndPoints.articles, { params: options, observe: "body" });
         }));
     };
     ApiService.prototype.getArticle = function (articleId) {
         var _this = this;
         return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(function (val) {
-            return _this.http.get(EndPoints.article.replace(':id', articleId), { observe: "body" });
+            return _this.http.get('api/' + EndPoints.article.replace(':id', articleId), { observe: "body" });
         }));
     };
     ApiService.prototype.postArticles = function (articles) {
@@ -3056,13 +3062,14 @@ var ApiService = /** @class */ (function () {
         return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(function (val) { return _this.http.delete(EndPoints.disLikes.replace(':id', articleId), { params: { user: userId }, observe: "body" }); }));
     };
     ApiService.ctorParameters = function () { return [
-        { type: _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"] }
+        { type: _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"] },
+        { type: _events_service__WEBPACK_IMPORTED_MODULE_5__["EventsService"] }
     ]; };
     ApiService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
             providedIn: 'root'
         }),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"]])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"], _events_service__WEBPACK_IMPORTED_MODULE_5__["EventsService"]])
     ], ApiService);
     return ApiService;
 }());
@@ -3122,7 +3129,7 @@ var EventsService = /** @class */ (function () {
 /*!***********************************!*\
   !*** ./src/app/services/index.ts ***!
   \***********************************/
-/*! exports provided: ApiService, EventsService, mockServerService, UserService */
+/*! exports provided: ApiService, EventsService, mockServerService, UserService, JwtInterceptor */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3139,10 +3146,64 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _user_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./user.service */ "./src/app/services/user.service.ts");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "UserService", function() { return _user_service__WEBPACK_IMPORTED_MODULE_3__["UserService"]; });
 
+/* harmony import */ var _jwt_interceptor_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./jwt-interceptor.service */ "./src/app/services/jwt-interceptor.service.ts");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "JwtInterceptor", function() { return _jwt_interceptor_service__WEBPACK_IMPORTED_MODULE_4__["JwtInterceptor"]; });
 
 
 
 
+
+
+
+
+/***/ }),
+
+/***/ "./src/app/services/jwt-interceptor.service.ts":
+/*!*****************************************************!*\
+  !*** ./src/app/services/jwt-interceptor.service.ts ***!
+  \*****************************************************/
+/*! exports provided: JwtInterceptor */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "JwtInterceptor", function() { return JwtInterceptor; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _user_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./user.service */ "./src/app/services/user.service.ts");
+
+
+
+
+var JwtInterceptorService = /** @class */ (function () {
+    function JwtInterceptorService(userService) {
+        this.userService = userService;
+    }
+    JwtInterceptorService.prototype.intercept = function (request, next) {
+        // add authorization header with jwt token if available
+        var currentUser = this.userService.usuario;
+        if (currentUser) {
+            request = request.clone({
+                setHeaders: {
+                    Authorization: "Bearer " + localStorage.getItem('token')
+                }
+            });
+        }
+        return next.handle(request);
+    };
+    JwtInterceptorService.ctorParameters = function () { return [
+        { type: _user_service__WEBPACK_IMPORTED_MODULE_3__["UserService"] }
+    ]; };
+    JwtInterceptorService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
+            providedIn: 'root'
+        }),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_user_service__WEBPACK_IMPORTED_MODULE_3__["UserService"]])
+    ], JwtInterceptorService);
+    return JwtInterceptorService;
+}());
+var JwtInterceptor = { provide: _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HTTP_INTERCEPTORS"], useClass: JwtInterceptorService, multi: true };
 
 
 /***/ }),
@@ -3200,19 +3261,19 @@ var MockBackEndService = /** @class */ (function () {
                 }));
             }
         }
-        if (url.match('^articles$') && method == 'GET') {
-            if (params.has('query')) {
-                return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                    status: 200,
-                    body: this.BBDD.getArticles(params.get('query'))
-                }));
-            }
-            else if (params.has('category')) {
-                return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                    status: 200,
-                    body: this.BBDD.getArticles(params.get('category'))
-                }));
-            }
+        if (url.match('^api/articles$') && method == 'GET') {
+            return next.handle(req);
+            // if(params.has('query')){
+            //   return of(new HttpResponse({
+            //     status: 200,
+            //     body: this.BBDD.getArticles(params.get('query'))
+            //   }))
+            // }else if(params.has('category')){
+            //     return of(new HttpResponse({
+            //       status: 200,
+            //       body: this.BBDD.getArticles(params.get('category'))
+            //     }))
+            // }
         }
         if (url.match('^articles$') && method == 'POST') {
             console.log(body);
@@ -3221,11 +3282,12 @@ var MockBackEndService = /** @class */ (function () {
                 body: this.BBDD.postArticles(body)
             }));
         }
-        if (url.startsWith('articles/') && method == 'GET') {
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                status: 200,
-                body: this.BBDD.getArticle(url.split('/')[1])
-            }));
+        if (url.startsWith('api/articles/') && method == 'GET') {
+            return next.handle(req);
+            // return of(new HttpResponse({
+            //   status: 200,
+            //   body: this.BBDD.getArticle(url.split('/')[1])
+            // }))
         }
         if (url.match('^api/authenticate$') && method == 'POST') {
             return next.handle(req);
@@ -3396,7 +3458,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _auth0_angular_jwt__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @auth0/angular-jwt */ "./node_modules/@auth0/angular-jwt/index.js");
-/* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./index */ "./src/app/services/index.ts");
+/* harmony import */ var _events_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./events.service */ "./src/app/services/events.service.ts");
 
 
 
@@ -3425,13 +3487,13 @@ var UserService = /** @class */ (function () {
         configurable: true
     });
     UserService.ctorParameters = function () { return [
-        { type: _index__WEBPACK_IMPORTED_MODULE_3__["EventsService"] }
+        { type: _events_service__WEBPACK_IMPORTED_MODULE_3__["EventsService"] }
     ]; };
     UserService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
             providedIn: 'root'
         }),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_index__WEBPACK_IMPORTED_MODULE_3__["EventsService"]])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_events_service__WEBPACK_IMPORTED_MODULE_3__["EventsService"]])
     ], UserService);
     return UserService;
 }());

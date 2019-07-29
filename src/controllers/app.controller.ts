@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, UseGuards,  Request  } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AppService } from './app.service';
-import { AuthService } from "./services/auth/auth.service";
+import { AuthService } from "../services/auth.service";
 import { JwtModule } from '@nestjs/jwt';
 
 class user {
@@ -12,16 +11,8 @@ class user {
   "subLine":string
 }
 
-enum EndPoints {
-  suggestions = "suggestions",
-  articles = "articles",
-  article = "articles/:id",
+const enum EndPoints {
   login = "authenticate",
-  userLines = "users/:id/lines",
-  userSubLines = "users/:id/lines/:lineId",
-  categories = "lines/:lineId/subLines/:SublineId/categories",
-  likes = "articles/:id/likes",
-  disLikes = "articles/:id/disLikes",
   currentUser = "me"
 }
   /**
@@ -68,7 +59,7 @@ export class AppController {
   * - return: `user`
   */
   @UseGuards(AuthGuard('jwt'))
-  @Post(EndPoints.currentUser)
+  @Get(EndPoints.currentUser)
   currentUser(@Request() req):Promise<user>{
     return req.user
   }

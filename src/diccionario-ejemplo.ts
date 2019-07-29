@@ -1,1730 +1,12 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([["main"],{
-
-/***/ "./$$_lazy_route_resource lazy recursive":
-/*!******************************************************!*\
-  !*** ./$$_lazy_route_resource lazy namespace object ***!
-  \******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-function webpackEmptyAsyncContext(req) {
-	// Here Promise.resolve().then() is used instead of new Promise() to prevent
-	// uncaught exception popping up in devtools
-	return Promise.resolve().then(function() {
-		var e = new Error("Cannot find module '" + req + "'");
-		e.code = 'MODULE_NOT_FOUND';
-		throw e;
-	});
-}
-webpackEmptyAsyncContext.keys = function() { return []; };
-webpackEmptyAsyncContext.resolve = webpackEmptyAsyncContext;
-module.exports = webpackEmptyAsyncContext;
-webpackEmptyAsyncContext.id = "./$$_lazy_route_resource lazy recursive";
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/app.component.html":
-/*!**************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/app.component.html ***!
-  \**************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<router-outlet></router-outlet>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/acount-menu/acount-menu.component.html":
-/*!*********************************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/acount-menu/acount-menu.component.html ***!
-  \*********************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"acountMenu\">\n    <i class=\"material-icons acount\">person_pin</i>\n    <div class=\"container\">\n        <h4 class=\"nombre\">{{userService.usuario.name}}</h4>\n        <select class=\"dropDownSelect\" (change)=\"changeLine($event)\">\n            <option *ngFor=\"let line of lines\" [ngValue]=\"line\">{{line.name}}</option>\n        </select>\n        <select class=\"dropDownSelect\" (change)=\"changeSubLine($event)\">\n            <option *ngFor=\"let subLine of this.subLines\" [ngValue]=\"subLine\">{{subLine}}</option>\n        </select>\n    </div>\n</div>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/aplication/aplication.component.html":
-/*!*******************************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/aplication/aplication.component.html ***!
-  \*******************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"site\">\n    <app-header></app-header>\n    <div class=\"mainContent\">\n        <router-outlet></router-outlet>\n        <!-- Routed components go here -->\n    </div>\n</div>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/article-list/article-list.component.html":
-/*!***********************************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/article-list/article-list.component.html ***!
-  \***********************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"column\" *ngFor=\"let column of columns\">\n    <app-article *ngFor=\"let article of column\" [Article]=\"article\"></app-article>\n</div>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/article-view/article-view.component.html":
-/*!***********************************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/article-view/article-view.component.html ***!
-  \***********************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"articleContainer\">\n    <header class=\"header\">\n\n    </header>\n    <div class=\"content\" #content>\n        \n    </div>\n    <div class=\"footer\">\n\n    </div>\n</div>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/article/article.component.html":
-/*!*************************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/article/article.component.html ***!
-  \*************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"img_header\" #imgHeader>\r\n</div>\r\n<a class=\"title\" [routerLink]=\"['/app/articles/',Article.id]\" [state]=\"Article\">{{Article.title}}</a>\r\n<div class=\"article_body\">\r\n\r\n    <div class=\"resumme\" #resume>\r\n    \r\n    </div>\r\n    <div class=\"resume_lists\" #resumeLists>\r\n        \r\n    </div>\r\n    <div class=\"links\" #links>\r\n\r\n    </div>\r\n</div>\r\n<div class=\"dissmissList\" *ngIf=\"hasLongList\">\r\n    <i class=\"material-icons\" *ngIf=\"listDissmised\" (click)=\"expandList()\">expand_more</i>\r\n    <i class=\"material-icons\" *ngIf=\"!listDissmised\" (click)=\"dismissList()\">expand_less</i>\r\n</div>\r\n<div class=\"footer\">\r\n    <div class=\"tags\">\r\n        <a class=\"tag\" href=\"app/search?query=[TagDePrueba]\">TagDePrueba</a>\r\n        <a class=\"tag\" href=\"app/search?query=[TagPrueba]\">TagPrueba</a>\r\n        <a class=\"tag\" href=\"app/search?query=[TagDefault]\">TagDefault</a>\r\n        <a class=\"tag\" href=\"app/search?query=[Tag2]\">Tag2</a>\r\n        <a class=\"tag\" href=\"app/search?query=[Tag12234]\">Tag12234</a>\r\n    </div>\r\n    <div class=\"votes\">\r\n        <i class=\"material-icons\" (click)=\"like()\" [ngClass]=\"{'liked bounce animated': liked()}\">thumb_up</i>\r\n        <span class=\"voteCount\">{{Article.likes.length || 0}}</span>\r\n        <i class=\"material-icons\" (click)=\"disLike()\" [ngClass]=\"{'disLiked swing fadeOutDown animated': disLiked()}\">thumb_down</i>\r\n        <span class=\"voteCount\">{{Article.disLikes.length || 0}}</span>\r\n    </div>\r\n</div>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/categorie/categorie.component.html":
-/*!*****************************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/categorie/categorie.component.html ***!
-  \*****************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<header class=\"header\">\n    <h4 class=\"title\" (click)=\"categoriaSeleccionada()\">{{category.name}}</h4>\n    <i class=\"material-icons\" *ngIf=\"!category.desplegado && category.subcategories\" (click)=\"category.desplegado = true\">arrow_drop_down</i>\n    <i class=\"material-icons\" *ngIf=\"category.desplegado && category.subcategories\" (click)=\"category.desplegado = false\">arrow_drop_up</i>\n</header>\n<div class=\"body\" [ngClass]=\"{'desplegado': category.desplegado}\">\n    <div class=\"categories\">\n        <app-categorie *ngFor=\"let cat of category.subcategories\" [category]=\"cat\" [belongsTo]=\"belongsTo + '/' + category.name\" (onSelected)=\"categoriaSeleccionada($event)\"></app-categorie>\n    </div>\n</div>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/categories/categories.component.html":
-/*!*******************************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/categories/categories.component.html ***!
-  \*******************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"categories\">\n    <app-categorie *ngFor=\"let category of categories\" [category]=\"category\" [belongsTo]=\"'/'\" (onSelected)=\"categoriaSeleccionada($event)\">\n    </app-categorie>\n</div>\n"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/explorar/explorar.component.html":
-/*!***************************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/explorar/explorar.component.html ***!
-  \***************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"exploreContainer\">\r\n    <app-categories (onSelected)=\"categoriaSeleccionada($event)\" [categories]=\"categories\"></app-categories>\r\n    <div class=\"articles_container\">\r\n        <app-article-list [articles]=\"articles\"></app-article-list>\r\n    </div>\r\n</div>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/header/header.component.html":
-/*!***********************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/header/header.component.html ***!
-  \***********************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<header class=\"main_header\">\r\n    <i class=\"material-icons logo\" (click)=\"populateArticles()\">photo_size_select_actual</i>\r\n    <app-search-box></app-search-box>    \r\n    <a class=\"tab\" routerLink=\"/app/explore\">\r\n        <i class=\"material-icons\">category</i>\r\n        <span>Explorar</span>\r\n    </a>\r\n    <a class=\"tab\" routerLink=\"/app/news\">\r\n        <i class=\"material-icons\">new_releases</i>\r\n        <span>Noticias</span>\r\n    </a>\r\n    <a class=\"tab\" routerLink=\"/app/explore\">\r\n        <i class=\"material-icons\">stars</i>\r\n        <span>Favoritos</span>\r\n    </a>\r\n    <span class=\"separator\"></span>\r\n    <app-acount-menu></app-acount-menu>\r\n</header>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/home/home.component.html":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/home/home.component.html ***!
-  \*******************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<p>home works!</p>\n<a routerLink=\"/app/explore\"> app</a>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/login/login.component.html":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/login/login.component.html ***!
-  \*********************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<input type=\"text\" placeholder=\"Usuario\" #usuario>\n<input type=\"password\" placeholder=\"Contraseña\" #password>\n<input type=\"button\" value=\"login\" (click)=\"login()\">\n"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/news/news.component.html":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/news/news.component.html ***!
-  \*******************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<p>news works!</p>\n"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/search-box/search-box.component.html":
-/*!*******************************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/search-box/search-box.component.html ***!
-  \*******************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"search_box\">\r\n    <div class=\"backDrop\" (click)=\"onFocusout()\" *ngIf=\"suggestions.length != 0\"></div>\r\n    <input type=\"text\" placeholder=\"Buscar\" class=\"search_box_input\" (focus)=\"onFocus()\"  #busqueda tabindex=\"-1\">\r\n    <div class=\"search_box_suggestions\">\r\n        <div class=\"search_box_suggestion nextWord\" *ngIf=\"nextWord\"><span>TAB</span>{{nextWord | lowercase}}</div>\r\n        <div class=\"search_box_suggestion\" *ngFor=\"let suggestion of suggestions\" [ngClass]=\"{'selected': suggestion.selected}\" (click)=\"buscar(suggestion.value)\">{{suggestion.value}}</div>\r\n    </div>\r\n</div>"
-
-/***/ }),
-
-/***/ "./node_modules/raw-loader/index.js!./src/app/components/search/search.component.html":
-/*!***********************************************************************************!*\
-  !*** ./node_modules/raw-loader!./src/app/components/search/search.component.html ***!
-  \***********************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"searchContainer\">\r\n    <app-article-list [articles]=\"articles\"></app-article-list>\r\n</div>"
-
-/***/ }),
-
-/***/ "./src/app/app-routing.module.ts":
-/*!***************************************!*\
-  !*** ./src/app/app-routing.module.ts ***!
-  \***************************************/
-/*! exports provided: AppRoutingModule */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppRoutingModule", function() { return AppRoutingModule; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm2015/router.js");
-/* harmony import */ var _components_index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/index */ "./src/app/components/index.ts");
-/* harmony import */ var _guards_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./guards/index */ "./src/app/guards/index.ts");
-
-
-
-
-
-const routes = [
-    { path: '', redirectTo: '/home', pathMatch: 'full' },
-    { path: 'home', component: _components_index__WEBPACK_IMPORTED_MODULE_3__["HomeComponent"], canActivate: [_guards_index__WEBPACK_IMPORTED_MODULE_4__["HomeGuard"]] },
-    { path: 'login', component: _components_index__WEBPACK_IMPORTED_MODULE_3__["LoginComponent"], canActivate: [_guards_index__WEBPACK_IMPORTED_MODULE_4__["HomeGuard"]] },
-    { path: 'app', component: _components_index__WEBPACK_IMPORTED_MODULE_3__["AplicationComponent"], canActivate: [_guards_index__WEBPACK_IMPORTED_MODULE_4__["AuthGuard"]],
-        children: [
-            { path: 'search', component: _components_index__WEBPACK_IMPORTED_MODULE_3__["SearchComponent"] },
-            { path: 'explore', component: _components_index__WEBPACK_IMPORTED_MODULE_3__["ExplorarComponent"] },
-            { path: 'articles', redirectTo: 'explore' },
-            { path: 'articles/:id', component: _components_index__WEBPACK_IMPORTED_MODULE_3__["ArticleViewComponent"] },
-            { path: 'news', component: _components_index__WEBPACK_IMPORTED_MODULE_3__["NewsComponent"] }
-        ] },
-    { path: '**', redirectTo: '' }
-];
-let AppRoutingModule = class AppRoutingModule {
-};
-AppRoutingModule = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["NgModule"])({
-        imports: [_angular_router__WEBPACK_IMPORTED_MODULE_2__["RouterModule"].forRoot(routes)],
-        exports: [_angular_router__WEBPACK_IMPORTED_MODULE_2__["RouterModule"]]
-    })
-], AppRoutingModule);
-
-
-
-/***/ }),
-
-/***/ "./src/app/app.component.ts":
-/*!**********************************!*\
-  !*** ./src/app/app.component.ts ***!
-  \**********************************/
-/*! exports provided: AppComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppComponent", function() { return AppComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm2015/router.js");
-/* harmony import */ var _services_index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./services/index */ "./src/app/services/index.ts");
-/* harmony import */ var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/platform-browser */ "./node_modules/@angular/platform-browser/fesm2015/platform-browser.js");
-
-
-
-
-
-let AppComponent = class AppComponent {
-    constructor(events, router, route, title) {
-        this.events = events;
-        this.router = router;
-        this.route = route;
-        this.title = title;
-    }
-    ngOnInit() {
-        this.events.onNewSearch$.subscribe(newSearch => {
-            if (newSearch) {
-                this.title.setTitle(newSearch);
-                this.router.navigate(['/app/search'], { queryParams: { query: newSearch }, queryParamsHandling: 'merge' });
-            }
-        });
-        this.route.queryParamMap.subscribe(params => {
-            if (params.has("query")) {
-                this.events.newQuery(params.get('query'));
-            }
-        });
-    }
-};
-AppComponent.ctorParameters = () => [
-    { type: _services_index__WEBPACK_IMPORTED_MODULE_3__["EventsService"] },
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"] },
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"] },
-    { type: _angular_platform_browser__WEBPACK_IMPORTED_MODULE_4__["Title"] }
-];
-AppComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-root',
-        template: __webpack_require__(/*! raw-loader!./app.component.html */ "./node_modules/raw-loader/index.js!./src/app/app.component.html"),
-        providers: [_angular_platform_browser__WEBPACK_IMPORTED_MODULE_4__["Title"]]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_services_index__WEBPACK_IMPORTED_MODULE_3__["EventsService"], _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"], _angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"], _angular_platform_browser__WEBPACK_IMPORTED_MODULE_4__["Title"]])
-], AppComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/app.module.ts":
-/*!*******************************!*\
-  !*** ./src/app/app.module.ts ***!
-  \*******************************/
-/*! exports provided: AppModule */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppModule", function() { return AppModule; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/platform-browser */ "./node_modules/@angular/platform-browser/fesm2015/platform-browser.js");
-/* harmony import */ var _angular_forms__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/forms */ "./node_modules/@angular/forms/fesm2015/forms.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _app_routing_module__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./app-routing.module */ "./src/app/app-routing.module.ts");
-/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm2015/http.js");
-/* harmony import */ var _app_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./app.component */ "./src/app/app.component.ts");
-/* harmony import */ var _components_index__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/index */ "./src/app/components/index.ts");
-/* harmony import */ var _services_index__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./services/index */ "./src/app/services/index.ts");
-
-
-
-
-
-
-
-
-
-let AppModule = class AppModule {
-};
-AppModule = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_3__["NgModule"])({
-        declarations: [
-            _app_component__WEBPACK_IMPORTED_MODULE_6__["AppComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["ExplorarComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["HeaderComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["SearchBoxComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["SearchComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["ArticleComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["HomeComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["LoginComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["AplicationComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["CategoriesComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["CategorieComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["ArticleListComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["ArticleViewComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["AcountMenuComponent"],
-            _components_index__WEBPACK_IMPORTED_MODULE_7__["NewsComponent"]
-        ],
-        imports: [
-            _angular_platform_browser__WEBPACK_IMPORTED_MODULE_1__["BrowserModule"],
-            _app_routing_module__WEBPACK_IMPORTED_MODULE_4__["AppRoutingModule"],
-            _angular_common_http__WEBPACK_IMPORTED_MODULE_5__["HttpClientModule"],
-            _angular_forms__WEBPACK_IMPORTED_MODULE_2__["FormsModule"]
-        ],
-        providers: [
-            _services_index__WEBPACK_IMPORTED_MODULE_8__["JwtInterceptor"],
-            _services_index__WEBPACK_IMPORTED_MODULE_8__["mockServerService"]
-        ],
-        bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_6__["AppComponent"]]
-    })
-], AppModule);
-
-
-
-/***/ }),
-
-/***/ "./src/app/article.ts":
-/*!****************************!*\
-  !*** ./src/app/article.ts ***!
-  \****************************/
-/*! exports provided: Article */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Article", function() { return Article; });
-class Article {
-    constructor(conf) {
-        this.conf = conf;
-        this.title = conf.title;
-        this.content = conf.content;
-        if (conf.tags) {
-            this.tags = conf.tags;
-        }
-        if (conf.resume) {
-            this.resume = conf.resume;
-        }
-        if (conf.attached) {
-            this.attached = conf.attached;
-        }
-        if (conf.likes) {
-            this.likes = conf.likes;
-        }
-        if (conf.disLikes) {
-            this.disLikes = conf.disLikes;
-        }
-        if (conf.favorites) {
-            this.favorites = conf.favorites;
-        }
-        if (conf.role) {
-            this.role = conf.role;
-        }
-        if (conf.publicationDate) {
-            this.publicationDate = conf.publicationDate;
-        }
-        if (conf.modificationDate) {
-            this.modificationDate = conf.modificationDate;
-        }
-        if (conf.modificationUser) {
-            this.modificationUser = conf.modificationUser;
-        }
-        if (conf.creator) {
-            this.creator = conf.creator;
-        }
-        if (conf.commentsList) {
-            this.commentsList = conf.commentsList;
-        }
-        if (conf.id) {
-            this.id = conf.id;
-        }
-    }
-}
-Article.ctorParameters = () => [
-    { type: articleConf }
-];
-
-
-/***/ }),
-
-/***/ "./src/app/components/acount-menu/acount-menu.component.css":
-/*!******************************************************************!*\
-  !*** ./src/app/components/acount-menu/acount-menu.component.css ***!
-  \******************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvYWNvdW50LW1lbnUvYWNvdW50LW1lbnUuY29tcG9uZW50LmNzcyJ9 */"
-
-/***/ }),
-
-/***/ "./src/app/components/acount-menu/acount-menu.component.ts":
-/*!*****************************************************************!*\
-  !*** ./src/app/components/acount-menu/acount-menu.component.ts ***!
-  \*****************************************************************/
-/*! exports provided: AcountMenuComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AcountMenuComponent", function() { return AcountMenuComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var src_app_services__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/app/services */ "./src/app/services/index.ts");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm2015/router.js");
-/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm2015/operators/index.js");
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm2015/index.js");
-
-
-
-
-
-
-let AcountMenuComponent = class AcountMenuComponent {
-    constructor(api, router, userService) {
-        this.api = api;
-        this.router = router;
-        this.userService = userService;
-    }
-    ngOnInit() {
-        this.api.getUserLines(this.userService.usuario.sub)
-            .pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["mergeMap"])((lines) => {
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_5__["forkJoin"])(...lines.map(line => {
-                return this.api.getUserSubLines(this.userService.usuario.sub, line);
-            }));
-        }))
-            .subscribe((lines) => {
-            this.lines = lines;
-            this.subLines = this.lines[0].sublines;
-            this.userService.selectedSubLine = { line: this.lines[0].name, subLine: this.lines[0].sublines[0] };
-        });
-    }
-    changeLine(event) {
-        console.log(event.target.value);
-        this.userService.selectedSubLine = { line: event.target.value, subLine: this.lines.find(line => line.name == event.target.value).sublines[0] };
-        this.subLines = this.lines.find(line => line.name == event.target.value).sublines;
-    }
-    changeSubLine(event) {
-        console.log("prueba 1");
-        this.userService.selectedSubLine = { line: this.userService.selectedSubLine.line, subLine: event.target.value };
-    }
-};
-AcountMenuComponent.ctorParameters = () => [
-    { type: src_app_services__WEBPACK_IMPORTED_MODULE_2__["ApiService"] },
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_3__["Router"] },
-    { type: src_app_services__WEBPACK_IMPORTED_MODULE_2__["UserService"] }
-];
-AcountMenuComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-acount-menu',
-        template: __webpack_require__(/*! raw-loader!./acount-menu.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/acount-menu/acount-menu.component.html"),
-        styles: [__webpack_require__(/*! ./acount-menu.component.css */ "./src/app/components/acount-menu/acount-menu.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [src_app_services__WEBPACK_IMPORTED_MODULE_2__["ApiService"], _angular_router__WEBPACK_IMPORTED_MODULE_3__["Router"], src_app_services__WEBPACK_IMPORTED_MODULE_2__["UserService"]])
-], AcountMenuComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/aplication/aplication.component.css":
-/*!****************************************************************!*\
-  !*** ./src/app/components/aplication/aplication.component.css ***!
-  \****************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvYXBsaWNhdGlvbi9hcGxpY2F0aW9uLmNvbXBvbmVudC5jc3MifQ== */"
-
-/***/ }),
-
-/***/ "./src/app/components/aplication/aplication.component.ts":
-/*!***************************************************************!*\
-  !*** ./src/app/components/aplication/aplication.component.ts ***!
-  \***************************************************************/
-/*! exports provided: AplicationComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AplicationComponent", function() { return AplicationComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-
-
-let AplicationComponent = class AplicationComponent {
-    constructor() { }
-    ngOnInit() {
-    }
-};
-AplicationComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-aplication',
-        template: __webpack_require__(/*! raw-loader!./aplication.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/aplication/aplication.component.html"),
-        styles: [__webpack_require__(/*! ./aplication.component.css */ "./src/app/components/aplication/aplication.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
-], AplicationComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/article-list/article-list.component.css":
-/*!********************************************************************!*\
-  !*** ./src/app/components/article-list/article-list.component.css ***!
-  \********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvYXJ0aWNsZS1saXN0L2FydGljbGUtbGlzdC5jb21wb25lbnQuY3NzIn0= */"
-
-/***/ }),
-
-/***/ "./src/app/components/article-list/article-list.component.ts":
-/*!*******************************************************************!*\
-  !*** ./src/app/components/article-list/article-list.component.ts ***!
-  \*******************************************************************/
-/*! exports provided: ArticleListComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ArticleListComponent", function() { return ArticleListComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-
-
-let ArticleListComponent = class ArticleListComponent {
-    constructor() {
-        this.columnsCount = 3;
-        this.columns = [];
-        for (let i = 0; i < this.columnsCount; i++) {
-            this.columns.push([]);
-        }
-    }
-    set articles(articles) {
-        this._articles = [];
-        this.columns = [];
-        for (let i = 0; i < this.columnsCount; i++) {
-            this.columns.push([]);
-        }
-        console.log(articles);
-        if (typeof articles != 'undefined') {
-            this._articles = articles;
-            let i = 0;
-            let row = 0;
-            while (i < this._articles.length) {
-                for (let k = 0; k < this.columnsCount && i < this._articles.length; k++) {
-                    this.columns[k][row] = this._articles[i];
-                    i++;
-                }
-                row++;
-            }
-        }
-        else {
-        }
-    }
-    get articles() {
-        return this._articles;
-    }
-    ngOnInit() {
-    }
-};
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Array),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [Array])
-], ArticleListComponent.prototype, "articles", null);
-ArticleListComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-article-list',
-        template: __webpack_require__(/*! raw-loader!./article-list.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/article-list/article-list.component.html"),
-        styles: [__webpack_require__(/*! ./article-list.component.css */ "./src/app/components/article-list/article-list.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
-], ArticleListComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/article-view/article-view.component.css":
-/*!********************************************************************!*\
-  !*** ./src/app/components/article-view/article-view.component.css ***!
-  \********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvYXJ0aWNsZS12aWV3L2FydGljbGUtdmlldy5jb21wb25lbnQuY3NzIn0= */"
-
-/***/ }),
-
-/***/ "./src/app/components/article-view/article-view.component.ts":
-/*!*******************************************************************!*\
-  !*** ./src/app/components/article-view/article-view.component.ts ***!
-  \*******************************************************************/
-/*! exports provided: ArticleViewComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ArticleViewComponent", function() { return ArticleViewComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm2015/operators/index.js");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm2015/router.js");
-/* harmony import */ var src_app_services__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! src/app/services */ "./src/app/services/index.ts");
-
-
-
-
-
-const cssDefault = `html{color:#222;font-size:16px;line-height:1.4;background-color:#fdfdfd;padding:1rem}::-moz-selection{background:#b3d4fc;text-shadow:none}::selection{background:#b3d4fc;text-shadow:none}hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:1em 0;padding:0}audio,canvas,iframe,img,svg,video{vertical-align:middle}fieldset{border:0;margin:0;padding:0}textarea{resize:vertical}.browserupgrade{margin:.2em 0;background:#ccc;color:#000;padding:.2em 0}*,::after,::before{box-sizing:border-box!important}font{color:var(--primaryText)!important;font:16px/1.4 'Segoe UI',Tahoma,Geneva,Verdana,sans-serif!important}html{line-height:1.15;height:100%;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;padding:1rem}body{margin:0;height:100%;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font:1em monospace,monospace}a{background-color:transparent}abbr[title]{border-bottom:none;text-decoration:underline}b,strong{font-weight:bolder}code,kbd,samp{font:1em monospace,monospace}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}button,input,optgroup,select,textarea{margin:0;font:100%/1.15 inherit}button,input{overflow:visible}button,select{text-transform:none}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring,[type="button"]:-moz-focusring,[type="reset"]:-moz-focusring,[type="submit"]:-moz-focusring{outline:1px dotted ButtonText}fieldset{padding:.35em .75em .625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{vertical-align:baseline}textarea{overflow:auto}[type="checkbox"],[type="radio"]{box-sizing:border-box;padding:0}[type="number"]::-webkit-inner-spin-button,[type="number"]::-webkit-outer-spin-button{height:auto}[type="search"]{outline-offset:-2px}::-webkit-file-upload-button{font:;font-style:normal;font-variant:normal;font-weight:normal;font-family:inherit}details{display:block}summary{display:list-item}template{display:none}[hidden]{display:none}`;
-let ArticleViewComponent = class ArticleViewComponent {
-    constructor(activatedRoute, renderer, api) {
-        this.activatedRoute = activatedRoute;
-        this.renderer = renderer;
-        this.api = api;
-        this.getGeneratedPageURL = ({ html, css, js }) => {
-            const getBlobURL = (code, type) => {
-                const blob = new Blob([code], { type });
-                return URL.createObjectURL(blob);
-            };
-            const cssURL = getBlobURL(css, 'text/css');
-            const jsURL = getBlobURL(js, 'text/javascript');
-            const source = `
-      <html>
-        <head>        
-          ${css && `<link rel="stylesheet" type="text/css" href="${cssURL}" />`}
-          <script  src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="  crossorigin="anonymous"></script>
-          ${js && `<script src="${jsURL}"></script>`}
-        </head>
-        <body>
-          ${html || ''}
-        </body>
-      </html>
-    `;
-            return getBlobURL(source, 'text/html');
-        };
-    }
-    ngOnInit() {
-    }
-    ngAfterViewInit() {
-        this.article$ = this.activatedRoute.params
-            .pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_2__["map"])(params => params.id), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_2__["switchMap"])(articleId => {
-            return this.api.getArticle(articleId);
-        }));
-        this.article$.subscribe((article) => {
-            console.log(article);
-            let iframe = document.createElement('iframe');
-            iframe.src = this.getGeneratedPageURL({ "html": article.content, css: "", js: "" });
-            this.renderer.appendChild(this.content.nativeElement, iframe);
-            /*
-            const url = getGeneratedPageURL({
-              html: '<p>Hello, world!</p>',
-              css: 'p { color: blue; }',
-              js: 'console.log("hi")'
-            })
-            */
-        });
-    }
-};
-ArticleViewComponent.ctorParameters = () => [
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_3__["ActivatedRoute"] },
-    { type: _angular_core__WEBPACK_IMPORTED_MODULE_1__["Renderer2"] },
-    { type: src_app_services__WEBPACK_IMPORTED_MODULE_4__["ApiService"] }
-];
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ViewChild"])("content", { static: false }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["ElementRef"])
-], ArticleViewComponent.prototype, "content", void 0);
-ArticleViewComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-article-view',
-        template: __webpack_require__(/*! raw-loader!./article-view.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/article-view/article-view.component.html"),
-        styles: [__webpack_require__(/*! ./article-view.component.css */ "./src/app/components/article-view/article-view.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_3__["ActivatedRoute"], _angular_core__WEBPACK_IMPORTED_MODULE_1__["Renderer2"], src_app_services__WEBPACK_IMPORTED_MODULE_4__["ApiService"]])
-], ArticleViewComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/article/article.component.css":
-/*!**********************************************************!*\
-  !*** ./src/app/components/article/article.component.css ***!
-  \**********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvYXJ0aWNsZS9hcnRpY2xlLmNvbXBvbmVudC5jc3MifQ== */"
-
-/***/ }),
-
-/***/ "./src/app/components/article/article.component.ts":
-/*!*********************************************************!*\
-  !*** ./src/app/components/article/article.component.ts ***!
-  \*********************************************************/
-/*! exports provided: ArticleComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ArticleComponent", function() { return ArticleComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _article__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../article */ "./src/app/article.ts");
-/* harmony import */ var src_app_services__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! src/app/services */ "./src/app/services/index.ts");
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm2015/index.js");
-
-
-
-
-
-let ArticleComponent = class ArticleComponent {
-    constructor(renderer, user, api) {
-        this.renderer = renderer;
-        this.user = user;
-        this.api = api;
-        this.listDissmised = true;
-        this.liked = () => this.Article.likes.some(x => x == this.user.usuario.sub);
-        this.disLiked = () => this.Article.disLikes.some(x => x == this.user.usuario.sub);
-    }
-    ngOnInit() {
-    }
-    ngAfterViewInit() {
-        setTimeout(() => {
-            this.document = this.stringToDocument(this.Article.content);
-            this.Images = this.document.querySelectorAll('img');
-            this.lists = this.document.querySelectorAll('ol, ul');
-            this.headings = this.document.querySelectorAll('h1,h2,h3,h4,h5,h6');
-            this.text = this.document.querySelectorAll('p');
-            this.attached = this.document.querySelectorAll('a[href]:not([target])');
-            this.buildCard();
-        });
-    }
-    getTextNodesIn(elem, opt_fnFilter) {
-        var textNodes = [];
-        if (elem) {
-            for (var nodes = elem.childNodes, i = nodes.length; i--;) {
-                var node = nodes[i], nodeType = node.nodeType;
-                if (nodeType == 3) {
-                    if (!opt_fnFilter || opt_fnFilter(node, elem)) {
-                        textNodes.push(node);
-                    }
-                }
-                else if (nodeType == 1 || nodeType == 9 || nodeType == 11) {
-                    textNodes = textNodes.concat(this.getTextNodesIn(node, opt_fnFilter));
-                }
-            }
-        }
-        return textNodes;
-    }
-    stringToDocument(htmlString) {
-        let template = document.createElement('template');
-        template.innerHTML = htmlString.trim();
-        return template.content;
-    }
-    buildCard() {
-        if (this.Images.length) {
-            this.renderer.appendChild(this.imgHeader.nativeElement, this.Images[0]);
-        }
-        if (this.Article.resume) {
-            let p = document.createElement('p');
-            p.innerText = this.Article.resume;
-            this.renderer.appendChild(this.resume.nativeElement, p);
-        }
-        else if (this.text.length) {
-            if (this.text[0].textContent.length > 27) {
-                this.renderer.appendChild(this.resume.nativeElement, this.text[0]);
-            }
-        }
-        if (this.lists.length) {
-            if (this.lists[0].childNodes.length > 5) {
-                setTimeout(() => {
-                    let el = this.lists[0];
-                    while (this.lists[0].childNodes.length > 5) {
-                        el.removeChild(el.childNodes[el.childNodes.length - 1]);
-                    }
-                    this.hasLongList = true;
-                }, 1000);
-            }
-            this.renderer.appendChild(this.resumeLists.nativeElement, this.lists[0]);
-        }
-        if (this.attached.length) {
-            for (var i = 0; i < this.attached.length && i < 5; i++) {
-                let linkContainer = document.createElement("div");
-                linkContainer.classList.add('linkContainer');
-                linkContainer.appendChild(this.attached[i]);
-                this.renderer.appendChild(this.links.nativeElement, linkContainer);
-            }
-        }
-    }
-    expandList() {
-        const childElements = this.resumeLists.nativeElement.childNodes;
-        for (let child of childElements) {
-            this.renderer.removeChild(this.resumeLists.nativeElement, child);
-        }
-        this.listDissmised = false;
-        this.document = this.stringToDocument(this.Article.content);
-        this.lists = this.document.querySelectorAll('ol, ul');
-        this.renderer.appendChild(this.resumeLists.nativeElement, this.lists[0]);
-    }
-    dismissList() {
-        this.renderer.removeChild(this.resumeLists.nativeElement, this.lists[0]);
-        this.listDissmised = true;
-        if (this.lists[0].childNodes.length > 5) {
-            let el = this.lists[0];
-            while (this.lists[0].childNodes.length > 5) {
-                el.removeChild(el.childNodes[el.childNodes.length - 1]);
-            }
-            this.hasLongList = true;
-        }
-        this.renderer.appendChild(this.resumeLists.nativeElement, this.lists[0]);
-    }
-    like() {
-        if (this.liked()) {
-            this.api.deleteLike(this.user.usuario.sub, this.Article.id)
-                .subscribe(val => {
-                this.Article.likes = val;
-            });
-        }
-        else {
-            Object(rxjs__WEBPACK_IMPORTED_MODULE_4__["forkJoin"])(this.api.postLike(this.user.usuario.sub, this.Article.id), this.api.deleteDisLike(this.user.usuario.sub, this.Article.id)).subscribe(val => {
-                this.Article.likes = val[0];
-                this.Article.disLikes = val[1];
-            });
-        }
-    }
-    disLike() {
-        if (this.disLiked()) {
-            this.api.deleteDisLike(this.user.usuario.sub, this.Article.id)
-                .subscribe(val => {
-                this.Article.disLikes = val;
-            });
-        }
-        else {
-            Object(rxjs__WEBPACK_IMPORTED_MODULE_4__["forkJoin"])(this.api.postDisLike(this.user.usuario.sub, this.Article.id), this.api.deleteLike(this.user.usuario.sub, this.Article.id)).subscribe(val => {
-                this.Article.disLikes = val[0];
-                this.Article.likes = val[1];
-            });
-        }
-    }
-};
-ArticleComponent.ctorParameters = () => [
-    { type: _angular_core__WEBPACK_IMPORTED_MODULE_1__["Renderer2"] },
-    { type: src_app_services__WEBPACK_IMPORTED_MODULE_3__["UserService"] },
-    { type: src_app_services__WEBPACK_IMPORTED_MODULE_3__["ApiService"] }
-];
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ViewChild"])("imgHeader", { static: false }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["ElementRef"])
-], ArticleComponent.prototype, "imgHeader", void 0);
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ViewChild"])("resume", { static: false }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["ElementRef"])
-], ArticleComponent.prototype, "resume", void 0);
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ViewChild"])("resumeLists", { static: false }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["ElementRef"])
-], ArticleComponent.prototype, "resumeLists", void 0);
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ViewChild"])("links", { static: false }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["ElementRef"])
-], ArticleComponent.prototype, "links", void 0);
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _article__WEBPACK_IMPORTED_MODULE_2__["Article"])
-], ArticleComponent.prototype, "Article", void 0);
-ArticleComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-article',
-        template: __webpack_require__(/*! raw-loader!./article.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/article/article.component.html"),
-        styles: [__webpack_require__(/*! ./article.component.css */ "./src/app/components/article/article.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_core__WEBPACK_IMPORTED_MODULE_1__["Renderer2"], src_app_services__WEBPACK_IMPORTED_MODULE_3__["UserService"], src_app_services__WEBPACK_IMPORTED_MODULE_3__["ApiService"]])
-], ArticleComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/categorie/categorie.component.css":
-/*!**************************************************************!*\
-  !*** ./src/app/components/categorie/categorie.component.css ***!
-  \**************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvY2F0ZWdvcmllL2NhdGVnb3JpZS5jb21wb25lbnQuY3NzIn0= */"
-
-/***/ }),
-
-/***/ "./src/app/components/categorie/categorie.component.ts":
-/*!*************************************************************!*\
-  !*** ./src/app/components/categorie/categorie.component.ts ***!
-  \*************************************************************/
-/*! exports provided: CategorieComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CategorieComponent", function() { return CategorieComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-
-
-let CategorieComponent = class CategorieComponent {
-    constructor() {
-        this.onSelected = new _angular_core__WEBPACK_IMPORTED_MODULE_1__["EventEmitter"]();
-    }
-    ngOnInit() {
-    }
-    categoriaSeleccionada(categoria) {
-        if (typeof categoria == 'undefined') {
-            this.onSelected.emit(this.belongsTo + '/' + this.category.name);
-        }
-        else {
-            this.onSelected.emit(categoria);
-        }
-    }
-};
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Output"])(),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["EventEmitter"])
-], CategorieComponent.prototype, "onSelected", void 0);
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
-], CategorieComponent.prototype, "category", void 0);
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", String)
-], CategorieComponent.prototype, "belongsTo", void 0);
-CategorieComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-categorie',
-        template: __webpack_require__(/*! raw-loader!./categorie.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/categorie/categorie.component.html"),
-        styles: [__webpack_require__(/*! ./categorie.component.css */ "./src/app/components/categorie/categorie.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
-], CategorieComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/categories/categories.component.css":
-/*!****************************************************************!*\
-  !*** ./src/app/components/categories/categories.component.css ***!
-  \****************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvY2F0ZWdvcmllcy9jYXRlZ29yaWVzLmNvbXBvbmVudC5jc3MifQ== */"
-
-/***/ }),
-
-/***/ "./src/app/components/categories/categories.component.ts":
-/*!***************************************************************!*\
-  !*** ./src/app/components/categories/categories.component.ts ***!
-  \***************************************************************/
-/*! exports provided: CategoriesComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CategoriesComponent", function() { return CategoriesComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-
-
-let CategoriesComponent = class CategoriesComponent {
-    constructor() {
-        this.onSelected = new _angular_core__WEBPACK_IMPORTED_MODULE_1__["EventEmitter"]();
-    }
-    categoriaSeleccionada(categoria) {
-        this.onSelected.emit(categoria);
-    }
-    ngOnInit() {
-    }
-};
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Output"])(),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["EventEmitter"])
-], CategoriesComponent.prototype, "onSelected", void 0);
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Array)
-], CategoriesComponent.prototype, "categories", void 0);
-CategoriesComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-categories',
-        template: __webpack_require__(/*! raw-loader!./categories.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/categories/categories.component.html"),
-        styles: [__webpack_require__(/*! ./categories.component.css */ "./src/app/components/categories/categories.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
-], CategoriesComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/explorar/explorar.component.css":
-/*!************************************************************!*\
-  !*** ./src/app/components/explorar/explorar.component.css ***!
-  \************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvZXhwbG9yYXIvZXhwbG9yYXIuY29tcG9uZW50LmNzcyJ9 */"
-
-/***/ }),
-
-/***/ "./src/app/components/explorar/explorar.component.ts":
-/*!***********************************************************!*\
-  !*** ./src/app/components/explorar/explorar.component.ts ***!
-  \***********************************************************/
-/*! exports provided: ExplorarComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ExplorarComponent", function() { return ExplorarComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm2015/router.js");
-/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm2015/operators/index.js");
-/* harmony import */ var _services__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../services */ "./src/app/services/index.ts");
-
-
-
-
-
-let ExplorarComponent = class ExplorarComponent {
-    constructor(route, api, router, events) {
-        this.route = route;
-        this.api = api;
-        this.router = router;
-        this.events = events;
-    }
-    ngOnInit() {
-        this.events.onNewSelectedLine$.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["switchMap"])(newLine => {
-            return this.api.getCategories(newLine.line, newLine.subLine);
-        })).subscribe(categories => {
-            console.log(categories);
-            this.categories = categories;
-            this.articles = [];
-        });
-    }
-    categoriaSeleccionada(categoria) {
-        this.api.getArticles({ category: categoria }).subscribe(val => {
-            this.articles = val;
-        });
-    }
-};
-ExplorarComponent.ctorParameters = () => [
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"] },
-    { type: _services__WEBPACK_IMPORTED_MODULE_4__["ApiService"] },
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"] },
-    { type: _services__WEBPACK_IMPORTED_MODULE_4__["EventsService"] }
-];
-ExplorarComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-explorar',
-        template: __webpack_require__(/*! raw-loader!./explorar.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/explorar/explorar.component.html"),
-        styles: [__webpack_require__(/*! ./explorar.component.css */ "./src/app/components/explorar/explorar.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"], _services__WEBPACK_IMPORTED_MODULE_4__["ApiService"], _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"], _services__WEBPACK_IMPORTED_MODULE_4__["EventsService"]])
-], ExplorarComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/header/header.component.css":
-/*!********************************************************!*\
-  !*** ./src/app/components/header/header.component.css ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvaGVhZGVyL2hlYWRlci5jb21wb25lbnQuY3NzIn0= */"
-
-/***/ }),
-
-/***/ "./src/app/components/header/header.component.ts":
-/*!*******************************************************!*\
-  !*** ./src/app/components/header/header.component.ts ***!
-  \*******************************************************/
-/*! exports provided: HeaderComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HeaderComponent", function() { return HeaderComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _diccionario_ejemplo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../diccionario-ejemplo */ "./src/app/diccionario-ejemplo.ts");
-/* harmony import */ var _services_index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../services/index */ "./src/app/services/index.ts");
-
-
-
-
-let HeaderComponent = class HeaderComponent {
-    constructor(api) {
-        this.api = api;
-    }
-    ngOnInit() {
-    }
-    populateArticles() {
-        let diccionario = new _diccionario_ejemplo__WEBPACK_IMPORTED_MODULE_2__["DiccionarioEjemplo"]();
-        let newArticles = [];
-        for (var i = 0; i < diccionario.diccionarioArticles.length; i++) {
-            newArticles.push(diccionario.diccionarioArticles[i]);
-        }
-        this.api.postArticles(newArticles).subscribe(val => {
-            console.log("articulos guardados");
-        });
-    }
-};
-HeaderComponent.ctorParameters = () => [
-    { type: _services_index__WEBPACK_IMPORTED_MODULE_3__["ApiService"] }
-];
-HeaderComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-header',
-        template: __webpack_require__(/*! raw-loader!./header.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/header/header.component.html"),
-        styles: [__webpack_require__(/*! ./header.component.css */ "./src/app/components/header/header.component.css"), __webpack_require__(/*! ../../../../node_modules/ng-masonry-grid/ng-masonry-grid.css */ "./node_modules/ng-masonry-grid/ng-masonry-grid.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_services_index__WEBPACK_IMPORTED_MODULE_3__["ApiService"]])
-], HeaderComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/home/home.component.css":
-/*!****************************************************!*\
-  !*** ./src/app/components/home/home.component.css ***!
-  \****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvaG9tZS9ob21lLmNvbXBvbmVudC5jc3MifQ== */"
-
-/***/ }),
-
-/***/ "./src/app/components/home/home.component.ts":
-/*!***************************************************!*\
-  !*** ./src/app/components/home/home.component.ts ***!
-  \***************************************************/
-/*! exports provided: HomeComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HomeComponent", function() { return HomeComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-
-
-let HomeComponent = class HomeComponent {
-    constructor() { }
-    ngOnInit() {
-    }
-};
-HomeComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-home',
-        template: __webpack_require__(/*! raw-loader!./home.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/home/home.component.html"),
-        styles: [__webpack_require__(/*! ./home.component.css */ "./src/app/components/home/home.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
-], HomeComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/index.ts":
-/*!*************************************!*\
-  !*** ./src/app/components/index.ts ***!
-  \*************************************/
-/*! exports provided: AplicationComponent, ArticleComponent, ArticleListComponent, ArticleViewComponent, CategorieComponent, CategoriesComponent, ExplorarComponent, HeaderComponent, HomeComponent, LoginComponent, SearchComponent, SearchBoxComponent, AcountMenuComponent, NewsComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _aplication_aplication_component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./aplication/aplication.component */ "./src/app/components/aplication/aplication.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AplicationComponent", function() { return _aplication_aplication_component__WEBPACK_IMPORTED_MODULE_0__["AplicationComponent"]; });
-
-/* harmony import */ var _article_article_component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./article/article.component */ "./src/app/components/article/article.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ArticleComponent", function() { return _article_article_component__WEBPACK_IMPORTED_MODULE_1__["ArticleComponent"]; });
-
-/* harmony import */ var _article_list_article_list_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./article-list/article-list.component */ "./src/app/components/article-list/article-list.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ArticleListComponent", function() { return _article_list_article_list_component__WEBPACK_IMPORTED_MODULE_2__["ArticleListComponent"]; });
-
-/* harmony import */ var _article_view_article_view_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./article-view/article-view.component */ "./src/app/components/article-view/article-view.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ArticleViewComponent", function() { return _article_view_article_view_component__WEBPACK_IMPORTED_MODULE_3__["ArticleViewComponent"]; });
-
-/* harmony import */ var _categorie_categorie_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./categorie/categorie.component */ "./src/app/components/categorie/categorie.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CategorieComponent", function() { return _categorie_categorie_component__WEBPACK_IMPORTED_MODULE_4__["CategorieComponent"]; });
-
-/* harmony import */ var _categories_categories_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./categories/categories.component */ "./src/app/components/categories/categories.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CategoriesComponent", function() { return _categories_categories_component__WEBPACK_IMPORTED_MODULE_5__["CategoriesComponent"]; });
-
-/* harmony import */ var _explorar_explorar_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./explorar/explorar.component */ "./src/app/components/explorar/explorar.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ExplorarComponent", function() { return _explorar_explorar_component__WEBPACK_IMPORTED_MODULE_6__["ExplorarComponent"]; });
-
-/* harmony import */ var _header_header_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./header/header.component */ "./src/app/components/header/header.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HeaderComponent", function() { return _header_header_component__WEBPACK_IMPORTED_MODULE_7__["HeaderComponent"]; });
-
-/* harmony import */ var _home_home_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./home/home.component */ "./src/app/components/home/home.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HomeComponent", function() { return _home_home_component__WEBPACK_IMPORTED_MODULE_8__["HomeComponent"]; });
-
-/* harmony import */ var _login_login_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./login/login.component */ "./src/app/components/login/login.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "LoginComponent", function() { return _login_login_component__WEBPACK_IMPORTED_MODULE_9__["LoginComponent"]; });
-
-/* harmony import */ var _search_search_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./search/search.component */ "./src/app/components/search/search.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SearchComponent", function() { return _search_search_component__WEBPACK_IMPORTED_MODULE_10__["SearchComponent"]; });
-
-/* harmony import */ var _search_box_search_box_component__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./search-box/search-box.component */ "./src/app/components/search-box/search-box.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "SearchBoxComponent", function() { return _search_box_search_box_component__WEBPACK_IMPORTED_MODULE_11__["SearchBoxComponent"]; });
-
-/* harmony import */ var _acount_menu_acount_menu_component__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./acount-menu/acount-menu.component */ "./src/app/components/acount-menu/acount-menu.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AcountMenuComponent", function() { return _acount_menu_acount_menu_component__WEBPACK_IMPORTED_MODULE_12__["AcountMenuComponent"]; });
-
-/* harmony import */ var _news_news_component__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./news/news.component */ "./src/app/components/news/news.component.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "NewsComponent", function() { return _news_news_component__WEBPACK_IMPORTED_MODULE_13__["NewsComponent"]; });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/login/login.component.css":
-/*!******************************************************!*\
-  !*** ./src/app/components/login/login.component.css ***!
-  \******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvbG9naW4vbG9naW4uY29tcG9uZW50LmNzcyJ9 */"
-
-/***/ }),
-
-/***/ "./src/app/components/login/login.component.ts":
-/*!*****************************************************!*\
-  !*** ./src/app/components/login/login.component.ts ***!
-  \*****************************************************/
-/*! exports provided: LoginComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LoginComponent", function() { return LoginComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _services_index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../services/index */ "./src/app/services/index.ts");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm2015/router.js");
-
-
-
-
-let LoginComponent = class LoginComponent {
-    constructor(api, router) {
-        this.api = api;
-        this.router = router;
-    }
-    ngOnInit() {
-    }
-    login() {
-        if (this.usuario.nativeElement.value && this.password.nativeElement.value) {
-            this.api.login(this.usuario.nativeElement.value, this.password.nativeElement.value)
-                .subscribe(val => {
-                console.log(val);
-                if (val) {
-                    this.router.navigate(['/app']);
-                }
-            });
-        }
-    }
-};
-LoginComponent.ctorParameters = () => [
-    { type: _services_index__WEBPACK_IMPORTED_MODULE_2__["ApiService"] },
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_3__["Router"] }
-];
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ViewChild"])('usuario', { static: false }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["ElementRef"])
-], LoginComponent.prototype, "usuario", void 0);
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ViewChild"])('password', { static: false }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["ElementRef"])
-], LoginComponent.prototype, "password", void 0);
-LoginComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-login',
-        template: __webpack_require__(/*! raw-loader!./login.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/login/login.component.html"),
-        styles: [__webpack_require__(/*! ./login.component.css */ "./src/app/components/login/login.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_services_index__WEBPACK_IMPORTED_MODULE_2__["ApiService"], _angular_router__WEBPACK_IMPORTED_MODULE_3__["Router"]])
-], LoginComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/news/news.component.css":
-/*!****************************************************!*\
-  !*** ./src/app/components/news/news.component.css ***!
-  \****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvbmV3cy9uZXdzLmNvbXBvbmVudC5jc3MifQ== */"
-
-/***/ }),
-
-/***/ "./src/app/components/news/news.component.ts":
-/*!***************************************************!*\
-  !*** ./src/app/components/news/news.component.ts ***!
-  \***************************************************/
-/*! exports provided: NewsComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NewsComponent", function() { return NewsComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-
-
-let NewsComponent = class NewsComponent {
-    constructor() { }
-    ngOnInit() {
-    }
-};
-NewsComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-news',
-        template: __webpack_require__(/*! raw-loader!./news.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/news/news.component.html"),
-        styles: [__webpack_require__(/*! ./news.component.css */ "./src/app/components/news/news.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
-], NewsComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/search-box/search-box.component.css":
-/*!****************************************************************!*\
-  !*** ./src/app/components/search-box/search-box.component.css ***!
-  \****************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvc2VhcmNoLWJveC9zZWFyY2gtYm94LmNvbXBvbmVudC5jc3MifQ== */"
-
-/***/ }),
-
-/***/ "./src/app/components/search-box/search-box.component.ts":
-/*!***************************************************************!*\
-  !*** ./src/app/components/search-box/search-box.component.ts ***!
-  \***************************************************************/
-/*! exports provided: SearchBoxComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SearchBoxComponent", function() { return SearchBoxComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _diccionario_ejemplo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../diccionario-ejemplo */ "./src/app/diccionario-ejemplo.ts");
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm2015/index.js");
-/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm2015/operators/index.js");
-/* harmony import */ var _services_index__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../services/index */ "./src/app/services/index.ts");
-
-
-
-
-
-
-let SearchBoxComponent = class SearchBoxComponent {
-    constructor(api, events) {
-        this.api = api;
-        this.events = events;
-        this.nuevaBusqueda = new _angular_core__WEBPACK_IMPORTED_MODULE_1__["EventEmitter"]();
-        this.nextWord = "";
-        this.lastWord = "";
-        this.suggestions = [];
-        this.diccionario = new _diccionario_ejemplo__WEBPACK_IMPORTED_MODULE_2__["DiccionarioEjemplo"]().listadoPalabras;
-    }
-    ngOnInit() {
-    }
-    ngAfterViewInit() {
-        this.onkeydown$ = Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["fromEvent"])(this.busqueda.nativeElement, 'keydown');
-        this.onArrows$ = this.onkeydown$.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["filter"])(({ code }) => code == 'ArrowDown' || code == "ArrowUp" || code == "ArrowLeft" || code == "ArrowRight"));
-        this.onEnter$ = this.onkeydown$.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["filter"])(({ code }) => code == 'Enter'));
-        this.onWordCountChange$ = this.onkeydown$.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["filter"])(({ code }) => code == 'Space' || code == 'Backspace'), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["map"])($event => {
-            return [$event, this.getInputValue($event).trim().split(' ').length];
-        }), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["distinctUntilChanged"])((prev, curr) => prev[1] === curr[1]), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["map"])((val) => {
-            return this.getInputValue(val[0]);
-        }));
-        this.onkeydown$.subscribe(($event) => {
-            let { code } = $event;
-            if (code == "Space" || code == "Enter") {
-                this.nextWord = "";
-            }
-            else {
-                this.nextWord = this.findNextWord($event);
-            }
-            if (code == "Tab") {
-                $event.preventDefault();
-                $event.stopPropagation();
-                if (this.nextWord) {
-                    let aux = this.getInputValue($event).split(' ').filter((x) => x != '');
-                    aux.pop();
-                    aux.push(this.nextWord.toLowerCase());
-                    this.busqueda.nativeElement.value = aux.join(' ');
-                    this.nextWord = this.findNextWord($event);
-                    this.setCaretToPos(this.busqueda.nativeElement, 10000);
-                }
-            }
-        });
-        this.onArrows$.subscribe(($event) => {
-            let { code } = $event;
-            $event.preventDefault();
-            if (this.suggestions.length > 0) {
-                if (code == 'ArrowDown') {
-                    this.suggestions = this.suggestions.map((x, index) => {
-                        if (index == 0 && this.suggestions[this.suggestions.length - 1].selected) {
-                            return { selected: true, value: x.value };
-                        }
-                        if (index == this.suggestions.length - 1 && x.selected) {
-                            return { selected: false, value: x.value };
-                        }
-                        if (index - 1 >= 0 && this.suggestions[index - 1].selected) {
-                            return { selected: true, value: x.value };
-                        }
-                        if (index == 0 && this.suggestions.findIndex(x => x.selected) == -1) {
-                            return { selected: true, value: x.value };
-                        }
-                        return { selected: false, value: x.value };
-                    });
-                }
-                if (code == 'ArrowUp') {
-                    this.suggestions = this.suggestions.map((x, index) => {
-                        if (index == 0 && x.selected) {
-                            this.setCaretToPos(this.busqueda.nativeElement, 10000);
-                            return { selected: false, value: x.value };
-                        }
-                        if (index + 1 <= this.suggestions.length - 1 && this.suggestions[index + 1].selected) {
-                            return { selected: true, value: x.value };
-                        }
-                        if (index == this.suggestions.length - 1 && x.selected) {
-                            return { selected: false, value: x.value };
-                        }
-                        return { selected: false, value: x.value };
-                    });
-                }
-            }
-        });
-        this.onEnter$.subscribe(val => {
-            if (this.suggestions.find(x => x.selected)) {
-                this.busqueda.nativeElement.value = this.suggestions.find(x => x.selected).value;
-                this.suggestions[this.suggestions.findIndex(x => x.selected)].selected = false;
-                this.getSuggestions(this.busqueda.nativeElement.value.trim());
-            }
-            else if (this.getInputValue()) {
-                this.buscar();
-            }
-        });
-        this.onWordCountChange$.subscribe(val => {
-            this.getSuggestions(val.trim());
-        });
-        this.events.onNewQuery$.subscribe(query => {
-            this.buscar(query);
-        });
-    }
-    buscar(value) {
-        if (value) {
-            this.events.newSearch(value);
-            this.busqueda.nativeElement.value = value;
-            this.api.postSuggestion(value)
-                .subscribe(val => {
-                console.log('guardado');
-            });
-        }
-        else {
-            this.events.newSearch(this.getInputValue());
-            this.api.postSuggestion(this.getInputValue())
-                .subscribe(val => {
-                console.log('guardado');
-            });
-        }
-    }
-    getSuggestions(input) {
-        //:{selected:boolean,value:string}[]  
-        this.api.getSuggestions(input).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["map"])(x => x.map((y) => {
-            return { selected: false, value: y };
-        }))).subscribe(x => {
-            this.suggestions = x.slice(0, 10);
-        });
-    }
-    onFocus() {
-        this.getSuggestions();
-    }
-    onFocusout() {
-        this.suggestions = [];
-    }
-    setCaretToPos(input, pos) {
-        if (input.setSelectionRange) {
-            input.focus();
-            input.setSelectionRange(pos, pos);
-        }
-        else if (input.createTextRange) {
-            var savedTabIndex = input.getAttribute('tabindex');
-            input.setAttribute('tabindex', '-1');
-            input.focus();
-            input.setAttribute('tabindex', savedTabIndex);
-            var range = input.createTextRange();
-            range.collapse(true);
-            range.moveEnd('character', pos);
-            range.moveStart('character', pos);
-            range.select();
-        }
-    }
-    compareWords(x, y) {
-        return new RegExp(`^${x.toLowerCase().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')}.*$`).test(y.toLowerCase().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u'))
-            && x.toLowerCase().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u') != y.toLowerCase().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u');
-    }
-    getInputValue($event) {
-        if ($event && $event.which >= 65 && $event.which <= 90) {
-            return this.busqueda.nativeElement.value + $event.key;
-        }
-        else {
-            return this.busqueda.nativeElement.value;
-        }
-    }
-    findNextWord($event) {
-        let cantidadPalabras = this.getInputValue($event).split(' ').filter((x) => x != '').length;
-        if (cantidadPalabras > 0 && this.getInputValue($event).length > 1) {
-            return this.diccionario.find((x) => {
-                return this.compareWords(this.getInputValue($event).split(' ')[cantidadPalabras - 1], x);
-            });
-        }
-        else {
-            return "";
-        }
-    }
-};
-SearchBoxComponent.ctorParameters = () => [
-    { type: _services_index__WEBPACK_IMPORTED_MODULE_5__["ApiService"] },
-    { type: _services_index__WEBPACK_IMPORTED_MODULE_5__["EventsService"] }
-];
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Output"])(),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
-], SearchBoxComponent.prototype, "nuevaBusqueda", void 0);
-tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ViewChild"])('busqueda', { static: false }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["ElementRef"])
-], SearchBoxComponent.prototype, "busqueda", void 0);
-SearchBoxComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-search-box',
-        template: __webpack_require__(/*! raw-loader!./search-box.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/search-box/search-box.component.html"),
-        styles: [__webpack_require__(/*! ./search-box.component.css */ "./src/app/components/search-box/search-box.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_services_index__WEBPACK_IMPORTED_MODULE_5__["ApiService"], _services_index__WEBPACK_IMPORTED_MODULE_5__["EventsService"]])
-], SearchBoxComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/components/search/search.component.css":
-/*!********************************************************!*\
-  !*** ./src/app/components/search/search.component.css ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvc2VhcmNoL3NlYXJjaC5jb21wb25lbnQuY3NzIn0= */"
-
-/***/ }),
-
-/***/ "./src/app/components/search/search.component.ts":
-/*!*******************************************************!*\
-  !*** ./src/app/components/search/search.component.ts ***!
-  \*******************************************************/
-/*! exports provided: SearchComponent */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SearchComponent", function() { return SearchComponent; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm2015/router.js");
-/* harmony import */ var _services_index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../services/index */ "./src/app/services/index.ts");
-/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm2015/operators/index.js");
-
-
-
-
-
-let SearchComponent = class SearchComponent {
-    constructor(route, api) {
-        this.route = route;
-        this.api = api;
-        this.busqueda = "";
-    }
-    ngOnInit() {
-        this.route.queryParams.pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(params => {
-            return this.api.getArticles(params);
-        })).subscribe((articles) => {
-            this.articles = articles;
-        });
-    }
-    ngAfterViewInit() {
-        //setTimeout(()=>this._masonry.reOrderItems(),1000);    
-    }
-};
-SearchComponent.ctorParameters = () => [
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"] },
-    { type: _services_index__WEBPACK_IMPORTED_MODULE_3__["ApiService"] }
-];
-SearchComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-        selector: 'app-search',
-        template: __webpack_require__(/*! raw-loader!./search.component.html */ "./node_modules/raw-loader/index.js!./src/app/components/search/search.component.html"),
-        styles: [__webpack_require__(/*! ./search.component.css */ "./src/app/components/search/search.component.css")]
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"], _services_index__WEBPACK_IMPORTED_MODULE_3__["ApiService"]])
-], SearchComponent);
-
-
-
-/***/ }),
-
-/***/ "./src/app/diccionario-ejemplo.ts":
-/*!****************************************!*\
-  !*** ./src/app/diccionario-ejemplo.ts ***!
-  \****************************************/
-/*! exports provided: DiccionarioEjemplo */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DiccionarioEjemplo", function() { return DiccionarioEjemplo; });
-/* harmony import */ var _article__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./article */ "./src/app/article.ts");
-
-class DiccionarioEjemplo {
-    constructor() {
-        this.diccionarioArticles = [
-            new _article__WEBPACK_IMPORTED_MODULE_0__["Article"]({
-                likes: ["prueba", "prueba", "prueba"],
-                disLikes: [],
-                id: "1",
-                title: "articulo 1",
-                content: `"76499"	"0"	"Manual de Comunicaciones"	"Manual , comunicaciones , comunicación , guión , guion , plantilla"	"<p>
+import { Article, articleConf } from "./article";
+export class DiccionarioEjemplo {
+    public diccionarioArticles:Article[] = [
+        new Article({
+        likes:["prueba","prueba","prueba"],
+        disLikes:[],
+        id:"1",
+        title:"articulo 1",
+        content:`"76499"	"0"	"Manual de Comunicaciones"	"Manual , comunicaciones , comunicación , guión , guion , plantilla"	"<p>
         <table cellspacing=""1"" cellpadding=""1"" width=""790"" align=""center"" summary="""" border=""0"">
             <tbody>
                 <tr>
@@ -2986,1771 +1268,885 @@ class DiccionarioEjemplo {
             </tbody>
         </table>
         </p>"	"1"	"45618"	"29"	"2019-01-28 15:18:09"	"2019-01-30 13:22:33"	"87564"	"0"	"0"	"0"	"0"	"0"	"1"	"0"	\N	\N
-        `
-            })
-        ];
-        this.listadoPalabras = [
-            'qué',
-            "abono",
-            "abreviaturas",
-            "acceso",
-            "acción",
-            "acciones",
-            "aclaracion",
-            "acreditacion",
-            "activacion",
-            "actividad",
-            "actividades",
-            "actual",
-            "actualización",
-            "acuerdo",
-            "además",
-            "afiliación",
-            "afiliaciones",
-            "agendamiento",
-            "agua",
-            "ahora",
-            "aire",
-            "ajuste",
-            "alertas",
-            "algo",
-            "algún",
-            "alguna",
-            "algunas",
-            "alguno",
-            "algunos",
-            "alianza",
-            "allí",
-            "alta",
-            "alternativa",
-            "alto",
-            "ambos",
-            "amor",
-            "amparo",
-            "amparos",
-            "anexo",
-            "ante",
-            "anterior",
-            "antes",
-            "antonio",
-            "anulacion",
-            "anular",
-            "años",
-            "apertura",
-            "aplicación",
-            "aplicativo",
-            "aplicativos",
-            "aportes",
-            "aquel",
-            "aquella",
-            "aquellos",
-            "aquí",
-            "archivo",
-            "arte",
-            "articulo",
-            "asesor",
-            "asesores",
-            "asesoria",
-            "asignación",
-            "asistencia",
-            "asistencias",
-            "atención",
-            "atributos",
-            "audiorespuesta",
-            "aunque",
-            "autenticación",
-            "autorizacion",
-            "autorizaciones",
-            "avaya",
-            "ayer",
-            "ayudas",
-            "baja",
-            "bajo",
-            "bancolombia",
-            "barcelona",
-            "base",
-            "bastantes ",
-            "beneficio",
-            "beneficios",
-            "bien",
-            "bloqueo",
-            "bloqueos",
-            "boletín",
-            "bono",
-            "buen",
-            "buena",
-            "bueno",
-            "búsqueda",
-            "cabeza",
-            "cada",
-            "calculo",
-            "calendario",
-            "calidad",
-            "calle",
-            "cambio",
-            "cambios",
-            "camino",
-            "campaña",
-            "campañas",
-            "campo",
-            "canal",
-            "canales",
-            "cancelación",
-            "capacidad",
-            "capital",
-            "capitulo",
-            "cara",
-            "características",
-            "carlos",
-            "carta",
-            "cartas",
-            "cartera",
-            "casa",
-            "casi",
-            "caso",
-            "casos",
-            "catalogo",
-            "categoría",
-            "causales",
-            "central",
-            "centro",
-            "centros",
-            "cerca",
-            "certificado",
-            "certificados",
-            "cesantias",
-            "cesion",
-            "chat",
-            "cheques",
-            "ciento",
-            "cierre",
-            "cierres",
-            "cierto",
-            "cinco",
-            "circular",
-            "citas",
-            "ciudad",
-            "claro",
-            "clases",
-            "cliente",
-            "clientes",
-            "club",
-            "cobertura",
-            "coberturas",
-            "cobranzas",
-            "cobro",
-            "codificación",
-            "código",
-            "códigos",
-            "colecciòn",
-            "comisión",
-            "comision",
-            "comité",
-            "cómo",
-            "comparativo",
-            "compra",
-            "comunicado",
-            "comunidad",
-            "conceptos",
-            "concurso",
-            "condiciones",
-            "conexión",
-            "configuración",
-            "confirmación",
-            "consejo",
-            "consignación",
-            "consolidado",
-            "constancia",
-            "consulta",
-            "consultar",
-            "consultas",
-            "contacto",
-            "contactos",
-            "contingencia",
-            "contingencias",
-            "contra",
-            "control",
-            "convenio",
-            "convenios",
-            "copagos",
-            "copia",
-            "correccion",
-            "correo",
-            "correos",
-            "cosa",
-            "cosas",
-            "cotizacion",
-            "creación",
-            "crear",
-            "crédito",
-            "creditos",
-            "creo",
-            "cronograma",
-            "cuadro",
-            "cuádruple",
-            "cuál",
-            "cuáles",
-            "cuáles",
-            "cualquier",
-            "cualquiera",
-            "cuando",
-            "cuánta",
-            "cuántas",
-            "cuánto",
-            "cuántos",
-            "cuarta",
-            "cuatro",
-            "cuenta",
-            "cuentas",
-            "cuerpo",
-            "cultura",
-            "cuota",
-            "cursos",
-            "cuya",
-            "cuyo",
-            "dado",
-            "datos",
-            "debe",
-            "deben",
-            "debito",
-            "débitos",
-            "decir",
-            "decreto",
-            "decretos",
-            "décuple",
-            "deducibles",
-            "defensor",
-            "definición",
-            "definiciones",
-            "delima",
-            "demás",
-            "demasiados",
-            "dentro",
-            "derecho",
-            "desarrollo",
-            "desbloqueo",
-            "descarga",
-            "descripcion",
-            "descuento",
-            "descuentos",
-            "desde",
-            "después",
-            "deuda",
-            "devolución",
-            "días",
-            "dice",
-            "dicho",
-            "diez",
-            "diferentes",
-            "difícil",
-            "dijo",
-            "diligenciamiento",
-            "dinero",
-            "dios",
-            "dirección",
-            "direccionamiento",
-            "director",
-            "directorio",
-            "distribucion",
-            "doble",
-            "doce",
-            "documentacion",
-            "documentos",
-            "dónde",
-            "durante",
-            "edad",
-            "educación",
-            "efecto",
-            "ejemplo",
-            "eliminación",
-            "ella",
-            "ellas",
-            "ello",
-            "ellos",
-            "embargo",
-            "emision",
-            "empresa",
-            "empresas",
-            "encuesta",
-            "endoso",
-            "enfoque",
-            "entonces",
-            "entre",
-            "entrega",
-            "envio59",
-            "equipo",
-            "eran",
-            "error",
-            "errores",
-            "esas",
-            "escalamiento",
-            "escalamientos",
-            "escasos",
-            "esos",
-            "espacio",
-            "españa",
-            "español",
-            "española",
-            "especial",
-            "especialidades",
-            "esquema",
-            "esta",
-            "está",
-            "estaba",
-            "estaban",
-            "estado",
-            "estado",
-            "estados",
-            "están",
-            "estar",
-            "estas",
-            "éste",
-            "esto",
-            "estos",
-            "estoy",
-            "estrategia",
-            "estructura",
-            "estudio",
-            "evaluacion",
-            "evento",
-            "eventos",
-            "evidente",
-            "exámenes",
-            "exclusiones",
-            "existe",
-            "expedicion",
-            "extensiones",
-            "extracto",
-            "extractos",
-            "factoring",
-            "fallas",
-            "falta",
-            "familia",
-            "fecha",
-            "fechas",
-            "feria",
-            "festival",
-            "figura",
-            "final",
-            "financiacion",
-            "flash",
-            "flash:",
-            "fondo",
-            "forma",
-            "formas",
-            "formato",
-            "formatos",
-            "frente",
-            "fuera",
-            "fueron",
-            "fuerza",
-            "funciones",
-            "fusión",
-            "futuro",
-            "generacion",
-            "general",
-            "generalidades",
-            "gente",
-            "gestion",
-            "giros",
-            "glosario",
-            "gobierno",
-            "gonzález",
-            "gran",
-            "grandes",
-            "grupo",
-            "grupos",
-            "guerra",
-            "guía",
-            "guias",
-            "guion",
-            "guiones",
-            "haber",
-            "había",
-            "habían",
-            "hablar",
-            "hablemos,",
-            "hace",
-            "hacer",
-            "hacia",
-            "hacía",
-            "hasta",
-            "haya",
-            "hecho",
-            "hemos",
-            "herramienta",
-            "hijo",
-            "historia",
-            "historial",
-            "historico",
-            "hizo",
-            "hoja",
-            "hombre",
-            "hombres",
-            "hora",
-            "horario",
-            "horarios",
-            "horas",
-            "hubiera",
-            "idea",
-            "identificación",
-            "igual",
-            "imagen",
-            "importante",
-            "impreso",
-            "impuesto",
-            "incentivo",
-            "incidente",
-            "incluso",
-            "inconveniente",
-            "inconvenientes",
-            "incremento",
-            "indicativos",
-            "índice",
-            "información",
-            "informe",
-            "ingreso",
-            "inscripción",
-            "instalacion",
-            "instituciones",
-            "instrucciones",
-            "instructivo",
-            "instructivos",
-            "interés",
-            "interior",
-            "internacional",
-            "inventario",
-            "investigación",
-            "invitacion",
-            "josé",
-            "joven",
-            "juan",
-            "juego",
-            "julio",
-            "junto",
-            "lado",
-            "lanzamiento",
-            "largo",
-            "leasing",
-            "levantamiento",
-            "libertad",
-            "libro",
-            "licencia",
-            "licuadora",
-            "linea",
-            "lineas",
-            "liquidacion",
-            "lista",
-            "listado",
-            "llamada",
-            "llamadas",
-            "llegar",
-            "llegó",
-            "luego",
-            "lugar",
-            "luis",
-            "madre",
-            "manejo",
-            "manera",
-            "mano",
-            "manos",
-            "mantenimiento",
-            "manual",
-            "manuales",
-            "mañana",
-            "mapa",
-            "marcación",
-            "maría",
-            "matriz",
-            "mayor",
-            "mayoría",
-            "media",
-            "mediante",
-            "medicamentos",
-            "medicina",
-            "medicos",
-            "medida",
-            "medio",
-            "medios",
-            "mejor",
-            "menos",
-            "mensajes",
-            "menu",
-            "mercado",
-            "meses",
-            "métodos",
-            "méxico",
-            "miembros",
-            "mientras",
-            "migracion",
-            "millones",
-            "ministro",
-            "minutos",
-            "misma",
-            "mismo",
-            "modelo",
-            "modificación",
-            "modificaciones",
-            "modo",
-            "modulo",
-            "momento",
-            "motivos",
-            "movimiento",
-            "mucha",
-            "muchas",
-            "mucho",
-            "muchos",
-            "muerte",
-            "mujer",
-            "mujeres",
-            "multicase",
-            "multiconsulta",
-            "mundo",
-            "música",
-            "nacional",
-            "nada",
-            "nadie",
-            "navegacion",
-            "necesario",
-            "necesidad",
-            "negociacion",
-            "ningún",
-            "ninguna",
-            "ninguno",
-            "niño",
-            "niños",
-            "nivel",
-            "noche",
-            "nombre",
-            "nónuple",
-            "normas",
-            "normatividad",
-            "nosotros",
-            "notas",
-            "noti",
-            "notificacion",
-            "novedad",
-            "novedades",
-            "nuestra",
-            "nuestro",
-            "nuestros",
-            "nueva",
-            "nueva",
-            "nuevas",
-            "nuevas",
-            "nueve",
-            "nuevo",
-            "nuevo",
-            "nuevos",
-            "nuevos",
-            "número",
-            "número",
-            "números",
-            "nunca",
-            "objeciones",
-            "obra",
-            "obras",
-            "observaciones",
-            "ocho",
-            "óctuple",
-            "odontología",
-            "oferta",
-            "ofertas",
-            "oficinas",
-            "ojos",
-            "olla",
-            "once",
-            "opcion",
-            "opciones",
-            "operaciones",
-            "operadores",
-            "orbitel",
-            "orden",
-            "organización",
-            "otra",
-            "otras",
-            "otro",
-            "otros",
-            "otros",
-            "pacientes",
-            "padre",
-            "página",
-            "páginas",
-            "pago",
-            "pagos",
-            "país",
-            "países",
-            "palabras",
-            "pamd",
-            "papel",
-            "paquete",
-            "paquetes",
-            "para",
-            "parametrización",
-            "parece",
-            "parte",
-            "partido",
-            "partir",
-            "pasa",
-            "pasado",
-            "paso",
-            "pasos",
-            "pedido",
-            "pensión",
-            "pérdida",
-            "perfil",
-            "perfiles",
-            "pero",
-            "persona",
-            "personal",
-            "personas",
-            "pesar",
-            "pesetas",
-            "pico",
-            "piloto",
-            "plan",
-            "planeación",
-            "planes",
-            "planilla",
-            "plantilla",
-            "plantillas",
-            "plus",
-            "población",
-            "poco",
-            "pocos",
-            "poder",
-            "podía",
-            "podría",
-            "policía",
-            "política",
-            "políticas",
-            "político",
-            "poliza",
-            "polizas",
-            "porque",
-            "portadas",
-            "portafolio",
-            "portafolio:",
-            "portal",
-            "posibilidad",
-            "posible",
-            "precios",
-            "preguntas",
-            "premios",
-            "presencia",
-            "presentacion",
-            "presentaciones",
-            "presidente",
-            "preturno",
-            "preturnos",
-            "primer",
-            "primera",
-            "primero",
-            "primeros",
-            "principio",
-            "problema",
-            "problemas",
-            "procedimiento",
-            "procedimientos",
-            "proceso",
-            "procesos",
-            "producción",
-            "producto",
-            "productos",
-            "programa",
-            "progracion",
-            "programas",
-            "promocion",
-            "promociones",
-            "pronto",
-            "propia",
-            "propio",
-            "protección",
-            "protocolo",
-            "proveedor",
-            "proveedores",
-            "proyecto",
-            "prueba",
-            "pruebas",
-            "público",
-            "pueblo",
-            "puede",
-            "pueden",
-            "puerta",
-            "pues",
-            "puesto",
-            "punto",
-            "puntos",
-            "queja",
-            "quejas",
-            "quién",
-            "quiénes",
-            "quiere",
-            "quinta",
-            "quinto",
-            "quíntuple",
-            "radicación",
-            "razón",
-            "real",
-            "realidad",
-            "recaudo",
-            "recaudos",
-            "reclamacion",
-            "reclamaciones",
-            "reclamos",
-            "recomendaciones",
-            "reconocimiento",
-            "recuperacion",
-            "rediseño",
-            "referidos",
-            "reforma",
-            "registro",
-            "reglas",
-            "reintegro",
-            "relación",
-            "relaciones",
-            "renovación",
-            "renta",
-            "rentabilidad",
-            "reporte",
-            "reportes",
-            "requisitos",
-            "resolucion",
-            "respecto",
-            "respuesta",
-            "resultados",
-            "resumen",
-            "retención",
-            "retiro",
-            "retiros",
-            "revisión",
-            "revista",
-            "ruta",
-            "rutas",
-            "sabe",
-            "saber",
-            "salario",
-            "saldos",
-            "salud",
-            "sector",
-            "sedes",
-            "según",
-            "segunda",
-            "segundo",
-            "seguridad",
-            "seguro",
-            "seguros",
-            "seis",
-            "semana",
-            "sentido",
-            "señor",
-            "séptima",
-            "séptimo",
-            "séptuple",
-            "sera",
-            "será",
-            "sería",
-            "serie",
-            "servicio",
-            "servicios",
-            "sexta",
-            "sexto",
-            "séxtuple",
-            "sido",
-            "siempre",
-            "siendo",
-            "siete",
-            "siglo",
-            "sigue",
-            "siguiente",
-            "siniestros",
-            "sino",
-            "sistema",
-            "situación",
-            "sobre",
-            "social",
-            "sociedad",
-            "solicitud",
-            "solicitudes",
-            "solo",
-            "solución",
-            "soporte",
-            "sucursal",
-            "sucursales",
-            "suspension",
-            "tabla",
-            "talleres",
-            "también",
-            "tampoco",
-            "tanto",
-            "tantos",
-            "tarde",
-            "tarifa",
-            "tarifas",
-            "tarjeta",
-            "tarjetas",
-            "tasa",
-            "tasas",
-            "telefonos",
-            "telemercadeo",
-            "tema",
-            "temporada",
-            "tener",
-            "tengo",
-            "tenía",
-            "tercer",
-            "tercera",
-            "tercero",
-            "tercio",
-            "terminologia",
-            "tiempo",
-            "tiempos",
-            "tiene",
-            "tienen",
-            "tierra",
-            "tipificación",
-            "tipo",
-            "tipos",
-            "tips",
-            "toda",
-            "todas",
-            "todavía",
-            "todo",
-            "todos",
-            "toma",
-            "topes",
-            "total",
-            "trabajo",
-            "tramite",
-            "tramites",
-            "transacciones",
-            "transferencia",
-            "transferencias",
-            "transpromo",
-            "tras",
-            "traslado",
-            "traslados",
-            "trata",
-            "través",
-            "tres",
-            "triple",
-            "turnos",
-            "tuvo",
-            "ubicacion",
-            "última",
-            "último",
-            "últimos",
-            "unas",
-            "único",
-            "unidos",
-            "unos",
-            "urgencias",
-            "usted",
-            "usuarios",
-            "validación",
-            "validaciones",
-            "valor",
-            "valores",
-            "varios",
-            "veces",
-            "vehículos",
-            "venta",
-            "verdad",
-            "verificacion",
-            "vida",
-            "vigencia",
-            "vista",
-            "visto",
-            "vivamos:",
-            "volante",
-            "zona",
-            "zonas"
-        ];
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/app/guards/auth.guard.ts":
-/*!**************************************!*\
-  !*** ./src/app/guards/auth.guard.ts ***!
-  \**************************************/
-/*! exports provided: AuthGuard */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AuthGuard", function() { return AuthGuard; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm2015/router.js");
-
-
-
-let AuthGuard = class AuthGuard {
-    constructor(router) {
-        this.router = router;
-    }
-    canActivate(next, state) {
-        if (localStorage.getItem('token')) {
-            return true;
-        }
-        else {
-            this.router.navigate(['/login']);
-            return false;
-        }
-    }
-};
-AuthGuard.ctorParameters = () => [
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"] }
-];
-AuthGuard = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
-        providedIn: 'root'
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"]])
-], AuthGuard);
-
-
-
-/***/ }),
-
-/***/ "./src/app/guards/home.guard.ts":
-/*!**************************************!*\
-  !*** ./src/app/guards/home.guard.ts ***!
-  \**************************************/
-/*! exports provided: HomeGuard */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HomeGuard", function() { return HomeGuard; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm2015/router.js");
-
-
-
-let HomeGuard = class HomeGuard {
-    constructor(router) {
-        this.router = router;
-    }
-    canActivate(next, state) {
-        if (localStorage.getItem('token')) {
-            this.router.navigate(['/app']);
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-};
-HomeGuard.ctorParameters = () => [
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"] }
-];
-HomeGuard = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
-        providedIn: 'root'
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"]])
-], HomeGuard);
-
-
-
-/***/ }),
-
-/***/ "./src/app/guards/index.ts":
-/*!*********************************!*\
-  !*** ./src/app/guards/index.ts ***!
-  \*********************************/
-/*! exports provided: AuthGuard, HomeGuard, LineGuard */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _auth_guard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./auth.guard */ "./src/app/guards/auth.guard.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AuthGuard", function() { return _auth_guard__WEBPACK_IMPORTED_MODULE_0__["AuthGuard"]; });
-
-/* harmony import */ var _home_guard__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./home.guard */ "./src/app/guards/home.guard.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "HomeGuard", function() { return _home_guard__WEBPACK_IMPORTED_MODULE_1__["HomeGuard"]; });
-
-/* harmony import */ var _line_guard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./line.guard */ "./src/app/guards/line.guard.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "LineGuard", function() { return _line_guard__WEBPACK_IMPORTED_MODULE_2__["LineGuard"]; });
-
-
-
-
-
-
-/***/ }),
-
-/***/ "./src/app/guards/line.guard.ts":
-/*!**************************************!*\
-  !*** ./src/app/guards/line.guard.ts ***!
-  \**************************************/
-/*! exports provided: LineGuard */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LineGuard", function() { return LineGuard; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm2015/router.js");
-
-
-
-let LineGuard = class LineGuard {
-    constructor(router, route) {
-        this.router = router;
-        this.route = route;
-    }
-    canActivate(next, state) {
-        // https://stackoverflow.com/questions/43698032/angular-how-to-update-queryparams-without-changing-route      
-        if (next.queryParamMap.has('line')) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-};
-LineGuard.ctorParameters = () => [
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"] },
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"] }
-];
-LineGuard = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
-        providedIn: 'root'
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"], _angular_router__WEBPACK_IMPORTED_MODULE_2__["ActivatedRoute"]])
-], LineGuard);
-
-
-
-/***/ }),
-
-/***/ "./src/app/local-storage.ts":
-/*!**********************************!*\
-  !*** ./src/app/local-storage.ts ***!
-  \**********************************/
-/*! exports provided: LocalStorage */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LocalStorage", function() { return LocalStorage; });
-class LocalStorage {
-    constructor() {
-    }
-    postSuggestion(suggestion) {
-        let suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
-        suggestions.push(suggestion);
-        localStorage.setItem('suggestions', JSON.stringify(suggestions));
-    }
-    getSuggestions(input) {
-        let suggestions = (JSON.parse(localStorage.getItem('suggestions')) || []);
-        if (typeof input == 'string') {
-            return suggestions.filter(x => x.match(`^${input}.*$`));
-        }
-        else if (typeof input == 'number') {
-            return suggestions.slice(0, input);
-        }
-    }
-    getArticles(input) {
-        let articles = (JSON.parse(localStorage.getItem('articles')) || []);
-        return articles;
-    }
-    getArticle(articleId) {
-        let articles = (JSON.parse(localStorage.getItem('articles')) || []);
-        return articles.find(article => article.id == articleId);
-    }
-    postArticles(articles) {
-        let articulos = (JSON.parse(localStorage.getItem('articles')) || []);
-        localStorage.setItem('articles', JSON.stringify(articulos.concat(articles)));
-        return articles;
-    }
-    postLike(articleId, userid) {
-        let articles = (JSON.parse(localStorage.getItem('articles')) || []);
-        articles.map(article => {
-            if (article.id == articleId) {
-                article.likes.push(userid);
-            }
-            return article;
-        });
-        localStorage.setItem('articles', JSON.stringify(articles));
-        return articles.find(x => x.id == articleId).likes;
-    }
-    deleteLike(articleId, userid) {
-        let articles = (JSON.parse(localStorage.getItem('articles')) || []);
-        articles.map(article => {
-            if (article.id == articleId) {
-                let index = article.likes.findIndex(x => x == userid);
-                console.log(index);
-                if (index > -1) {
-                    article.likes.splice(index, 1);
-                }
-            }
-            return article;
-        });
-        localStorage.setItem('articles', JSON.stringify(articles));
-        return articles.find(x => x.id == articleId).likes;
-    }
-    postDisLike(articleId, userid) {
-        let articles = (JSON.parse(localStorage.getItem('articles')) || []);
-        articles.map(article => {
-            if (article.id == articleId) {
-                article.disLikes.push(userid);
-            }
-            return article;
-        });
-        localStorage.setItem('articles', JSON.stringify(articles));
-        return articles.find(x => x.id == articleId).disLikes;
-    }
-    deleteDisLike(articleId, userid) {
-        let articles = (JSON.parse(localStorage.getItem('articles')) || []);
-        articles.map(article => {
-            if (article.id == articleId) {
-                let index = article.disLikes.findIndex(x => x == userid);
-                if (index > -1) {
-                    article.disLikes.splice(index, 1);
-                }
-            }
-            return article;
-        });
-        localStorage.setItem('articles', JSON.stringify(articles));
-        return articles.find(x => x.id == articleId).disLikes;
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/app/services/api.service.ts":
-/*!*****************************************!*\
-  !*** ./src/app/services/api.service.ts ***!
-  \*****************************************/
-/*! exports provided: ApiService */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ApiService", function() { return ApiService; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm2015/http.js");
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm2015/index.js");
-/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm2015/operators/index.js");
-/* harmony import */ var _events_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./events.service */ "./src/app/services/events.service.ts");
-
-
-
-
-
-
-var EndPoints;
-(function (EndPoints) {
-    EndPoints["suggestions"] = "suggestions";
-    EndPoints["articles"] = "articles";
-    EndPoints["article"] = "articles/:id";
-    EndPoints["likes"] = "articles/:id/likes";
-    EndPoints["disLikes"] = "articles/:id/disLikes";
-    EndPoints["login"] = "authenticate";
-    EndPoints["userLines"] = "users/:id/lines";
-    EndPoints["userSubLines"] = "users/:id/lines/:lineId";
-    EndPoints["categories"] = "lines/:lineId/subLines/:SublineId/categories";
-})(EndPoints || (EndPoints = {}));
-let ApiService = class ApiService {
-    constructor(http, events) {
-        this.http = http;
-        this.events = events;
-    }
-    /**
-    * Gets a list of common search
-    * . If suggestion is defined get related searchs, If not return a list of 10 common searchs
-    * @param suggestion string
-    * @returns Observable<string[]>
-    */
-    getSuggestions(suggestion) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => {
-            if (suggestion) {
-                return this.http.get(EndPoints.suggestions, { params: { input: suggestion }, observe: "body" });
-            }
-            else {
-                return this.http.get(EndPoints.suggestions, { observe: "body" });
-            }
-        }));
-    }
-    /**
-    * save a new search
-    * @param suggestion string
-    * @returns Observable<string[]>
-    */
-    postSuggestion(suggestion) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => this.http.post(EndPoints.suggestions, suggestion, { observe: "body" })));
-    }
-    /**
-    * ### retorna una lista de articulos que se relacionan con la busqueda pasada como argumento
-    * ***
-    * @param input `string`
-    *
-    * Testo que se va a utilizar para realizar la busqueda
-    * ***
-    * @returns Observable<string[]>
-    *
-    * Observable que retorna un array de articulos
-    */
-    getArticles(params) {
-        let line = this.events.newSelectedLineSource.getValue();
-        let options = Object.assign({}, line, params);
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => {
-            return this.http.get('api/' + EndPoints.articles, { params: options, observe: "body" });
-        }));
-    }
-    getArticle(articleId) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => {
-            return this.http.get('api/' + EndPoints.article.replace(':id', articleId), { observe: "body" });
-        }));
-    }
-    postArticles(articles) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => this.http.post(EndPoints.articles, articles, { observe: "body" })));
-    }
-    getCategories(lineId, sublineId) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => {
-            return this.http.get(EndPoints.categories.replace(':lineId', lineId).replace(':SublineId', sublineId), { observe: "body" });
-        }));
-    }
-    login(user, pass) {
-        console.log();
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => this.http.post('api/' + EndPoints.login, { username: user, password: pass }, { observe: "body" })), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["tap"])(val => {
-            if (val.tokem) {
-                localStorage.setItem('token', val.tokem);
-            }
-        }), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["map"])(val => {
-            if (val.tokem) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }));
-    }
-    getUserLines(userId) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => {
-            return this.http.get(EndPoints.userLines.replace(':id', userId), { observe: "body" });
-        }));
-    }
-    getUserSubLines(userId, line) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => {
-            return this.http.get(EndPoints.userSubLines.replace(':id', userId).replace(':lineId', line), { observe: "body" });
-        }));
-    }
-    postLike(userId, articleId) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => this.http.post(EndPoints.likes.replace(':id', articleId), { user: userId }, { observe: "body" })));
-    }
-    deleteLike(userId, articleId) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => this.http.delete(EndPoints.likes.replace(':id', articleId), { params: { user: userId }, observe: "body" })));
-    }
-    postDisLike(userId, articleId) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => this.http.post(EndPoints.disLikes.replace(':id', articleId), { user: userId }, { observe: "body" })));
-    }
-    deleteDisLike(userId, articleId) {
-        return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(val => this.http.delete(EndPoints.disLikes.replace(':id', articleId), { params: { user: userId }, observe: "body" })));
-    }
-};
-ApiService.ctorParameters = () => [
-    { type: _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"] },
-    { type: _events_service__WEBPACK_IMPORTED_MODULE_5__["EventsService"] }
-];
-ApiService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
-        providedIn: 'root'
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"], _events_service__WEBPACK_IMPORTED_MODULE_5__["EventsService"]])
-], ApiService);
-
-
-
-/***/ }),
-
-/***/ "./src/app/services/events.service.ts":
-/*!********************************************!*\
-  !*** ./src/app/services/events.service.ts ***!
-  \********************************************/
-/*! exports provided: EventsService */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EventsService", function() { return EventsService; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm2015/index.js");
-
-
-
-let EventsService = class EventsService {
-    constructor() {
-        this.newSearchSource = new rxjs__WEBPACK_IMPORTED_MODULE_2__["BehaviorSubject"]('');
-        this.newQuerySource = new rxjs__WEBPACK_IMPORTED_MODULE_2__["BehaviorSubject"]('');
-        this.newSelectedLineSource = new rxjs__WEBPACK_IMPORTED_MODULE_2__["BehaviorSubject"]({ line: '', subLine: '' });
-        this.onNewSearch$ = this.newSearchSource.asObservable();
-        this.onNewQuery$ = this.newQuerySource.asObservable();
-        this.onNewSelectedLine$ = this.newSelectedLineSource.asObservable();
-    }
-    newSearch(input) {
-        this.newSearchSource.next(input);
-    }
-    newQuery(input) {
-        this.newQuerySource.next(input);
-    }
-    newSelectedLine(newLine) {
-        this.newSelectedLineSource.next(newLine);
-    }
-};
-EventsService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
-        providedIn: 'root'
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
-], EventsService);
-
-
-
-/***/ }),
-
-/***/ "./src/app/services/index.ts":
-/*!***********************************!*\
-  !*** ./src/app/services/index.ts ***!
-  \***********************************/
-/*! exports provided: ApiService, EventsService, mockServerService, UserService, JwtInterceptor */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api.service */ "./src/app/services/api.service.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ApiService", function() { return _api_service__WEBPACK_IMPORTED_MODULE_0__["ApiService"]; });
-
-/* harmony import */ var _events_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./events.service */ "./src/app/services/events.service.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "EventsService", function() { return _events_service__WEBPACK_IMPORTED_MODULE_1__["EventsService"]; });
-
-/* harmony import */ var _mock_back_end_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./mock-back-end.service */ "./src/app/services/mock-back-end.service.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "mockServerService", function() { return _mock_back_end_service__WEBPACK_IMPORTED_MODULE_2__["mockServerService"]; });
-
-/* harmony import */ var _user_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./user.service */ "./src/app/services/user.service.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "UserService", function() { return _user_service__WEBPACK_IMPORTED_MODULE_3__["UserService"]; });
-
-/* harmony import */ var _jwt_interceptor_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./jwt-interceptor.service */ "./src/app/services/jwt-interceptor.service.ts");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "JwtInterceptor", function() { return _jwt_interceptor_service__WEBPACK_IMPORTED_MODULE_4__["JwtInterceptor"]; });
-
-
-
-
-
-
-
-
-/***/ }),
-
-/***/ "./src/app/services/jwt-interceptor.service.ts":
-/*!*****************************************************!*\
-  !*** ./src/app/services/jwt-interceptor.service.ts ***!
-  \*****************************************************/
-/*! exports provided: JwtInterceptor */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "JwtInterceptor", function() { return JwtInterceptor; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm2015/http.js");
-/* harmony import */ var _user_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./user.service */ "./src/app/services/user.service.ts");
-
-
-
-
-let JwtInterceptorService = class JwtInterceptorService {
-    constructor(userService) {
-        this.userService = userService;
-    }
-    intercept(request, next) {
-        // add authorization header with jwt token if available
-        let currentUser = this.userService.usuario;
-        if (currentUser) {
-            request = request.clone({
-                setHeaders: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-        }
-        return next.handle(request);
-    }
-};
-JwtInterceptorService.ctorParameters = () => [
-    { type: _user_service__WEBPACK_IMPORTED_MODULE_3__["UserService"] }
-];
-JwtInterceptorService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
-        providedIn: 'root'
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_user_service__WEBPACK_IMPORTED_MODULE_3__["UserService"]])
-], JwtInterceptorService);
-const JwtInterceptor = { provide: _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HTTP_INTERCEPTORS"], useClass: JwtInterceptorService, multi: true };
-
-
-/***/ }),
-
-/***/ "./src/app/services/mock-back-end.service.ts":
-/*!***************************************************!*\
-  !*** ./src/app/services/mock-back-end.service.ts ***!
-  \***************************************************/
-/*! exports provided: mockServerService */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mockServerService", function() { return mockServerService; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm2015/http.js");
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm2015/index.js");
-/* harmony import */ var _local_storage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../local-storage */ "./src/app/local-storage.ts");
-
-
-
-
-
-let MockBackEndService = class MockBackEndService {
-    constructor() {
-        this.BBDD = new _local_storage__WEBPACK_IMPORTED_MODULE_4__["LocalStorage"]();
-    }
-    //let articulos: Tarticles = JSON.parse(localStorage.getItem('articulos')) || [];
-    /**
-    * Conecta cada url con su respectivo metodo en la base de datos
-    * @param req HttpRequest<string>
-    * @returns Observable<HttpEvent<string[]>>
-    */
-    enrutar(req, next) {
-        let { url, method, body, params } = req;
-        if (url.match('^suggestions$') && method == 'POST') {
-            this.BBDD.postSuggestion(body);
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                status: 200,
-                body: this.BBDD.getSuggestions(10)
-            }));
-        }
-        if (url.match('^suggestions$') && method == 'GET') {
-            if (params.has('input')) {
-                return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                    status: 200,
-                    body: this.BBDD.getSuggestions(params.get('input'))
-                }));
-            }
-            else {
-                return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                    status: 200,
-                    body: this.BBDD.getSuggestions(10)
-                }));
-            }
-        }
-        if (url.match('^api/articles$') && method == 'GET') {
-            return next.handle(req);
-            // if(params.has('query')){
-            //   return of(new HttpResponse({
-            //     status: 200,
-            //     body: this.BBDD.getArticles(params.get('query'))
-            //   }))
-            // }else if(params.has('category')){
-            //     return of(new HttpResponse({
-            //       status: 200,
-            //       body: this.BBDD.getArticles(params.get('category'))
-            //     }))
-            // }
-        }
-        if (url.match('^articles$') && method == 'POST') {
-            console.log(body);
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                status: 200,
-                body: this.BBDD.postArticles(body)
-            }));
-        }
-        if (url.startsWith('api/articles/') && method == 'GET') {
-            return next.handle(req);
-            // return of(new HttpResponse({
-            //   status: 200,
-            //   body: this.BBDD.getArticle(url.split('/')[1])
-            // }))
-        }
-        if (url.match('^api/authenticate$') && method == 'POST') {
-            return next.handle(req);
-            // if(body.user == 'julian' && body.pass == '123'){
-            //   return of(new HttpResponse({
-            //     status: 200,
-            //     body: {tokem:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikp1bGlhbiIsInJvbCI6ImFkbWluIiwibGluZSI6ImFsbCIsInN1YkxpbmUiOiIifQ.SkMKVjzCyzHQTvHq7MvEf_VCBldjhdHnLm6-1WBiodk"}
-            //   }))
-            // }
-        }
-        if (url.match("^users/.*/lines$") && method == 'GET') {
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                status: 200,
-                body: ["Bancolombia", "Sura", "DirecTV"]
-            }));
-        }
-        if (url.match("^users/.*/lines/.*$") && method == 'GET') {
-            let subLines = [];
-            switch (url.split('/')[3]) {
-                case 'Bancolombia':
-                    subLines = ["Atencion al cliente", "Ventas", "Soporte"];
-                    break;
-                case 'Sura':
-                    subLines = ["Citas", "Urgencias"];
-                    break;
-                case 'DirecTV':
-                    subLines = ["Soporte", "SAC"];
-                    break;
-                default:
-                    subLines = ["Atencion al cliente", "Ventas", "Soporte"];
-                    break;
-            }
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                status: 200,
-                body: { name: url.split('/')[3], sublines: subLines }
-            }));
-        }
-        if (url.match("^lines/.*/subLines/.*/categories$") && method == 'GET') {
-            let intPrueba = (Math.random() * 100).toPrecision(1);
-            let categories = [
-                {
-                    name: `categoria ${intPrueba}`,
-                    order: 1,
-                    desplegado: true,
-                    subcategories: [{
-                            name: "sub Categoria 1",
-                            order: 1,
-                            desplegado: true
-                        }, {
-                            name: "sub Categoria 2",
-                            order: 1,
-                            desplegado: true
-                        }
-                    ]
-                }, {
-                    name: "categoria 2",
-                    order: 1,
-                    desplegado: true,
-                    subcategories: [{
-                            name: "sub Categoria 1",
-                            order: 1,
-                            desplegado: true
-                        }, {
-                            name: "sub Categoria 2",
-                            order: 1,
-                            desplegado: true
-                        }
-                    ]
-                }, {
-                    name: "categoria 3",
-                    order: 1,
-                    desplegado: true,
-                    subcategories: [{
-                            name: "sub Categoria 1",
-                            order: 1,
-                            desplegado: true,
-                            subcategories: [{
-                                    name: "sub Categoria 1",
-                                    order: 1,
-                                    desplegado: true,
-                                    subcategories: [{
-                                            name: "sub Categoria 1",
-                                            order: 1,
-                                            desplegado: true
-                                        }, {
-                                            name: "sub Categoria 2",
-                                            order: 1,
-                                            desplegado: true
-                                        }
-                                    ]
-                                }, {
-                                    name: "sub Categoria 2",
-                                    order: 1,
-                                    desplegado: true
-                                }
-                            ]
-                        }, {
-                            name: "sub Categoria 2",
-                            order: 1,
-                            desplegado: true
-                        }
-                    ]
-                },
-            ];
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                status: 200,
-                body: categories
-            }));
-        }
-        if (url.match('^articles/.*/likes$') && method == 'POST') {
-            let articleId = url.split('/')[1];
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                status: 200,
-                body: this.BBDD.postLike(articleId, body['user'])
-            }));
-        }
-        if (url.match('^articles/.*/disLikes$') && method == 'POST') {
-            let articleId = url.split('/')[1];
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                status: 200,
-                body: this.BBDD.postDisLike(articleId, body['user'])
-            }));
-        }
-        if (url.match('^articles/.*/likes$') && method == 'DELETE') {
-            let articleId = url.split('/')[1];
-            let userId = params.get('user');
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                status: 200,
-                body: this.BBDD.deleteLike(articleId, userId)
-            }));
-        }
-        if (url.match('^articles/.*/disLikes$') && method == 'DELETE') {
-            let articleId = url.split('/')[1];
-            let userId = params.get('user');
-            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(new _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]({
-                status: 200,
-                body: this.BBDD.deleteDisLike(articleId, userId)
-            }));
-        }
-    }
-    intercept(req, next) {
-        return this.enrutar(req, next);
-    }
-    ;
-};
-MockBackEndService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
-        providedIn: 'root'
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
-], MockBackEndService);
-const mockServerService = { provide: _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HTTP_INTERCEPTORS"], useClass: MockBackEndService, multi: true };
-
-
-/***/ }),
-
-/***/ "./src/app/services/user.service.ts":
-/*!******************************************!*\
-  !*** ./src/app/services/user.service.ts ***!
-  \******************************************/
-/*! exports provided: UserService */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UserService", function() { return UserService; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _auth0_angular_jwt__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @auth0/angular-jwt */ "./node_modules/@auth0/angular-jwt/index.js");
-/* harmony import */ var _events_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./events.service */ "./src/app/services/events.service.ts");
-
-
-
-
-const helper = new _auth0_angular_jwt__WEBPACK_IMPORTED_MODULE_2__["JwtHelperService"]();
-let UserService = class UserService {
-    constructor(events) {
-        this.events = events;
-    }
-    get usuario() {
-        return helper.decodeToken(localStorage.getItem("token"));
-    }
-    set selectedSubLine(newSubLine) {
-        this._selectedSubLine = newSubLine;
-        this.events.newSelectedLine(newSubLine);
-    }
-    get selectedSubLine() {
-        return this._selectedSubLine;
-    }
-};
-UserService.ctorParameters = () => [
-    { type: _events_service__WEBPACK_IMPORTED_MODULE_3__["EventsService"] }
-];
-UserService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
-        providedIn: 'root'
-    }),
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_events_service__WEBPACK_IMPORTED_MODULE_3__["EventsService"]])
-], UserService);
-
-
-
-/***/ }),
-
-/***/ "./src/environments/environment.ts":
-/*!*****************************************!*\
-  !*** ./src/environments/environment.ts ***!
-  \*****************************************/
-/*! exports provided: environment */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "environment", function() { return environment; });
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
-// The list of file replacements can be found in `angular.json`.
-const environment = {
-    production: false
-};
-/*
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact
- * on performance if an error is thrown.
- */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.
-
-
-/***/ }),
-
-/***/ "./src/main.ts":
-/*!*********************!*\
-  !*** ./src/main.ts ***!
-  \*********************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm2015/core.js");
-/* harmony import */ var _angular_platform_browser_dynamic__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/platform-browser-dynamic */ "./node_modules/@angular/platform-browser-dynamic/fesm2015/platform-browser-dynamic.js");
-/* harmony import */ var _app_app_module__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./app/app.module */ "./src/app/app.module.ts");
-/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./environments/environment */ "./src/environments/environment.ts");
-
-
-
-
-if (_environments_environment__WEBPACK_IMPORTED_MODULE_3__["environment"].production) {
-    Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["enableProdMode"])();
-}
-Object(_angular_platform_browser_dynamic__WEBPACK_IMPORTED_MODULE_1__["platformBrowserDynamic"])().bootstrapModule(_app_app_module__WEBPACK_IMPORTED_MODULE_2__["AppModule"])
-    .catch(err => console.error(err));
-
-
-/***/ }),
-
-/***/ 0:
-/*!***************************!*\
-  !*** multi ./src/main.ts ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! C:\Users\julian.vargas.a\Documents\multiConsulta\front-end\src\main.ts */"./src/main.ts");
-
-
-/***/ })
-
-},[[0,"runtime","vendor"]]]);
-//# sourceMappingURL=main-es2015.js.map
+        `})
+    ];
+
+    public listadoPalabras:string[] =
+[
+    'qué'
+    ,"abono"    
+    ,"abreviaturas" 
+    ,"acceso"   
+    ,"acción"
+    ,"acciones" 
+    ,"aclaracion"   
+    ,"acreditacion" 
+    ,"activacion"   
+    ,"actividad"    
+    ,"actividades"  
+    ,"actual"
+    ,"actualización"    
+    ,"acuerdo"
+    ,"además"
+    ,"afiliación"   
+    ,"afiliaciones" 
+    ,"agendamiento" 
+    ,"agua"     
+    ,"ahora"
+    ,"aire"
+    ,"ajuste"   
+    ,"alertas"  
+    ,"algo"
+    ,"algún"
+    ,"alguna"
+    ,"algunas"
+    ,"alguno"
+    ,"algunos"
+    ,"alianza"  
+    ,"allí"
+    ,"alta"
+    ,"alternativa"  
+    ,"alto"
+    ,"ambos"
+    ,"amor"
+    ,"amparo"   
+    ,"amparos"  
+    ,"anexo"    
+    ,"ante"
+    ,"anterior"
+    ,"antes"
+    ,"antonio"
+    ,"anulacion"    
+    ,"anular"       
+    ,"años"
+    ,"apertura" 
+    ,"aplicación"   
+    ,"aplicativo"   
+    ,"aplicativos"  
+    ,"aportes"  
+    ,"aquel"
+    ,"aquella"
+    ,"aquellos"
+    ,"aquí"
+    ,"archivo"  
+    ,"arte"
+    ,"articulo" 
+    ,"asesor"   
+    ,"asesores" 
+    ,"asesoria"     
+    ,"asignación"   
+    ,"asistencia"   
+    ,"asistencias"  
+    ,"atención"
+    ,"atributos"    
+    ,"audiorespuesta"       
+    ,"aunque"
+    ,"autenticación"    
+    ,"autorizacion" 
+    ,"autorizaciones"   
+    ,"avaya"    
+    ,"ayer"
+    ,"ayudas"   
+    ,"baja"
+    ,"bajo"
+    ,"bancolombia"  
+    ,"barcelona"
+    ,"base"
+    ,"bastantes "
+    ,"beneficio"    
+    ,"beneficios"   
+    ,"bien"
+    ,"bloqueo"  
+    ,"bloqueos" 
+    ,"boletín"  
+    ,"bono" 
+    ,"buen"
+    ,"buena"
+    ,"bueno"
+    ,"búsqueda" 
+    ,"cabeza"
+    ,"cada"
+    ,"calculo"  
+    ,"calendario"   
+    ,"calidad" 
+    ,"calle"
+    ,"cambio"   
+    ,"cambios"  
+    ,"camino"
+    ,"campaña"
+    ,"campañas" 
+    ,"campo"
+    ,"canal"    
+    ,"canales"  
+    ,"cancelación"  
+    ,"capacidad"
+    ,"capital"
+    ,"capitulo" 
+    ,"cara"
+    ,"características"  
+    ,"carlos"
+    ,"carta"    
+    ,"cartas"   
+    ,"cartera"  
+    ,"casa"
+    ,"casi"
+    ,"caso"
+    ,"casos"    
+    ,"catalogo" 
+    ,"categoría"    
+    ,"causales"      
+    ,"central"
+    ,"centro"   
+    ,"centros"  
+    ,"cerca"
+    ,"certificado"  
+    ,"certificados" 
+    ,"cesantias"    
+    ,"cesion"   
+    ,"chat" 
+    ,"cheques"  
+    ,"ciento"
+    ,"cierre"   
+    ,"cierres"  
+    ,"cierto"
+    ,"cinco"
+    ,"circular" 
+    ,"citas"    
+    ,"ciudad"
+    ,"claro"
+    ,"clases"   
+    ,"cliente"  
+    ,"clientes" 
+    ,"club" 
+    ,"cobertura"    
+    ,"coberturas"   
+    ,"cobranzas"    
+    ,"cobro"    
+    ,"codificación" 
+    ,"código"   
+    ,"códigos"  
+    ,"colecciòn"    
+    ,"comisión"
+    ,"comision" 
+    ,"comité"   
+    ,"cómo"
+    ,"comparativo"  
+    ,"compra"   
+    ,"comunicado"   
+    ,"comunidad"    
+    ,"conceptos"    
+    ,"concurso" 
+    ,"condiciones"  
+    ,"conexión" 
+    ,"configuración"    
+    ,"confirmación" 
+    ,"consejo"
+    ,"consignación" 
+    ,"consolidado"  
+    ,"constancia"   
+    ,"consulta" 
+    ,"consultar"    
+    ,"consultas"    
+    ,"contacto" 
+    ,"contactos"    
+    ,"contingencia" 
+    ,"contingencias"    
+    ,"contra"
+    ,"control"  
+    ,"convenio" 
+    ,"convenios"    
+    ,"copagos"  
+    ,"copia"    
+    ,"correccion"   
+    ,"correo"   
+    ,"correos"  
+    ,"cosa"
+    ,"cosas"
+    ,"cotizacion"   
+    ,"creación" 
+    ,"crear"    
+    ,"crédito"  
+    ,"creditos" 
+    ,"creo"
+    ,"cronograma"   
+    ,"cuadro"   
+    ,"cuádruple"
+    ,"cuál"
+    ,"cuáles"
+    ,"cuáles"   
+    ,"cualquier"
+    ,"cualquiera"
+    ,"cuando"   
+    ,"cuánta"
+    ,"cuántas"
+    ,"cuánto"
+    ,"cuántos"
+    ,"cuarta"
+    ,"cuatro"
+    ,"cuenta"   
+    ,"cuentas"  
+    ,"cuerpo"
+    ,"cultura"
+    ,"cuota"    
+    ,"cursos"   
+    ,"cuya"
+    ,"cuyo"
+    ,"dado"    
+    ,"datos"    
+    ,"debe"
+    ,"deben"
+    ,"debito"   
+    ,"débitos"  
+    ,"decir"
+    ,"decreto"  
+    ,"decretos" 
+    ,"décuple"
+    ,"deducibles"   
+    ,"defensor" 
+    ,"definición"   
+    ,"definiciones"    
+    ,"delima"   
+    ,"demás"
+    ,"demasiados"
+    ,"dentro"
+    ,"derecho"
+    ,"desarrollo"
+    ,"desbloqueo"   
+    ,"descarga" 
+    ,"descripcion"  
+    ,"descuento"    
+    ,"descuentos"   
+    ,"desde"
+    ,"después"
+    ,"deuda"    
+    ,"devolución"    
+    ,"días"
+    ,"dice"
+    ,"dicho"
+    ,"diez"
+    ,"diferentes"
+    ,"difícil"
+    ,"dijo"
+    ,"diligenciamiento" 
+    ,"dinero"    
+    ,"dios"
+    ,"dirección"
+    ,"direccionamiento" 
+    ,"director"
+    ,"directorio"   
+    ,"distribucion" 
+    ,"doble"
+    ,"doce"
+    ,"documentacion"    
+    ,"documentos"    
+    ,"dónde"    
+    ,"durante"
+    ,"edad"
+    ,"educación"
+    ,"efecto"
+    ,"ejemplo"
+    ,"eliminación"  
+    ,"ella"
+    ,"ellas"
+    ,"ello"
+    ,"ellos"
+    ,"embargo"
+    ,"emision"  
+    ,"empresa"
+    ,"empresas" 
+    ,"encuesta" 
+    ,"endoso"   
+    ,"enfoque"  
+    ,"entonces"
+    ,"entre"
+    ,"entrega"  
+    ,"envio59"
+    ,"equipo"    
+    ,"eran"
+    ,"error"    
+    ,"errores"      
+    ,"esas"
+    ,"escalamiento" 
+    ,"escalamientos"    
+    ,"escasos"        
+    ,"esos"
+    ,"espacio"
+    ,"españa"
+    ,"español"
+    ,"española"
+    ,"especial" 
+    ,"especialidades"   
+    ,"esquema"  
+    ,"esta"
+    ,"está"
+    ,"estaba"
+    ,"estaban"
+    ,"estado"
+    ,"estado"   
+    ,"estados"  
+    ,"están"
+    ,"estar"
+    ,"estas"
+    ,"éste"
+    ,"esto"
+    ,"estos"
+    ,"estoy"
+    ,"estrategia"   
+    ,"estructura"   
+    ,"estudio"
+    ,"evaluacion"   
+    ,"evento"   
+    ,"eventos"  
+    ,"evidente" 
+    ,"exámenes" 
+    ,"exclusiones"  
+    ,"existe"
+    ,"expedicion"   
+    ,"extensiones"  
+    ,"extracto" 
+    ,"extractos"    
+    ,"factoring"    
+    ,"fallas"   
+    ,"falta"
+    ,"familia"
+    ,"fecha"    
+    ,"fechas"   
+    ,"feria"    
+    ,"festival" 
+    ,"figura"    
+    ,"final"
+    ,"financiacion" 
+    ,"flash"    
+    ,"flash:"   
+    ,"fondo"    
+    ,"forma"    
+    ,"formas"   
+    ,"formato"  
+    ,"formatos" 
+    ,"frente"    
+    ,"fuera"
+    ,"fueron"
+    ,"fuerza"
+    ,"funciones"    
+    ,"fusión"   
+    ,"futuro"
+    ,"generacion"   
+    ,"general"
+    ,"generalidades"    
+    ,"gente"
+    ,"gestion"  
+    ,"giros"    
+    ,"glosario" 
+    ,"gobierno"
+    ,"gonzález"
+    ,"gran"
+    ,"grandes"
+    ,"grupo"
+    ,"grupos"
+    ,"guerra"
+    ,"guía" 
+    ,"guias"    
+    ,"guion"    
+    ,"guiones"  
+    ,"haber"
+    ,"había"
+    ,"habían"
+    ,"hablar"
+    ,"hablemos,"    
+    ,"hace"
+    ,"hacer"
+    ,"hacia"
+    ,"hacía"    
+    ,"hasta"    
+    ,"haya"
+    ,"hecho"
+    ,"hemos"
+    ,"herramienta"  
+    ,"hijo"
+    ,"historia" 
+    ,"historial"    
+    ,"historico"    
+    ,"hizo"
+    ,"hoja" 
+    ,"hombre"
+    ,"hombres"
+    ,"hora"
+    ,"horario"  
+    ,"horarios" 
+    ,"horas"    
+    ,"hubiera"    
+    ,"idea"
+    ,"identificación"   
+    ,"igual"
+    ,"imagen"
+    ,"importante"   
+    ,"impreso"  
+    ,"impuesto" 
+    ,"incentivo"    
+    ,"incidente"    
+    ,"incluso"
+    ,"inconveniente"    
+    ,"inconvenientes"   
+    ,"incremento"   
+    ,"indicativos"  
+    ,"índice"   
+    ,"información"
+    ,"informe"  
+    ,"ingreso"  
+    ,"inscripción"  
+    ,"instalacion"  
+    ,"instituciones"    
+    ,"instrucciones"    
+    ,"instructivo"  
+    ,"instructivos" 
+    ,"interés"
+    ,"interior"
+    ,"internacional"
+    ,"inventario"   
+    ,"investigación"
+    ,"invitacion"               
+    ,"josé"
+    ,"joven"
+    ,"juan"
+    ,"juego"    
+    ,"julio"
+    ,"junto"      
+    ,"lado"
+    ,"lanzamiento"  
+    ,"largo"          
+    ,"leasing"      
+    ,"levantamiento"           
+    ,"libertad"
+    ,"libro"
+    ,"licencia" 
+    ,"licuadora"    
+    ,"linea"    
+    ,"lineas"   
+    ,"liquidacion"  
+    ,"lista"    
+    ,"listado"  
+    ,"llamada"  
+    ,"llamadas" 
+    ,"llegar"
+    ,"llegó"    
+      
+    ,"luego"
+    ,"lugar"
+    ,"luis"    
+    ,"madre"
+    ,"manejo"   
+    ,"manera"
+    ,"mano"
+    ,"manos"
+    ,"mantenimiento"    
+    ,"manual"   
+    ,"manuales" 
+    ,"mañana"
+    ,"mapa" 
+    ,"marcación"    
+    ,"maría"    
+    ,"matriz"   
+    ,"mayor"
+    ,"mayoría"
+    ,"media"
+    ,"mediante"
+    ,"medicamentos" 
+    ,"medicina" 
+    ,"medicos"  
+    ,"medida"
+    ,"medio"
+    ,"medios"
+    ,"mejor"
+    ,"menos"
+    ,"mensajes" 
+    ,"menu" 
+    ,"mercado"    
+    ,"meses"
+    ,"métodos"  
+    ,"méxico"
+    ,"miembros"
+    ,"mientras"
+    ,"migracion"        
+    ,"millones"
+    ,"ministro"
+    ,"minutos"    
+    ,"misma"
+    ,"mismo"
+    ,"modelo"   
+    ,"modificación" 
+    ,"modificaciones"   
+    ,"modo"
+    ,"modulo"   
+    ,"momento"
+    ,"motivos"  
+    ,"movimiento"
+    ,"mucha"
+    ,"muchas"
+    ,"mucho"
+    ,"muchos"
+    ,"muerte"
+    ,"mujer"
+    ,"mujeres"
+    ,"multicase"    
+    ,"multiconsulta"    
+    ,"mundo"
+    ,"música"    
+    ,"nacional"
+    ,"nada"
+    ,"nadie"
+    ,"navegacion"   
+    ,"necesario"
+    ,"necesidad"
+    ,"negociacion"              
+    ,"ningún"
+    ,"ninguna"
+    ,"ninguno"
+    ,"niño"
+    ,"niños"      
+    ,"nivel"
+    ,"noche"
+    ,"nombre"
+    ,"nónuple"
+    ,"normas"   
+    ,"normatividad"     
+    ,"nosotros"
+    ,"notas"    
+    ,"noti" 
+    ,"notificacion" 
+    ,"novedad"  
+    ,"novedades"  
+    ,"nuestra"
+    ,"nuestro"
+    ,"nuestros"
+    ,"nueva"
+    ,"nueva"    
+    ,"nuevas"
+    ,"nuevas"   
+    ,"nueve"
+    ,"nuevo"
+    ,"nuevo"    
+    ,"nuevos"
+    ,"nuevos"   
+    ,"número"
+    ,"número"   
+    ,"números"  
+    ,"nunca"
+    ,"objeciones"   
+    ,"obra"
+    ,"obras"
+    ,"observaciones"    
+    ,"ocho"
+    ,"óctuple"
+    ,"odontología"  
+    ,"oferta"   
+    ,"ofertas"  
+    ,"oficinas" 
+    ,"ojos"
+    ,"olla" 
+    ,"once"
+    ,"opcion"   
+    ,"opciones" 
+    ,"operaciones"  
+    ,"operadores"   
+    ,"orbitel"  
+    ,"orden"
+    ,"organización"
+    ,"otra"
+    ,"otras"    
+    ,"otro"
+    ,"otros"
+    ,"otros"          
+    ,"pacientes"    
+    ,"padre"
+    ,"página"   
+    ,"páginas"  
+    ,"pago" 
+    ,"pagos"    
+    ,"país"
+    ,"países"
+    ,"palabras"
+    ,"pamd" 
+    ,"papel"
+    ,"paquete"  
+    ,"paquetes" 
+    ,"para" 
+    ,"parametrización"  
+    ,"parece"
+    ,"parte"
+    ,"partido"
+    ,"partir"
+    ,"pasa"
+    ,"pasado"
+    ,"paso" 
+    ,"pasos"        
+    ,"pedido"   
+    ,"pensión"  
+    ,"pérdida"  
+    ,"perfil"   
+    ,"perfiles" 
+    ,"pero"
+    ,"persona"
+    ,"personal" 
+    ,"personas" 
+    ,"pesar"
+    ,"pesetas"
+    ,"pico" 
+    ,"piloto"   
+    ,"plan" 
+    ,"planeación"   
+    ,"planes"   
+    ,"planilla" 
+    ,"plantilla"    
+    ,"plantillas"   
+    ,"plus" 
+    ,"población"
+    ,"poco"
+    ,"pocos"
+    ,"poder"
+    ,"podía"
+    ,"podría"
+    ,"policía"
+    ,"política" 
+    ,"políticas"    
+    ,"político"
+    ,"poliza"   
+    ,"polizas"      
+    ,"porque"
+    ,"portadas" 
+    ,"portafolio"   
+    ,"portafolio:"  
+    ,"portal"   
+    ,"posibilidad"
+    ,"posible"
+    ,"precios"  
+    ,"preguntas"    
+    ,"premios"  
+    ,"presencia"
+    ,"presentacion" 
+    ,"presentaciones"   
+    ,"presidente"
+    ,"preturno" 
+    ,"preturnos"    
+    ,"primer"
+    ,"primera"
+    ,"primero"
+    ,"primeros"
+    ,"principio"
+    ,"problema"
+    ,"problemas"    
+    ,"procedimiento"    
+    ,"procedimientos"   
+    ,"proceso"  
+    ,"procesos" 
+    ,"producción"
+    ,"producto" 
+    ,"productos"    
+    ,"programa"
+    ,"progracion" 
+    ,"programas"    
+    ,"promocion"    
+    ,"promociones"  
+    ,"pronto"
+    ,"propia"
+    ,"propio"
+    ,"protección"   
+    ,"protocolo"    
+    ,"proveedor"    
+    ,"proveedores"  
+    ,"proyecto" 
+    ,"prueba"   
+    ,"pruebas"  
+    ,"público"
+    ,"pueblo"
+    ,"puede"
+    ,"pueden"
+    ,"puerta"
+    ,"pues"
+    ,"puesto"
+    ,"punto"
+    ,"puntos"
+    ,"queja"    
+    ,"quejas"   
+    ,"quién"
+    ,"quiénes"
+    ,"quiere"
+    ,"quinta"
+    ,"quinto"
+    ,"quíntuple"
+    ,"radicación"   
+    ,"razón"
+    ,"real"
+    ,"realidad"
+    ,"recaudo"  
+    ,"recaudos" 
+    ,"reclamacion"  
+    ,"reclamaciones"    
+    ,"reclamos" 
+    ,"recomendaciones"  
+    ,"reconocimiento"   
+    ,"recuperacion"       
+    ,"rediseño" 
+    ,"referidos"    
+    ,"reforma"  
+    ,"registro" 
+    ,"reglas"   
+    ,"reintegro"    
+    ,"relación"
+    ,"relaciones"
+    ,"renovación"   
+    ,"renta"    
+    ,"rentabilidad" 
+    ,"reporte"  
+    ,"reportes" 
+    ,"requisitos"   
+    ,"resolucion"   
+    ,"respecto"
+    ,"respuesta"    
+    ,"resultados"
+    ,"resumen"  
+    ,"retención"    
+    ,"retiro"   
+    ,"retiros"  
+    ,"revisión" 
+    ,"revista"  
+    ,"ruta" 
+    ,"rutas"    
+    ,"sabe"
+    ,"saber"
+    ,"salario"  
+    ,"saldos"   
+    ,"salud"    
+    ,"sector"
+    ,"sedes"    
+    ,"según"
+    ,"segunda"
+    ,"segundo"
+    ,"seguridad"
+    ,"seguro"   
+    ,"seguros"  
+    ,"seis"
+    ,"semana"
+    ,"sentido"
+    ,"señor"
+    ,"séptima"
+    ,"séptimo"
+    ,"séptuple"    
+    ,"sera"
+    ,"será"
+    ,"sería"
+    ,"serie"
+    ,"servicio" 
+    ,"servicios"         
+    ,"sexta"
+    ,"sexto"
+    ,"séxtuple"
+    ,"sido"
+    ,"siempre"
+    ,"siendo"
+    ,"siete"
+    ,"siglo"
+    ,"sigue"
+    ,"siguiente"    
+    ,"siniestros"   
+    ,"sino"
+    ,"sistema"  
+    ,"situación"
+    ,"sobre"
+    ,"social"
+    ,"sociedad"
+    ,"solicitud"    
+    ,"solicitudes"  
+    ,"solo"
+    ,"solución"     
+    ,"soporte"      
+    ,"sucursal" 
+    ,"sucursales"       
+    ,"suspension"   
+    ,"tabla"        
+    ,"talleres" 
+    ,"también"
+    ,"tampoco"    
+    ,"tanto"
+    ,"tantos"
+    ,"tarde"
+    ,"tarifa"   
+    ,"tarifas"  
+    ,"tarjeta"  
+    ,"tarjetas" 
+    ,"tasa" 
+    ,"tasas"          
+    ,"telefonos"    
+    ,"telemercadeo" 
+    ,"tema"
+    ,"temporada"    
+    ,"tener"
+    ,"tengo"
+    ,"tenía"
+    ,"tercer"
+    ,"tercera"
+    ,"tercero"
+    ,"tercio"
+    ,"terminologia" 
+    ,"tiempo"
+    ,"tiempos"  
+    ,"tiene"
+    ,"tienen"
+    ,"tierra"
+    ,"tipificación" 
+    ,"tipo"
+    ,"tipos"    
+    ,"tips" 
+    ,"toda"
+    ,"todas"
+    ,"todavía"
+    ,"todo"
+    ,"todos"
+    ,"toma" 
+    ,"topes"    
+    ,"total"
+    ,"trabajo"
+    ,"tramite"  
+    ,"tramites" 
+    ,"transacciones"    
+    ,"transferencia"    
+    ,"transferencias"   
+    ,"transpromo"   
+    ,"tras"
+    ,"traslado" 
+    ,"traslados"    
+    ,"trata"
+    ,"través"
+    ,"tres"
+    ,"triple"
+    ,"turnos"   
+    ,"tuvo"
+    ,"ubicacion"    
+    ,"última"
+    ,"último"
+    ,"últimos"    
+    ,"unas"
+    ,"único"
+    ,"unidos"    
+    ,"unos"
+    ,"urgencias"    
+    ,"usted"
+    ,"usuarios" 
+    ,"validación"   
+    ,"validaciones" 
+    ,"valor"
+    ,"valores"      
+    ,"varios"
+    ,"veces"
+    ,"vehículos"    
+    ,"venta"        
+    ,"verdad"
+    ,"verificacion"     
+    ,"vida"
+    ,"vigencia" 
+    ,"vista"
+    ,"visto"
+    ,"vivamos:" 
+    ,"volante"      
+    ,"zona"
+    ,"zonas"    
+]}
