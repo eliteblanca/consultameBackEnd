@@ -1,6 +1,9 @@
-import { Controller, UseGuards, Request, Post, Get, Query, Param } from '@nestjs/common';
+import { Controller, UseGuards, Request, Post, Get, Query, Param, Body, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ModelService } from "../services/model.service";
+import { User } from "../user.decorator";
+import { User as U } from "../entities/user";
+import { Article } from "../entities/article";
 
 const enum EndPoints {
     articles = "articles",
@@ -56,7 +59,7 @@ export class ArticlesController {
  /**
   * #### URI: api/articles/:id
   * ***
-  * Retorna un articulo en es
+  * Retorna un articulo especifico
   * ***
   * - Method: `GET`
   * 
@@ -70,4 +73,98 @@ export class ArticlesController {
     return this.modelService.getArticle(idArticulo);
  }
 
-}
+  /**
+  * #### URI: api/articles/
+  * ***
+  * Agrega un articulo a la BBDD
+  * ***
+  * - Method: `POST`
+  * 
+  * - Body: `Article`
+  *
+  * - return: `none`
+  */
+ @UseGuards(AuthGuard('jwt'))
+ @Post()
+ createArticles(
+   @Body() body: Article[] ,
+   @User() user:U
+  ):any{
+    body.map(x=>{
+      x.creator = user.sub;
+      return x
+    })
+
+    this.modelService.createArticles(body)
+ }
+ 
+  /**
+  * #### URI: api/articles/:id/likes
+  * ***
+  * agrega un nuevo usuario a la lista de likes de un articulo
+  * ***
+  * - Method: `POST`
+  * 
+  * - Body: `none`
+  *
+  * - return: `string[]`
+  */
+ @UseGuards(AuthGuard('jwt'))
+ @Post(':id/likes')
+ addLike(@Param('id') idArticulo , @User() user:U):any{
+    return this.modelService.addLike(idArticulo,user.sub);
+ }
+
+
+  /**
+  * #### URI: api/articles/:id/disLikes
+  * ***
+  * agrega un nuevo usuario a la lista de dislikes de un articulo
+  * ***
+  * - Method: `POST`
+  * 
+  * - Body: `none`
+  *
+  * - return: `string[]`
+  */
+ @UseGuards(AuthGuard('jwt'))
+ @Post(':id/disLikes')
+ addDisLike(@Param('id') idArticulo , @User() user:U):any{
+    return this.modelService.addDisLike(idArticulo,user.sub);
+ }
+
+  /**
+  * #### URI: api/articles/:id/disLikes
+  * ***
+  * remueve un usuario de la lista de dislikes de un articulo
+  * ***
+  * - Method: `DELETE`
+  * 
+  * - Body: `none`
+  *
+  * - return: `string[]`
+  */
+ @UseGuards(AuthGuard('jwt'))
+ @Delete(':id/disLikes')
+ removeDisLike(@Param('id') idArticulo , @User() user:U):any{
+    return this.modelService.removeDisLike(idArticulo,user.sub);
+ }
+
+  /**
+  * #### URI: api/articles/:id/disLikes
+  * ***
+  * remueve un usuario de la lista de likes de un articulo
+  * ***
+  * - Method: `DELETE`
+  * 
+  * - Body: `none`
+  *
+  * - return: `string[]`
+  */
+ @UseGuards(AuthGuard('jwt'))
+ @Delete(':id/likes')
+ removeLike(@Param('id') idArticulo , @User() user:U):any{
+    return this.modelService.removeLike(idArticulo,user.sub);
+ }
+
+}  

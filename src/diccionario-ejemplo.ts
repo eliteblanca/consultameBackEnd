@@ -1,4 +1,4 @@
-import { Article, articleConf } from "./article";
+import { Article, articleConf } from "./entities/article";
 export class DiccionarioEjemplo {
     public diccionarioArticles:Article[] = [
         new Article({

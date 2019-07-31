@@ -20,7 +20,7 @@ export class SuggestionsController {
     */
     @UseGuards(AuthGuard('jwt'))
     @Get()
-    getSuggestions(@Query('input') input){
-        return this.modelService.getSuggestions(input);
+    getSuggestions(@Query('input') input:string, @Query('line') line:string, @Query('subLine') subLine:string ){
+        return this.modelService.getSuggestions(input, line, subLine);
     }
 }

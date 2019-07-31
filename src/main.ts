@@ -9,6 +9,8 @@ async function bootstrap() {
 
   const port: number = 3000;
 
+  app.enableCors();
+
   app.useStaticAssets(join(__dirname, '..', 'public'));
 
   app.useGlobalFilters(new DefaultPageFilter())
