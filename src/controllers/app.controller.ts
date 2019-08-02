@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, UseGuards,  Request  } from '@nestjs/commo
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from "../services/auth.service";
 import { JwtModule } from '@nestjs/jwt';
+import { ModelService } from "../services/model.service";
 
 class user {
   "sub":string
@@ -28,7 +29,7 @@ const enum EndPoints {
   */
 @Controller('api')
 export class AppController {
-  constructor(private authService:AuthService) {}
+  constructor(private authService:AuthService, private modelService:ModelService) {}
 
   /**
   * #### URI: api/authenticate
@@ -64,6 +65,9 @@ export class AppController {
     return req.user
   }
 
-
-
+  @UseGuards(AuthGuard('jwt'))
+  @Post('status')
+  checkStatus():any{
+    return this.modelService.DDBB_status();
+  }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DiccionarioEjemplo } from "../diccionario-ejemplo";
 import { Article } from 'src/entities/article';
+import { Client, ClientOptions } from "@elastic/elasticsearch";
 
 type categories = {
     name:string,
@@ -9,8 +10,46 @@ type categories = {
     subcategories?:categories
   }[];
 
+const PUNTO_DE_ENLACE:string = "https://search-multiconsulta-focy72himmej26z3i6sqv56pp4.us-west-1.es.amazonaws.com";
+
 @Injectable()
-export class ModelService {   
+export class ModelService { 
+
+    private readonly esClient: Client;
+
+    constructor(){
+        this.esClient = new Client({
+            node:PUNTO_DE_ENLACE,
+            requestTimeout:3000
+        })
+    }
+
+    private indexDocument<T>(doc:T,index:string){
+      return this.esClient.index({
+        index: index,
+        refresh: 'true',
+        body: doc
+      })
+    }
+
+    private indexDocuments<T>(docs:T[],index:string){
+
+      let bulk:any[] = [];
+
+      docs.forEach(doc => {
+        bulk.push({ index: {_index: index.toLowerCase(), _type: '_doc'} });
+        bulk.push(doc);
+      });
+
+      return this.esClient.bulk({
+        index: index.toLowerCase(),
+        refresh: 'true',
+        body: bulk
+      }).catch(err=>{
+        console.log(err.meta.body.error)
+      })
+
+    }
 
     private  suggestionList: string[] = [
         'prueba 1',
@@ -19,9 +58,30 @@ export class ModelService {
         'prueba 4',
         'prueba 5'];
 
-    public getArticles(options: { query?: string; category?: string; line: string; subLine: string; }){
-        let diccionario = new DiccionarioEjemplo();
-        return diccionario.diccionarioArticles;
+    public DDBB_status = ()=>{
+      return this.esClient.ping()
+    }
+
+    public async getArticles(options: { query?: string; category?: string; line: string; subLine: string; }):Promise<Article[]>{
+
+      try{
+        let result = await this.esClient.search({
+          index:"articles",
+          body:{
+            query:{
+              match:{
+                line: options.line
+              }
+            }
+          }
+        })
+
+        return result.body.hits.hits.map(articleSouce=>{
+          return <Article>articleSouce._source
+        })
+      }catch(err){
+        console.log(err.meta.body.error)
+      }
     }
     
     public getArticle(articleId:string):Article{
@@ -33,10 +93,8 @@ export class ModelService {
         return this.suggestionList;
     }
 
-    public createArticles(articles:Article[]):void{
-        console.log('---------')
-        console.log(articles)
-        console.log('---------')
+    public createArticles(articles:Article[]):any{
+      return this.indexDocuments<Article>(articles,'articles')
     }
 
     public userLines(id_usuario:string):string[]{

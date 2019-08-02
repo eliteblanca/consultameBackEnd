@@ -14,6 +14,8 @@ export interface articleConf{
     modificationUser?:string;
     creator?:string;
     commentsList?:string;
+    line?:string;
+    subLine?:string;
 }
 
 export class Article implements articleConf{
@@ -32,6 +34,8 @@ export class Article implements articleConf{
     public creator?:string;
     public commentsList?:string;
     public id?:string;
+    public subLine?:string;
+    public line?:string;    
 
     constructor(config:articleConf){
         this.title = config.title;
@@ -74,6 +78,12 @@ export class Article implements articleConf{
         }
         if(config.id){
             this.id = config.id;
+        }
+        if(config.line){
+            this.line = config.line;
+        }
+        if(config.subLine){
+            this.subLine = config.subLine;
         }
     }
 }

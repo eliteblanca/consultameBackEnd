@@ -46,8 +46,7 @@ export class ArticlesController {
    @Query('category') category,
    @Query('line') line, 
    @Query('subLine') subLine
- ):any{
-   
+ ):any{   
    return this.modelService.getArticles({
     query:query,
     category:category,
@@ -95,7 +94,7 @@ export class ArticlesController {
       return x
     })
 
-    this.modelService.createArticles(body)
+    return this.modelService.createArticles(body)
  }
  
   /**
@@ -114,7 +113,6 @@ export class ArticlesController {
  addLike(@Param('id') idArticulo , @User() user:U):any{
     return this.modelService.addLike(idArticulo,user.sub);
  }
-
 
   /**
   * #### URI: api/articles/:id/disLikes
@@ -167,4 +165,6 @@ export class ArticlesController {
     return this.modelService.removeLike(idArticulo,user.sub);
  }
 
-}  
+ 
+
+}
