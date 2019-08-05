@@ -1,14 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { DiccionarioEjemplo } from "../diccionario-ejemplo";
 import { Article } from 'src/entities/article';
-import { Client, ClientOptions } from "@elastic/elasticsearch";
+import { Client, ClientOptions, ApiResponse } from "@elastic/elasticsearch";
 
 type categories = {
     name:string,
     order:number,
     desplegado:boolean,
     subcategories?:categories
-  }[];
+}[];
+
+type category = {
+  name:string,
+  order:number,
+  desplegado:boolean,
+  subcategories?:categories
+};
 
 const PUNTO_DE_ENLACE:string = "https://search-multiconsulta-focy72himmej26z3i6sqv56pp4.us-west-1.es.amazonaws.com";
 
@@ -16,6 +23,13 @@ const PUNTO_DE_ENLACE:string = "https://search-multiconsulta-focy72himmej26z3i6s
 export class ModelService { 
 
     private readonly esClient: Client;
+
+    private  suggestionList: string[] = [
+      'prueba 1',
+      'prueba 2',
+      'prueba 3',
+      'prueba 4',
+      'prueba 5'];
 
     constructor(){
         this.esClient = new Client({
@@ -51,36 +65,83 @@ export class ModelService {
 
     }
 
-    private  suggestionList: string[] = [
-        'prueba 1',
-        'prueba 2',
-        'prueba 3',
-        'prueba 4',
-        'prueba 5'];
-
-    public DDBB_status = ()=>{
-      return this.esClient.ping()
+    private parseEsResultToArticles(result:ApiResponse<any, any>):Article[]{
+      return result.body.hits.hits.map(articleSouce=>{
+        return <Article>articleSouce._source
+      })
     }
 
-    public async getArticles(options: { query?: string; category?: string; line: string; subLine: string; }):Promise<Article[]>{
-
+    private async getArticlesByCategory(options: {category?: category; line: string; subLine: string; }):Promise<Article[]>{
       try{
         let result = await this.esClient.search({
           index:"articles",
           body:{
             query:{
-              match:{
-                line: options.line
+              bool:{
+                must: [
+                  {
+                    multi_match : {
+                      "query" : options.category,
+                      "fields" : [ "title^3", "content^2" , "tags"]
+                    }
+                  }
+                ],
+                filter: [
+                  { "term":  { "line": options.line }},
+                  { "term":  { "subLine": options.subLine }}
+                ]
               }
             }
           }
         })
 
-        return result.body.hits.hits.map(articleSouce=>{
-          return <Article>articleSouce._source
+        return this.parseEsResultToArticles(result);
+      }catch(err){        
+        console.log(err.meta.body.error);
+      }
+    }
+
+    private async getArticlesByQuery(options: {query?: string; line: string; subLine: string; }):Promise<Article[]>{
+      try{
+        let result = await this.esClient.search({
+          index:"articles",
+          body:{
+            query:{
+              bool:{
+                must: [
+                  {
+                    multi_match : {
+                      "query" : options.query,
+                      "fields" : [ "title^3", "content^2" , "tags"]
+                    }
+                  }
+                ],
+                filter: [
+                  { "term":  { "line": options.line }},
+                  { "term":  { "subLine": options.subLine }}
+                ]
+              }
+            }
+          }
         })
-      }catch(err){
+
+        return this.parseEsResultToArticles(result);
+      }catch(err){        
         console.log(err.meta.body.error)
+      }
+    }
+
+    public DDBB_status = ()=>{
+      return this.esClient.ping()
+    }
+
+    public async getArticles(options: { query?: string; category?: category; line: string; subLine: string; }):Promise<Article[]>{
+      if(options.query){
+        let {category, ...ops} = options;
+        return this.getArticlesByQuery(ops);
+      }else{
+        let {query, ...ops} = options;
+        return this.getArticlesByCategory(ops);
       }
     }
     

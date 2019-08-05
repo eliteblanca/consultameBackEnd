@@ -16,6 +16,7 @@ export interface articleConf{
     commentsList?:string;
     line?:string;
     subLine?:string;
+    category:string;// 'cat1/subCat1/subcat2'
 }
 
 export class Article implements articleConf{
@@ -36,6 +37,7 @@ export class Article implements articleConf{
     public id?:string;
     public subLine?:string;
     public line?:string;    
+    public category:string;
 
     constructor(config:articleConf){
         this.title = config.title;
@@ -84,6 +86,9 @@ export class Article implements articleConf{
         }
         if(config.subLine){
             this.subLine = config.subLine;
+        }
+        if(config.category){
+            this.category = config.category;
         }
     }
 }
