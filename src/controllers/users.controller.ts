@@ -1,11 +1,10 @@
 import { Controller, UseGuards, Get, Query, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ModelService } from "../services/model.service";
-
+import { UserModelService } from "../services/user-model.service";
 @Controller('api/users')
 export class UsersController {
 
-  constructor(private modelService:ModelService) {}
+  constructor(private userModel:UserModelService) {}
 
   /**
   * #### URI: :idUsuario/lines
@@ -24,7 +23,7 @@ export class UsersController {
     @Param('idUsuario') id_usuario
  ):any{
    console.log('id_usuario')
-   return this.modelService.userLines(id_usuario);
+   return this.userModel.userLines(id_usuario);
  }
 
   /**
@@ -45,7 +44,7 @@ export class UsersController {
     @Param('idLinea') id_linea,
  ):any{
    console.log('id_usuario')
-   return this.modelService.userSubLines(id_usuario, id_linea);
+   return this.userModel.userSubLines(id_usuario, id_linea);
  }
 
 }

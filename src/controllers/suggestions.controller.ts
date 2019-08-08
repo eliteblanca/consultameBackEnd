@@ -1,11 +1,11 @@
 import { Controller, UseGuards, Get, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ModelService } from '../services/model.service';
+import { SearchModelService } from "../services/search-model.service";
 
 @Controller('api/suggestions')
 export class SuggestionsController {
 
-    constructor(private modelService:ModelService) {}
+    constructor(private searchModel:SearchModelService) {}
 
     /**
     * #### URI: api/suggestions
@@ -20,7 +20,10 @@ export class SuggestionsController {
     */
     @UseGuards(AuthGuard('jwt'))
     @Get()
-    getSuggestions(@Query('input') input:string, @Query('line') line:string, @Query('subLine') subLine:string ){
-        return this.modelService.getSuggestions(input, line, subLine);
-    }
-}
+    getSuggestions(
+        @Query('input') input:string, 
+        @Query('line') line:string, 
+        @Query('subLine') subline:string){
+
+        return this.searchModel.getSuggestions(input, subline);
+    }}

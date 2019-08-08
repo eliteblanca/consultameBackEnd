@@ -1,9 +1,9 @@
 import { Controller, UseGuards, Request, Post, Get, Query, Param, Body, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ModelService } from "../services/model.service";
 import { User } from "../user.decorator";
 import { User as U } from "../entities/user";
 import { Article } from "../entities/article";
+import { ArticlesModelService, postArticlesDTO } from "../services/articles-model.service";
 
 const enum EndPoints {
     articles = "articles",
@@ -26,7 +26,7 @@ const enum EndPoints {
 @Controller('api/articles')
 export class ArticlesController {
 
-  constructor(private modelService:ModelService) {}
+  constructor(private articlesModel:ArticlesModelService) {}
 
   /**
   * #### URI: api/articles
@@ -42,17 +42,21 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Get()
  getArticles(
-   @Query('query') query, 
+   @Query('query')    query, 
    @Query('category') category,
-   @Query('line') line, 
-   @Query('subLine') subLine
+   @Query('line')     line, 
+   @Query('subLine')  subLine
  ):any{   
-   return this.modelService.getArticles({
-    query:query,
-    category:category,
-    line:line,
-    subLine:subLine
-   });
+
+  if(query){
+    return this.articlesModel.getArticlesByQuery({
+     query:query,
+     line:line,
+     subline:subLine
+    });
+  }else if(category){
+      return this.articlesModel.getArticlesByCategory(category);
+  }
  }
 
  /**
@@ -69,7 +73,7 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Get(':id')
  singleArticle(@Param('id') idArticulo ):any{
-    return this.modelService.getArticle(idArticulo);
+    return this.articlesModel.getArticle(idArticulo);
  }
 
   /**
@@ -86,15 +90,15 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Post()
  createArticles(
-   @Body() body: Article[] ,
-   @User() user:U
+   @Body() body: postArticlesDTO[] ,
+   @User() user: U
   ):any{
     body.map(x=>{
       x.creator = user.sub;
       return x
     })
 
-    return this.modelService.createArticles(body)
+    return this.articlesModel.createArticles(body)
  }
  
   /**
@@ -111,7 +115,7 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Post(':id/likes')
  addLike(@Param('id') idArticulo , @User() user:U):any{
-    return this.modelService.addLike(idArticulo,user.sub);
+    return this.articlesModel.addLike(idArticulo,user.sub);
  }
 
   /**
@@ -128,7 +132,7 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Post(':id/disLikes')
  addDisLike(@Param('id') idArticulo , @User() user:U):any{
-    return this.modelService.addDisLike(idArticulo,user.sub);
+    return this.articlesModel.addDisLike(idArticulo,user.sub);
  }
 
   /**
@@ -145,7 +149,7 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Delete(':id/disLikes')
  removeDisLike(@Param('id') idArticulo , @User() user:U):any{
-    return this.modelService.removeDisLike(idArticulo,user.sub);
+    return this.articlesModel.removeDisLike(idArticulo,user.sub);
  }
 
   /**
@@ -162,7 +166,7 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Delete(':id/likes')
  removeLike(@Param('id') idArticulo , @User() user:U):any{
-    return this.modelService.removeLike(idArticulo,user.sub);
+    return this.articlesModel.removeLike(idArticulo,user.sub);
  }
 
  

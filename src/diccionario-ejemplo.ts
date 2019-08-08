@@ -1,8 +1,8 @@
-import { Article, articleConf } from "./entities/article";
+import { Article } from "./entities/article";
 export class DiccionarioEjemplo {
     public diccionarioArticles:Article[] = [
         new Article({
-        category:'cat1/subCat1/subcat2',
+        category:'catId',
         likes:["prueba","prueba","prueba"],
         disLikes:[],
         id:"1",

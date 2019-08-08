@@ -1,32 +1,28 @@
-import { Controller, UseGuards, Get, Query, Param } from '@nestjs/common';
+import { Controller, UseGuards, Get, Query, Param, Post, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ModelService } from "../services/model.service";
-
+import { CategoriesModelService } from "../services/categories-model.service";
+import { User } from 'src/entities/user';
 @Controller('api/lines')
 export class LinesController {
 
+  constructor(private categoriesModel: CategoriesModelService) { }
 
-    constructor(private modelService:ModelService) {}
-
-    /**
-    * #### URI: :idLine/sublines/:idSubLine/categories
-    * ***
-    * Retorna una lista de las categorias de una sublinea
-    * ***
-    * - Method: `GET`
-    * 
-    * - Body: `none`
-    *
-    * - return: `string[]`
-    */
-   @UseGuards(AuthGuard('jwt'))
-   @Get(':idLine/sublines/:idSubLine/categories')
-   getUserLines(
-     @Param('idLine') id_line,
-     @Param('idSubLine') id_subLine
-   ):any{
-     console.log('id_usuario')
-     return this.modelService.categories(id_line, id_subLine);
-   }
-
+  /**
+  * #### URI: api/lines/
+  * ***
+  * Agrega una nueva linea a la BBDD
+  * ***
+  * - Method: `POST`
+  * 
+  * - Body: `{name:string}`
+  *
+  * - return: `none`
+  */
+  @UseGuards(AuthGuard('jwt'))
+  @Post()
+  createLines(
+    @Body() body: {}
+  ): any {
+    return this.articlesModel.createArticles(body)
+  }
 }
