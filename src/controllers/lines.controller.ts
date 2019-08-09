@@ -1,11 +1,10 @@
 import { Controller, UseGuards, Get, Query, Param, Post, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CategoriesModelService } from "../services/categories-model.service";
-import { User } from 'src/entities/user';
+import { LinesModelService, lineDTO, sublineDTO } from "../services/lines-model.service";
 @Controller('api/lines')
 export class LinesController {
 
-  constructor(private categoriesModel: CategoriesModelService) { }
+  constructor(private linesModel: LinesModelService) { }
 
   /**
   * #### URI: api/lines/
@@ -20,9 +19,29 @@ export class LinesController {
   */
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  createLines(
-    @Body() body: {}
+  createLine(
+    @Body() body: lineDTO
   ): any {
-    return this.articlesModel.createArticles(body)
+    return this.linesModel.createLine(body)
+  }
+
+  /**
+  * #### URI: api/lines/:id/sublines
+  * ***
+  * Agrega una nueva sublinea a la BBDD asociada a la linea pasada como parametro
+  * ***
+  * - Method: `POST`
+  * 
+  * - Body: `{name:string}`
+  *
+  * - return: `none`
+  */
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':id/sublines')
+  createSubline(
+    @Body() body: sublineDTO,
+    @Param('id') idLine: string
+  ): any {
+    return this.linesModel.createSubline(body, idLine)
   }
 }

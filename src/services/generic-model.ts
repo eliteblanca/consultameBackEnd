@@ -21,7 +21,7 @@ export class GenericModel {
         })
     }
 
-    protected indexDocuments<T>(docs: T[], index: string) {
+    protected async indexDocuments<T>(docs: T[], index: string):Promise<T[]> {
 
         let bulk: any[] = [];
 
@@ -30,14 +30,20 @@ export class GenericModel {
             bulk.push(doc);
         });
 
-        return this.esClient.bulk({
-            index: index.toLowerCase(),
-            refresh: 'true',
-            body: bulk
-        }).catch(err => {
-            console.log(err.meta.body.error)
-        })
+        try {
+            let result = await this.esClient.bulk({
+                index: index.toLowerCase(),
+                refresh: 'true',
+                body: bulk
+            })
 
+            let created:T[] = result.body.items.map((item,index)=>{
+                return { ...{ id : item.index._id} , ...docs[index] }
+            })
+
+            return created;
+        } catch (error) {
+            console.log(error)
+        }
     }
-
 }

@@ -44,18 +44,45 @@ export class EsClientService extends GenericModel{
                 break;
                 case 'searchs':                               
                     return await this.esClient.indices.create({
-                    index: index,
-                    include_type_name: false,
-                    body:{
-                        "mappings" : {
-                            "properties" : {
-                                "line"            : { "type": "keyword" },
-                                "subline"         : { "type": "keyword" },
-                                "query"           : { "type": "keyword" },
-                                "searches"        : { "type": "integer" },
+                        index: index,
+                        include_type_name: false,
+                        body:{
+                            "mappings" : {
+                                "properties" : {
+                                    "line"     : { "type": "keyword" },
+                                    "subline"  : { "type": "keyword" },
+                                    "query"    : { "type": "keyword" },
+                                    "searches" : { "type": "integer" },
+                                }
                             }
                         }
-                    }
+                    })
+                break;
+                case 'lines':                               
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body:{
+                            "mappings" : {
+                                "properties" : {
+                                    "name" : { "type": "keyword" }
+                                }
+                            }
+                        }
+                    })
+                break;
+                case 'sublines':                               
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body:{
+                            "mappings" : {
+                                "properties" : {
+                                    "name" : { "type": "keyword" },
+                                    "line" : { "type": "keyword" }
+                                }
+                            }
+                        }
                     })
                 break;
                 default:

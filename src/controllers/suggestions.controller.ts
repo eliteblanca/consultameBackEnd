@@ -26,4 +26,5 @@ export class SuggestionsController {
         @Query('subLine') subline:string){
 
         return this.searchModel.getSuggestions(input, subline);
-    }}
+    }
+}

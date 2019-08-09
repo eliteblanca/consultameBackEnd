@@ -27,7 +27,9 @@ export class ArticlesModelService extends GenericModel{
 
     private parseEsResultToArticles(result: ApiResponse<any, any>): Article[] {
         return result.body.hits.hits.map(articleSource => {
-            return <Article>articleSource._source
+            let articleAux = articleSource._source;
+            articleAux.id = articleSource['_id'];
+            return articleAux;
         })
     }
    
@@ -86,9 +88,18 @@ export class ArticlesModelService extends GenericModel{
         }
     }
 
-    public getArticle(articleId: string): Article {
-        let diccionario = new DiccionarioEjemplo();
-        return diccionario.diccionarioArticles[0];
+    public async getArticle(articleId: string): Promise<Article> {
+
+        let result = await this.esClient.get({
+                id: articleId,
+                index: 'articles',
+                type: '_doc'
+            })
+        
+        let obj = result.body._source;
+        obj.id = result.body._id;
+        
+        return obj;
     }
 
     public createArticles(articles: postArticlesDTO[]): any {
