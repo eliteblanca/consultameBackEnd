@@ -1,5 +1,6 @@
 import { Client, ClientOptions, ApiResponse } from "@elastic/elasticsearch";
 import { EsClientService } from "../services/es-client.service";
+import { validate, IsString, MinLength, ValidateNested } from 'class-validator';
 
 const PUNTO_DE_ENLACE:string = "https://search-multiconsulta-focy72himmej26z3i6sqv56pp4.us-west-1.es.amazonaws.com";
 
@@ -21,11 +22,15 @@ export class GenericModel {
         })
     }
 
-    protected async indexDocuments<T>(docs: T[], index: string):Promise<T[]> {
+    protected async indexDocuments<T>(docs: T[], index: string, ops?:{validate:boolean}):Promise<T[]> {
 
         let bulk: any[] = [];
 
-        docs.forEach(doc => {
+        docs.forEach(async doc => {
+            if(ops && ops.validate){
+                let validationErrors = await validate(doc)
+                console.log(validationErrors);
+            }
             bulk.push({ index: { _index: index.toLowerCase(), _type: '_doc' } });
             bulk.push(doc);
         });

@@ -2,8 +2,7 @@ import { Controller, UseGuards, Request, Post, Get, Query, Param, Body, Delete }
 import { AuthGuard } from '@nestjs/passport';
 import { User } from "../user.decorator";
 import { User as U } from "../entities/user";
-import { Article } from "../entities/article";
-import { ArticlesModelService, postArticlesDTO } from "../services/articles-model.service";
+import { ArticlesModelService, postArticlesDTO, getArticlesDTO, SingleArticleDTO } from "../services/articles-model.service";
 
 const enum EndPoints {
     articles = "articles",
@@ -12,17 +11,6 @@ const enum EndPoints {
     disLikes = "articles/:id/disLikes"
   }
 
-  /**
-  * #### URI base: api/articles
-  * ***
-  * Maneja todas las peticiones a la api/articles
-  * ***
-  * #### Members:
-  * ***
-  * `allArticles`: Retorna una lista de articulos segun la linea y sub linea recividas
-  * ***
-  * 
-  */
 @Controller('api/articles')
 export class ArticlesController {
 
@@ -42,21 +30,19 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Get()
  getArticles(
-   @Query('query')    query, 
-   @Query('category') category,
-   @Query('line')     line, 
-   @Query('subLine')  subLine
+   @Query() query:getArticlesDTO
  ):any{   
 
-  if(query){
-    return this.articlesModel.getArticlesByQuery({
-     query:query,
-     line:line,
-     subline:subLine
-    });
-  }else if(category){
-      return this.articlesModel.getArticlesByCategory(category);
-  }
+    return query;
+  // if(query){
+  //   return this.articlesModel.getArticlesByQuery({
+  //    query:query,
+  //    line:line,
+  //    subline:subLine
+  //   });
+  // }else if(category){
+  //     return this.articlesModel.getArticlesByCategory(category);
+  // }
  }
 
  /**
@@ -72,8 +58,8 @@ export class ArticlesController {
   */
  @UseGuards(AuthGuard('jwt'))
  @Get(':id')
- singleArticle(@Param('id') idArticulo ):any{
-    return this.articlesModel.getArticle(idArticulo);
+ singleArticle(@Param() singleArticleDTO:SingleArticleDTO ):any{
+    return this.articlesModel.getArticle(singleArticleDTO.id);
  }
 
   /**
@@ -90,15 +76,14 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Post()
  createArticles(
-   @Body() body: postArticlesDTO[] ,
+   @Body() body: postArticlesDTO ,
    @User() user: U
   ):any{
-    body.map(x=>{
+    body.articles.map(x=>{
       x.creator = user.sub;
       return x
     })
-
-    return this.articlesModel.createArticles(body)
+    return this.articlesModel.createArticles(body.articles)
  }
  
   /**
