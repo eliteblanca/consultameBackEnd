@@ -22,33 +22,50 @@ export class GenericModel {
         })
     }
 
-    protected async indexDocuments<T>(docs: T[], index: string, ops?:{validate:boolean}):Promise<T[]> {
+    // Deprecated
+    // private async asyncForEach(array, callback) {
+    //     for (let index = 0; index < array.length; index++) {
+    //         await callback(array[index], index, array);
+    //     }
+    // }
 
-        let bulk: any[] = [];
+    // Deprecated
+    // private async createBulk<T>(docs:T[],index:string , ops?:{validate:boolean}):Promise<any>{
+    //     let bulk: any[] = [];
+    //     await this.asyncForEach(docs, async (doc) => {
+    //         if(ops && ops.validate){
+    //             let validationErrors = await validate(doc)
+    //             console.log('validationErrors');
+    //             console.log(validationErrors);
+    //         }
+    //         bulk.push({ index: { _index: index.toLowerCase(), _type: '_doc' } });
+    //         bulk.push(doc);
+    //     });
+    //     return bulk
+    //   }
 
-        docs.forEach(async doc => {
-            if(ops && ops.validate){
-                let validationErrors = await validate(doc)
-                console.log(validationErrors);
-            }
-            bulk.push({ index: { _index: index.toLowerCase(), _type: '_doc' } });
-            bulk.push(doc);
-        });
+    // Deprecated
+    // protected async indexDocuments<T>(docs: T[], index: string, ops?:{validate:boolean}):Promise<T[]> {
+                 
+    //     let bulk: any[] = await this.createBulk<T>(docs,index,ops);
 
-        try {
-            let result = await this.esClient.bulk({
-                index: index.toLowerCase(),
-                refresh: 'true',
-                body: bulk
-            })
+    //     console.log('---------')
+    //     console.log(bulk)
 
-            let created:T[] = result.body.items.map((item,index)=>{
-                return { ...{ id : item.index._id} , ...docs[index] }
-            })
+    //     try {
+    //         let result = await this.esClient.bulk({
+    //             index: index.toLowerCase(),
+    //             refresh: 'true',
+    //             body: bulk
+    //         })
 
-            return created;
-        } catch (error) {
-            console.log(error)
-        }
-    }
+    //         let created:T[] = result.body.items.map((item,index)=>{
+    //             return { ...{ id : item.index._id} , ...docs[index] }
+    //         })
+
+    //         return created;
+    //     } catch (error) {
+    //         console.log(error.body.error)
+    //     }
+    // }
 }
