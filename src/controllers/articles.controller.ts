@@ -154,6 +154,4 @@ export class ArticlesController {
     return this.articlesModel.removeLike(idArticulo,user.sub);
  }
 
- 
-
 }

@@ -49,6 +49,23 @@ export class AppController {
   }
 
   /**
+  * #### URI: api/registrate
+  * ***
+  * agrega un nuevo usuario a la herramienta
+  * ***
+  * - Method: `POST`
+  * 
+  * - Body: `{username: string, password: string, rol:string}`
+  *
+  * - return: `{username: string, rol:string, id:string}`
+  */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('registrate')
+  registrate(@Body() req, ):Promise<{tokem:string}> {
+    return this.authService.generateJwt(req.user);
+  }
+
+  /**
   * #### URI: api/me
   * ***
   * Retorna la informacion del usuario actual

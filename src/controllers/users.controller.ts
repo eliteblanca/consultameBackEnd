@@ -7,6 +7,26 @@ export class UsersController {
   constructor(private userModel:UserModelService) {}
 
   /**
+  * #### URI: api/users
+  * ***
+  * agrega un nuevo usuario a la herramienta
+  * ***
+  * - Method: `POST`
+  * 
+  * - Body: `por definir`
+  *
+  * - return: `por definir`
+  */
+//  @UseGuards(AuthGuard('jwt'))
+//  @Get(':idUsuario/lines')
+//  getUserLines(
+//     @Param('idUsuario') id_usuario
+//  ):any{
+//    console.log('id_usuario')
+//    return this.userModel.userLines(id_usuario);
+//  }
+
+  /**
   * #### URI: :idUsuario/lines
   * ***
   * Retorna una lista de las lineas a las cuales el usuario tiene acceso
