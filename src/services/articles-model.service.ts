@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SearchModelService } from "../services/search-model.service";
 import { GenericModel } from "../services/generic-model";
 import { ApiResponse } from '@elastic/elasticsearch';
-import {MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested} from "class-validator";
+import {MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, IsOptional, MaxLength, IsIn, MinDate, IsDate, IsEmpty} from "class-validator";
 
 export class getArticlesDTO{
 
@@ -50,17 +50,10 @@ export interface Article {
     modificationDate?:Date;
     modificationUser?:string;
     creator?:string;
-    commentsList?:string;
     id?:string;
     category:string;
     subLine:string;
     line:string;
-}
-
-export class postArticlesDTO{
-    @IsNotEmpty({ message: "debes proporcionar una lista de articulos" })
-    @ValidateNested({ each: true })
-    articles:articleDTO[]
 }
 
 export class articleDTO implements Article{
@@ -69,26 +62,77 @@ export class articleDTO implements Article{
     @IsAscii({ message: "el titulo solo debe contener caracteres Ascii"})
     @MinLength(3,{ message: "has proporcionado un titulo demasiado corto, debe contener minimo $constraint1 caracteres" })
     public title:string;
-    
+
     @IsNotEmpty({ message: "debes proporcionar un contenido al articulo"})
     @MinLength(3,{ message: "has proporcionado un contenido demasiado corto, debe contener minimo $constraint1 caracteres" })
     public content:string;
+        
+    @MinLength(3,{ message: "has proporcionado un tag demasiado corto, debe contener minimo $constraint1 caracteres", each: true })
+    @MaxLength(150,{ message: "has proporcionado un tag demasiado largo, debe contener maximo $constraint1 caracteres", each: true })
+    @IsAscii({ message: "el tag solo debe contener caracteres Ascii", each: true})
+    @IsOptional()
     public tags?:string[];
+
+    @MinLength(3,{ message: "has proporcionado un resumen demasiado corto, debe contener minimo $constraint1 caracteres"})
+    @IsAscii({ message: "el resumen solo debe contener caracteres Ascii"})
+    @IsOptional()
     public resume?:string;
+
+    @MinLength(3,{ message: "has proporcionado un vinculo demasiado corto, debe contener minimo $constraint1 caracteres", each: true})
+    @IsOptional()
     public attached?:string[];
+
+    @IsOptional()
+    @IsByteLength(0,512,{ message: "has proporcionado un id invalido en la lista de likes" , each: true})
+    @IsBase64({ message: "has proporcionado un id invalido en la lista de likes" , each: true})
     public likes?:string[];//user ids
+
+    @IsOptional()
+    @IsByteLength(0,512,{ message: "has proporcionado un id invalido en la lista de disLikes" , each: true})
+    @IsBase64({ message: "has proporcionado un id invalido en la lista de disLikes" , each: true})
     public disLikes?:string[];//user ids
+
+    @IsOptional()
+    @IsByteLength(0,512,{ message: "has proporcionado un id invalido en la lista de favorites" , each: true})
+    @IsBase64({ message: "has proporcionado un id invalido en la lista de favorites" , each: true})
     public favorites?:string[];//user ids
+
+    @IsOptional()
+    @IsIn(["noticia","articulo"])
     public role?:"noticia"|"articulo";
+        
     public publicationDate?:Date;
+
     public modificationDate?:Date;
+
+    @IsOptional()
+    @IsByteLength(0,512,{ message: "has proporcionado un id invalido en el usuario modificador" , each: true})
+    @IsBase64({ message: "has proporcionado un id invalido en el usuario modificador" , each: true})
     public modificationUser?:string;
+    
+    @IsOptional()
+    @IsByteLength(0,512,{ message: "has proporcionado un id invalido en el usuario modificador" , each: true})
+    @IsBase64({ message: "has proporcionado un id invalido en el usuario modificador" , each: true})
     public creator?:string;
-    public commentsList?:string;
+
+    @IsEmpty({ message: "no debes proporcionar un id para el articulo, este será generado automaticamente"})
     public id?:string;
+    
+    @IsNotEmpty({ message: "debes proporcionar una categoria"})
+    @IsByteLength(0,512,{ message: "no has proporcionado un id valido para la categoria" })
+    @IsBase64({ message: "no has proporcionado un id valido para la categoria" })
     public category:string;
+
+    @IsNotEmpty({ message: "debes proporcionar una sublinea"})
+    @IsByteLength(0,512,{ message: "no has proporcionado un id valido para la sublinea" })
+    @IsBase64({ message: "no has proporcionado un id valido para la sublinea" })
     public subLine:string;
+
+    @IsNotEmpty({ message: "debes proporcionar una linea"})
+    @IsByteLength(0,512,{ message: "no has proporcionado un id valido para la linea" })
+    @IsBase64({ message: "no has proporcionado un id valido para la linea" })
     public line:string;
+
 }
 
 @Injectable()
@@ -163,7 +207,7 @@ export class ArticlesModelService extends GenericModel{
         }
     }
 
-    public async getArticle(articleId: string): Promise<Article> {
+    public async getArticle(articleId: string): Promise<articleDTO> {
 
         let result = await this.esClient.get({
                 id: articleId,
@@ -177,8 +221,14 @@ export class ArticlesModelService extends GenericModel{
         return obj;
     }
 
-    public createArticles(articles: articleDTO[]): any {
-        return this.indexDocuments<articleDTO>(articles, 'articles', { validate : true})
+    public async createArticle(article:articleDTO):Promise<any>{
+
+        console.log('{article}')
+        console.log(article)
+
+        let result = await this.indexDocument<articleDTO>(article,'articles')
+
+        return result;
     }
 
     public addLike(idArticulo:string,id_usuario:string):string[]{

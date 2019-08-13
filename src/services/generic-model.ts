@@ -14,12 +14,16 @@ export class GenericModel {
 
     protected readonly esClient: Client;
 
-    protected indexDocument<T>(doc: T, index: string) {
-        return this.esClient.index({
-            index: index,
-            refresh: 'true',
-            body: doc
-        })
+    protected async indexDocument<T>(doc: T, index: string) {
+        try {
+            return await this.esClient.index({
+                index: index,
+                refresh: 'true',
+                body: doc
+            })
+        } catch (error) {
+            console.log(error.meta.body.error)
+        }
     }
 
     // Deprecated

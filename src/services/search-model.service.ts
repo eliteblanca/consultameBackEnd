@@ -6,7 +6,7 @@ type search = {
     line:string,
     subline:string,
     searches:number
-};
+};  
 
 @Injectable()
 export class SearchModelService extends GenericModel{
@@ -61,7 +61,7 @@ export class SearchModelService extends GenericModel{
         if (searchs.length) {
             await this.increaseSearchCount(searchs[0]['id'])
         } else {
-            await this.indexDocuments<search>([{ searches: 1, ...options }], 'searchs')
+            await this.indexDocument<search>({ searches: 1, ...options }, 'searchs')
         }
     }
 

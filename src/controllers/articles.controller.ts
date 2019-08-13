@@ -1,8 +1,9 @@
-import { Controller, UseGuards, Request, Post, Get, Query, Param, Body, Delete } from '@nestjs/common';
+import { Controller, UseGuards, Request, Post, Get, Query, Param, Body, Delete, NotAcceptableException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from "../user.decorator";
 import { User as U } from "../entities/user";
-import { ArticlesModelService, postArticlesDTO, getArticlesDTO, SingleArticleDTO } from "../services/articles-model.service";
+import { ArticlesModelService, articleDTO, getArticlesDTO, SingleArticleDTO } from "../services/articles-model.service";
+import { isArray } from 'util';
 
 const enum EndPoints {
     articles = "articles",
@@ -30,19 +31,19 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Get()
  getArticles(
-   @Query() query:getArticlesDTO
+   @Query() params:getArticlesDTO
  ):any{   
 
-    return query;
-  // if(query){
-  //   return this.articlesModel.getArticlesByQuery({
-  //    query:query,
-  //    line:line,
-  //    subline:subLine
-  //   });
-  // }else if(category){
-  //     return this.articlesModel.getArticlesByCategory(category);
-  // }
+    
+  if(params.query){
+    return this.articlesModel.getArticlesByQuery({
+     query:params.query,
+     line:params.line,
+     subline:params.subline
+    });
+  }else if(params.category){
+      return this.articlesModel.getArticlesByCategory(params.category);
+  }
  }
 
  /**
@@ -75,15 +76,16 @@ export class ArticlesController {
   */
  @UseGuards(AuthGuard('jwt'))
  @Post()
- createArticles(
-   @Body() body: postArticlesDTO ,
+ createArticle(
+   @Body() body: articleDTO,
    @User() user: U
   ):any{
-    body.articles.map(x=>{
-      x.creator = user.sub;
-      return x
-    })
-    return this.articlesModel.createArticles(body.articles)
+   if(!isArray(body)){
+       body.creator = user.sub;
+       return this.articlesModel.createArticle(body)
+   }else{
+      throw new NotAcceptableException('No se permiten arrays en el cuerpo de la peticion')
+   }
  }
  
   /**

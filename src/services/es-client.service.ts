@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Client, ClientOptions, ApiResponse } from "@elastic/elasticsearch";
 import { GenericModel } from "../services/generic-model";
 
-
 @Injectable()
 export class EsClientService extends GenericModel{
 
@@ -105,3 +104,4 @@ export class EsClientService extends GenericModel{
         return this.esClient.ping()
     }
 }
+

@@ -90,7 +90,7 @@ export class LinesModelService extends GenericModel{
             console.log(existingLines)
 
             if(!existingLines.some(x=>x.name == line.name)){
-                return this.indexDocuments<lineDTO>([line],'lines');
+                return this.indexDocument<lineDTO>(line,'lines');
             }else{
                 return 'error';
             }
@@ -106,7 +106,7 @@ export class LinesModelService extends GenericModel{
                 let existingSublines = await this.getSublinesByName(subline.name, line)    
 
                 if(!existingSublines.some(x=>x.name == subline.name)){
-                    return this.indexDocuments<subLine>([{ name : subline.name, line : line }], 'sublines');
+                    return this.indexDocument<subLine>({ name : subline.name, line : line }, 'sublines');
                 }else{
                     return 'error';
                 }
