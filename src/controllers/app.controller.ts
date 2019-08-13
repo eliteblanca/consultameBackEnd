@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, UseGuards,  Request  } from '@nestjs/commo
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from "../services/auth.service";
 import { JwtModule } from '@nestjs/jwt';
+import { newUserDTO, UserModelService } from "../services/user-model.service";
 
 class user {
   "sub":string
@@ -9,11 +10,6 @@ class user {
   "rol":string
   "line":string
   "subLine":string
-}
-
-const enum EndPoints {
-  login = "authenticate",
-  currentUser = "me"
 }
 
   /**
@@ -29,7 +25,7 @@ const enum EndPoints {
   */
 @Controller('api')
 export class AppController {
-  constructor(private authService:AuthService) {}
+  constructor(private authService:AuthService, private userModel:UserModelService) {}
 
   /**
   * #### URI: api/authenticate
@@ -43,25 +39,8 @@ export class AppController {
   * - return: `{tokem:  string}`
   */
   @UseGuards(AuthGuard('local'))
-  @Post(EndPoints.login)
+  @Post('authenticate')
   login(@Request() req):Promise<{tokem:string}> {
-    return this.authService.generateJwt(req.user);
-  }
-
-  /**
-  * #### URI: api/registrate
-  * ***
-  * agrega un nuevo usuario a la herramienta
-  * ***
-  * - Method: `POST`
-  * 
-  * - Body: `{username: string, password: string, rol:string}`
-  *
-  * - return: `{username: string, rol:string, id:string}`
-  */
-  @UseGuards(AuthGuard('jwt'))
-  @Post('registrate')
-  registrate(@Body() req, ):Promise<{tokem:string}> {
     return this.authService.generateJwt(req.user);
   }
 
@@ -77,7 +56,7 @@ export class AppController {
   * - return: `user`
   */
   @UseGuards(AuthGuard('jwt'))
-  @Get(EndPoints.currentUser)
+  @Get('me')
   currentUser(@Request() req):Promise<user>{
     return req.user
   }

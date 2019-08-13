@@ -5,29 +5,28 @@ import { Strategy } from 'passport-local';
 import { JwtService } from '@nestjs/jwt';
 import { ExtractJwt, Strategy as jwStrategy } from 'passport-jwt';
 import { User } from "../entities/user";
-
+import { UserModelService } from "../services/user-model.service";
 const secretKey:string = "123";
 
 @Injectable()
 export class AuthService extends PassportStrategy(Strategy) {
 
-    constructor( private readonly jwtService: JwtService) { super(); }
+    constructor( private readonly jwtService: JwtService, private userModel:UserModelService) { super(); }
 
     async validate(username: string, password: string):Promise<User>{
-        if(username == "julian" && password == "123"){
+
+        let usersWithName = await this.userModel.getUserByName(username);
+
+        if(usersWithName.length && usersWithName[0].password == password ){
             return {
-                "sub": "1234567890",
-                "name": "Julian",
-                "rol": "admin",
-                "line": "all",
-                "subLine": ""
+                "sub": usersWithName[0].id,
+                "name": usersWithName[0].username,
+                "rol": usersWithName[0].rol
             }
-
-            // {tokem:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikp1bGlhbiIsInJvbCI6ImFkbWluIiwibGluZSI6ImFsbCIsInN1YkxpbmUiOiIifQ.SkMKVjzCyzHQTvHq7MvEf_VCBldjhdHnLm6-1WBiodk"}
-
         }else{
             throw new UnauthorizedException();
         }
+            // {tokem:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikp1bGlhbiIsInJvbCI6ImFkbWluIiwibGluZSI6ImFsbCIsInN1YkxpbmUiOiIifQ.SkMKVjzCyzHQTvHq7MvEf_VCBldjhdHnLm6-1WBiodk"}
     }
 
     async generateJwt(user):Promise<{tokem:string}>{

@@ -1,14 +1,15 @@
 import { Client, ClientOptions, ApiResponse } from "@elastic/elasticsearch";
 import { EsClientService } from "../services/es-client.service";
 import { validate, IsString, MinLength, ValidateNested } from 'class-validator';
+import { NotFoundException } from "@nestjs/common";
 
-const PUNTO_DE_ENLACE:string = "https://search-multiconsulta-focy72himmej26z3i6sqv56pp4.us-west-1.es.amazonaws.com";
+const PUNTO_DE_ENLACE: string = "https://search-multiconsulta-focy72himmej26z3i6sqv56pp4.us-west-1.es.amazonaws.com";
 
 export class GenericModel {
     constructor() {
         this.esClient = new Client({
-            node:PUNTO_DE_ENLACE,
-            requestTimeout:3000
+            node: PUNTO_DE_ENLACE,
+            requestTimeout: 3000
         })
     }
 
@@ -23,6 +24,21 @@ export class GenericModel {
             })
         } catch (error) {
             console.log(error.meta.body.error)
+        }
+    }
+
+    protected async deleteDocument(id: string, index: string): Promise<any> {
+        try {
+            await this.esClient.delete({
+                id: id,
+                index: index,
+                type: '_doc'
+            })
+
+            return { status: "200", mesage: "eliminado con exito" }
+
+        } catch (error) {
+            console.log(error.meta.body.error)            
         }
     }
 
@@ -50,7 +66,7 @@ export class GenericModel {
 
     // Deprecated
     // protected async indexDocuments<T>(docs: T[], index: string, ops?:{validate:boolean}):Promise<T[]> {
-                 
+
     //     let bulk: any[] = await this.createBulk<T>(docs,index,ops);
 
     //     console.log('---------')

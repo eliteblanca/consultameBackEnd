@@ -83,6 +83,21 @@ export class EsClientService extends GenericModel{
                             }
                         }
                     })
+                case 'users':                               
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body:{
+                            "mappings" : {
+                                "properties" : {
+                                    "username" : { "type": "keyword" },
+                                    "password" : { "type": "keyword" },
+                                    "rol" : { "type": "keyword" },
+                                    "subLines" : { "type": "keyword" }
+                                }
+                            }
+                        }
+                    })
                 break;
                 default:
                     break;

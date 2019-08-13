@@ -35,7 +35,7 @@ const secretKey = "123";
       useClass: MorganInterceptor('combined'),
     },
     AuthService,
-    JwtValidator,
+    JwtValidator,    
     EsClientService,
     ArticlesModelService,
     SearchModelService,

@@ -3,7 +3,7 @@ import { SearchModelService } from "../services/search-model.service";
 import { GenericModel } from "../services/generic-model";
 import { ApiResponse } from '@elastic/elasticsearch';
 import {MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, IsOptional, MaxLength, IsIn, MinDate, IsDate, IsEmpty} from "class-validator";
-
+import { help } from "../helpers/helper";
 export class getArticlesDTO{
 
     @ValidateIf(o => !o.category)
@@ -83,18 +83,12 @@ export class articleDTO implements Article{
     public attached?:string[];
 
     @IsOptional()
-    @IsByteLength(0,512,{ message: "has proporcionado un id invalido en la lista de likes" , each: true})
-    @IsBase64({ message: "has proporcionado un id invalido en la lista de likes" , each: true})
     public likes?:string[];//user ids
 
     @IsOptional()
-    @IsByteLength(0,512,{ message: "has proporcionado un id invalido en la lista de disLikes" , each: true})
-    @IsBase64({ message: "has proporcionado un id invalido en la lista de disLikes" , each: true})
     public disLikes?:string[];//user ids
 
     @IsOptional()
-    @IsByteLength(0,512,{ message: "has proporcionado un id invalido en la lista de favorites" , each: true})
-    @IsBase64({ message: "has proporcionado un id invalido en la lista de favorites" , each: true})
     public favorites?:string[];//user ids
 
     @IsOptional()
@@ -111,26 +105,15 @@ export class articleDTO implements Article{
     public modificationUser?:string;
     
     @IsOptional()
-    @IsByteLength(0,512,{ message: "has proporcionado un id invalido en el usuario modificador" , each: true})
-    @IsBase64({ message: "has proporcionado un id invalido en el usuario modificador" , each: true})
     public creator?:string;
-
-    @IsEmpty({ message: "no debes proporcionar un id para el articulo, este será generado automaticamente"})
-    public id?:string;
     
     @IsNotEmpty({ message: "debes proporcionar una categoria"})
-    @IsByteLength(0,512,{ message: "no has proporcionado un id valido para la categoria" })
-    @IsBase64({ message: "no has proporcionado un id valido para la categoria" })
     public category:string;
 
     @IsNotEmpty({ message: "debes proporcionar una sublinea"})
-    @IsByteLength(0,512,{ message: "no has proporcionado un id valido para la sublinea" })
-    @IsBase64({ message: "no has proporcionado un id valido para la sublinea" })
     public subLine:string;
 
     @IsNotEmpty({ message: "debes proporcionar una linea"})
-    @IsByteLength(0,512,{ message: "no has proporcionado un id valido para la linea" })
-    @IsBase64({ message: "no has proporcionado un id valido para la linea" })
     public line:string;
 
 }
@@ -222,13 +205,12 @@ export class ArticlesModelService extends GenericModel{
     }
 
     public async createArticle(article:articleDTO):Promise<any>{
-
-        console.log('{article}')
-        console.log(article)
-
-        let result = await this.indexDocument<articleDTO>(article,'articles')
-
-        return result;
+        try {
+            let result = await this.indexDocument<articleDTO>(article,'articles')
+            return help.combine(article,{id:result.body._id});
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     public addLike(idArticulo:string,id_usuario:string):string[]{

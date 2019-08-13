@@ -1,6 +1,6 @@
 import { Controller, UseGuards, Get, Query, Param, Post, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { LinesModelService, lineDTO, sublineDTO } from "../services/lines-model.service";
+import { LinesModelService, lineDTO, sublineDTO, GetLinesDTO, GetSublinesDTO } from "../services/lines-model.service";
 @Controller('api/lines')
 export class LinesController {
 
@@ -21,9 +21,30 @@ export class LinesController {
   @Post()
   createLine(
     @Body() body: lineDTO
-  ): any {
+  ):Promise<any> {
     return this.linesModel.createLine(body)
   }
+
+  /**
+  * #### URI: api/lines/
+  * ***
+  * Retorna todas las lineas
+  * ***
+  * - Method: `GET`
+  * 
+  * - Body: ``
+  *
+  * - query: include = subline
+  *
+  * - return: `lineDTO[]`
+  */
+ @UseGuards(AuthGuard('jwt'))
+ @Get()
+ getLines(
+   @Query() Params: GetLinesDTO
+ ):Promise<any> {
+   return this.linesModel.getLines(Params.include)
+ }
 
   /**
   * #### URI: api/lines/:id/sublines
@@ -44,4 +65,24 @@ export class LinesController {
   ): any {
     return this.linesModel.createSubline(body, idLine)
   }
+
+  /**
+  * #### URI: api/lines/:id/sublines
+  * ***
+  * Retorna todas las sublineas asociadas a una linea
+  * ***
+  * - Method: `GET`
+  * 
+  * - Body: ``
+  *
+  * - return: `none`
+  */
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':lineId/sublines')
+  getSublines(
+    @Param() params: GetSublinesDTO
+  ): any {
+    return this.linesModel.getSublines(params.lineId)
+  }
+
 }

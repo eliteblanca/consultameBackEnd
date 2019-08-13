@@ -15,10 +15,8 @@
 * ***
 * `subLine`: `String`
 */
-export class User {    
+export class User {
 "sub":string
 "name":string
 "rol":string
-"line":string
-"subLine":string
 }
