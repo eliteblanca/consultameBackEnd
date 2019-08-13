@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Query, Param } from '@nestjs/common';
+import { Controller, UseGuards, Get, Query, Param, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserModelService } from "../services/user-model.service";
 @Controller('api/users')
@@ -17,14 +17,14 @@ export class UsersController {
   *
   * - return: `por definir`
   */
-//  @UseGuards(AuthGuard('jwt'))
-//  @Get(':idUsuario/lines')
-//  getUserLines(
-//     @Param('idUsuario') id_usuario
-//  ):any{
-//    console.log('id_usuario')
-//    return this.userModel.userLines(id_usuario);
-//  }
+ @UseGuards(AuthGuard('jwt'))
+ @Get(':idUsuario/lines')
+ createUser(
+    @Body() body
+ ):any{
+   console.log('id_usuario')
+   return this.userModel.userLines(id_usuario);
+ }
 
   /**
   * #### URI: :idUsuario/lines

@@ -1,5 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
+import {MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested} from "class-validator";
+
+export class newUserDTO {
+  
+  public username:string;
+
+  public password:string;
+
+  public rol:string;
+
+  public subLines:string[];
+}
 
 @Injectable()
 export class UserModelService extends GenericModel{
