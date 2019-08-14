@@ -15,6 +15,7 @@ import { SearchModelService } from './services/search-model.service';
 import { UserModelService } from './services/user-model.service';
 import { CategoriesModelService } from './services/categories-model.service';
 import { LinesModelService } from './services/lines-model.service';
+import { CategoriesController } from './controllers/categories.controller';
 
 const secretKey = "123";
 
@@ -28,7 +29,7 @@ const secretKey = "123";
     }),
     MorganModule.forRoot(),
   ],
-  controllers: [AppController, ArticlesController, SuggestionsController, UsersController, LinesController, EsClientController],
+  controllers: [AppController, ArticlesController, SuggestionsController, UsersController, LinesController, EsClientController, CategoriesController],
   providers: [    
     {
       provide: APP_INTERCEPTOR,

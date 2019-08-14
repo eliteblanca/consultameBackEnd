@@ -14,8 +14,8 @@ async function bootstrap() {
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
 
-  app.useGlobalFilters(new DefaultPageFilter())
   app.useGlobalPipes(new ValidationPipe({transform: true}));
+  app.useGlobalFilters(new DefaultPageFilter())
 
   console.log("Listen in",`http://localhost:${port}`)
   await app.listen(port);

@@ -4,9 +4,18 @@ import { join } from 'path';
 @Catch(NotFoundException)
 export class DefaultPageFilter<T> implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
-    console.log(host);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
-    response.sendFile(join(__dirname, '../..', 'public/index.html'));
+    let url:string = ctx.getRequest().url;    
+    
+    if(url.startsWith('/api')){      
+      let responseObj = {
+        status : exception.getStatus(),
+        message: exception.message.message
+      }
+      response.status(responseObj.status).json(responseObj);
+    }else{
+      response.sendFile(join(__dirname, '../..', 'public/index.html'));
+    }
   }
 }

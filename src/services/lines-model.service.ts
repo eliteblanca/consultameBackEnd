@@ -1,23 +1,31 @@
-import { Injectable, ConflictException, HttpException } from '@nestjs/common';
+import { Injectable, ConflictException, HttpException, NotFoundException } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
 import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, MaxLength, IsIn, IsEmpty, IsOptional, Equals, IsString, IsAlphanumeric } from "class-validator";
 import { help } from "../helpers/helper";
-import * as async from "async";
+import * as async from 'async';
 
-export type lineDTO = {
+export class newLineDTO {
+    @IsNotEmpty({message:"debes proporcionar un nombre para la nueva linea"})
+    @IsString({message:"debes proporcionar un string como nombre para la linea"})
+    @IsAscii({message:"el nombre de la linea debe contener caracteres Ascii"})
+    @MinLength(3,{ message: "has proporcionado un nombre demasiado corto, debe contener minimo $constraint1 caracteres"})
+    @MaxLength(150,{ message: "has proporcionado un nombre demasiado largo, debe contener maximo $constraint1 caracteres"})
     name:string
 }
 
-type lineObject = {
+interface line {    
     name:string;
     id:string;
-    sublines?:{
+}
+
+interface line_with_sublines extends line {    
+    sublines:{
         name:string,
         id:string
     }[]
 }
 
-export class sublineDTO {
+export class newSublineDTO {
     @IsNotEmpty({message:"debes proporcionar un nombre para la nueva sublinea"})
     @IsString({message:"debes proporcionar un string como nombre para la sublinea"})
     @IsAscii({message:"el nombre de la sublinea debe contener caracteres Ascii"})
@@ -26,9 +34,13 @@ export class sublineDTO {
     name:string;
 }
 
-type subLine = {
-    name : string,
-    line : string
+interface subline {
+    name : string;
+    line : string;
+}
+
+interface subline_with_id extends subline {    
+    id:string;
 }
 
 export class GetLinesDTO{
@@ -49,7 +61,7 @@ export class LinesModelService extends GenericModel{
         super()
     }
 
-    private async getLinesByName(name:string):Promise<lineDTO[]>{
+    private async getLinesByName(name:string):Promise<newLineDTO[]>{
 
         try {
             let result = await this.esClient.search({
@@ -72,7 +84,7 @@ export class LinesModelService extends GenericModel{
         }
     }
 
-    private async getSublinesByName(name:string,line:string):Promise<sublineDTO[]>{
+    private async getSublinesByName(name:string,line:string):Promise<newSublineDTO[]>{
 
         try {
 
@@ -97,7 +109,7 @@ export class LinesModelService extends GenericModel{
         }
     }
 
-    private async getAllLines():Promise<lineObject[]>{
+    private async getAllLines():Promise<line[]>{
         try {
             let result = await this.esClient.search({
                 index: "lines",
@@ -116,29 +128,47 @@ export class LinesModelService extends GenericModel{
         }               
     }
 
-    private async populateWithSublines(line:lineObject):Promise<lineObject>{
-        let sublines = await this.getSublines(line.id)
-    }
-
-    private async getLinesWithSubline():Promise<lineObject[]>{
+    private populateWithSublines = async (line:line):Promise<line_with_sublines> => {
         try {
-            let lines = await this.getAllLines();
-
-            async.map(lines, fs.stat, function(err, results){
-            // results is now an array of stats for each file
-            });
-
-            await help.asyncForEach(lines, async => {
-
-            })
-
+            let sublines = await this.getSublines(line.id)
+            return help.combine(line,{ sublines:sublines })
         } catch (error) {
-            
+            console.log(error)
         }
     }
 
-    public async getSublines(lineId:string):Promise<any>{
-        try {   
+    private async getLinesWithSubline():Promise<line_with_sublines[]>{
+        try {
+
+            let lines = await this.getAllLines();
+
+            console.log({lines})
+
+            let result:line_with_sublines[] = await async.map(lines, this.populateWithSublines);
+
+            console.log(result)
+
+            console.log("primero")
+            return result;
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    public async getSubline(sublineId: string): Promise<newLineDTO> {
+
+        let result = await this.esClient.get({
+                id: sublineId,
+                index: 'sublines',
+                type: '_doc'
+            })
+
+        return help.combine(result.body._source,{id:result.body._id});
+    }
+
+    public async getSublines(lineId:string):Promise<subline_with_id[]>{
+        try {
             let result = await this.esClient.search({
                 index: "sublines",
                 body: {
@@ -161,32 +191,42 @@ export class LinesModelService extends GenericModel{
         }
     }
 
-    public async getLine(lineId: string): Promise<lineDTO> {
+    public async getLine(lineId: string): Promise<newLineDTO> {
 
-        let result = await this.esClient.get({
+        try{
+            let result = await this.esClient.get({
                 id: lineId,
                 index: 'lines',
                 type: '_doc'
             })
-
-        return help.combine(result.body._source,{id:result.body._id});
-    }
-
-    public async getLines(include?:string):Promise<any>{
-        if(include){
             
+            return help.combine(result.body._source,{id:result.body._id});
+            
+        }catch (error) {
+            if( error.meta.statusCode == 404 ){
+                throw new NotFoundException('articulo no encontrado');
+            }else{
+                console.log(error)
+            }
+        }
+   
+    }   
+
+    public async getLines(include?:string):Promise<line_with_sublines[] | line[]>{
+        if(include){
+            return this.getLinesWithSubline()
         }else{
             return this.getAllLines()
         }
     }
 
-    public async createLine(line:lineDTO):Promise<any>{
+    public async createLine(line:newLineDTO):Promise<any>{
 
         try {
             let existingLines = await this.getLinesByName(line.name)
 
             if(!existingLines.some(x=>x.name == line.name)){
-                let result = await this.indexDocument<lineDTO>(line,'lines')
+                let result = await this.indexDocument<newLineDTO>(line,'lines')
                 return help.combine(line,{id:result.body._id})
             }else{
                 throw new ConflictException('ya existe una linea con este nombre');
@@ -200,7 +240,7 @@ export class LinesModelService extends GenericModel{
         }
     }
 
-    public async createSubline(subline:sublineDTO, lineId:string):Promise<any>{
+    public async createSubline(subline:newSublineDTO, lineId:string):Promise<any>{
         try {
             let existingLines = await this.getLine(lineId);
 
@@ -210,7 +250,7 @@ export class LinesModelService extends GenericModel{
                 let existingSublines = await this.getSublinesByName(subline.name, lineId)    
 
                 if(!existingSublines.some(x => x.name == subline.name)){
-                    let result = await this.indexDocument<subLine>({ name : subline.name, line : lineId }, 'sublines');
+                    let result = await this.indexDocument<subline>({ name : subline.name, line : lineId }, 'sublines');
                     return help.combine(subline,{id:result.body._id});
                 }else{
                     throw new ConflictException('ya existe una sublinea con este nombre')

@@ -99,6 +99,23 @@ export class EsClientService extends GenericModel{
                         }
                     })
                 break;
+                case 'categories':  
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body:{
+                            "mappings" : {
+                                "properties" : {
+                                    "name"    : { "type": "keyword" },
+                                    "group"   : { "type": "keyword" },
+                                    "sublinea": { "type": "keyword" },
+                                    "position": { "type": "integer" },
+                                    "icon"    : { "type": "keyword" }
+                                }
+                            }
+                        }
+                    })
+                break;
                 default:
                     break;
             }

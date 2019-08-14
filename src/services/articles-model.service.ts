@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { SearchModelService } from "../services/search-model.service";
 import { GenericModel } from "../services/generic-model";
 import { ApiResponse } from '@elastic/elasticsearch';
-import {MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, IsOptional, MaxLength, IsIn, MinDate, IsDate, IsEmpty} from "class-validator";
+import {MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, IsOptional, MaxLength, IsIn, Length} from "class-validator";
 import { help } from "../helpers/helper";
 export class getArticlesDTO{
 
@@ -13,26 +13,22 @@ export class getArticlesDTO{
     query?:string;
     
     @IsNotEmpty({ message: "debes proporcionar una linea en la cual buscar los articulos" })
-    @IsByteLength(0,512,{ message: "no has proporcionado un id valido para la linea" })
-    @IsBase64({ message: "no has proporcionado un id valido para la linea" })
+    @Length(20,20,{ message: "debes proporcionar un id valido" })
     line:string;
 
     @IsNotEmpty({ message: "debes proporcionar una sublinea en la cual buscar los articulos" })
-    @IsByteLength(0,512,{ message: "no has proporcionado un id valido para la sublinea" })
-    @IsBase64({ message: "no has proporcionado un id valido para la sublinea" })
+    @Length(20,20,{ message: "debes proporcionar un id valido" })
     subline:string;
 
     @ValidateIf(o => !o.query)
     @IsNotEmpty({ message: "si no se proporciona una query se debe proporcionar una categoria" })
-    @IsByteLength(0,512,{ message: "no has proporcionado un id valido para la categoria" })
-    @IsBase64({ message: "no has proporcionado un id valido para la categoria" })
-    category
+    @Length(20,20,{ message: "debes proporcionar un id valido" })
+    category:string
 }
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: "debes proporcionar un id de articulo" })
-    @IsByteLength(0,512,{ message: "no has proporcionado un id valido para el articulo" })
-    @IsBase64({ message: "no has proporcionado un id valido para el articulo" })
+    @Length(20,20,{ message: "debes proporcionar un id valido" })
     id:string
 }
 
@@ -83,12 +79,15 @@ export class articleDTO implements Article{
     public attached?:string[];
 
     @IsOptional()
+    @Length(20,20,{ message: "debes proporcionar un id valido" ,each:true})
     public likes?:string[];//user ids
 
     @IsOptional()
+    @Length(20,20,{ message: "debes proporcionar un id valido" ,each:true})
     public disLikes?:string[];//user ids
 
     @IsOptional()
+    @Length(20,20,{ message: "debes proporcionar un id valido" ,each:true})
     public favorites?:string[];//user ids
 
     @IsOptional()
@@ -100,24 +99,26 @@ export class articleDTO implements Article{
     public modificationDate?:Date;
 
     @IsOptional()
-    @IsByteLength(0,512,{ message: "has proporcionado un id invalido en el usuario modificador" , each: true})
-    @IsBase64({ message: "has proporcionado un id invalido en el usuario modificador" , each: true})
+    @Length(20,20,{ message: "debes proporcionar un id valido"})
     public modificationUser?:string;
     
     @IsOptional()
+    @Length(20,20,{ message: "debes proporcionar un id valido"})
     public creator?:string;
     
     @IsNotEmpty({ message: "debes proporcionar una categoria"})
+    @Length(20,20,{ message: "debes proporcionar un id valido"})
     public category:string;
 
     @IsNotEmpty({ message: "debes proporcionar una sublinea"})
+    @Length(20,20,{ message: "debes proporcionar un id valido"})
     public subLine:string;
 
     @IsNotEmpty({ message: "debes proporcionar una linea"})
+    @Length(20,20,{ message: "debes proporcionar un id valido"})
     public line:string;
 
 }
-
 @Injectable()
 export class ArticlesModelService extends GenericModel{
 
@@ -192,16 +193,19 @@ export class ArticlesModelService extends GenericModel{
 
     public async getArticle(articleId: string): Promise<articleDTO> {
 
-        let result = await this.esClient.get({
+        try {
+            let result = await this.esClient.get({
                 id: articleId,
                 index: 'articles',
                 type: '_doc'
-            })
-        
-        let obj = result.body._source;
-        obj.id = result.body._id;
-        
-        return obj;
+            })        
+
+            return help.combine(result.body._source, {id:result.body._id});
+        } catch (error) {
+            if( error.meta.statusCode == 404 ){
+                throw new NotFoundException('articulo no encontrado');
+            }
+        }
     }
 
     public async createArticle(article:articleDTO):Promise<any>{

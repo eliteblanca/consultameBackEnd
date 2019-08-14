@@ -1,6 +1,6 @@
 import { Controller, UseGuards, Get, Query, Param, Post, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { LinesModelService, lineDTO, sublineDTO, GetLinesDTO, GetSublinesDTO } from "../services/lines-model.service";
+import { LinesModelService, newLineDTO, newSublineDTO, GetLinesDTO, GetSublinesDTO } from "../services/lines-model.service";
 @Controller('api/lines')
 export class LinesController {
 
@@ -20,8 +20,8 @@ export class LinesController {
   @UseGuards(AuthGuard('jwt'))
   @Post()
   createLine(
-    @Body() body: lineDTO
-  ):Promise<any> {
+    @Body() body: newLineDTO
+  ): Promise<any> {
     return this.linesModel.createLine(body)
   }
 
@@ -38,13 +38,13 @@ export class LinesController {
   *
   * - return: `lineDTO[]`
   */
- @UseGuards(AuthGuard('jwt'))
- @Get()
- getLines(
-   @Query() Params: GetLinesDTO
- ):Promise<any> {
-   return this.linesModel.getLines(Params.include)
- }
+  @UseGuards(AuthGuard('jwt'))
+  @Get()
+  getLines(
+    @Query() Params: GetLinesDTO
+  ): Promise<any> {
+    return this.linesModel.getLines(Params.include)
+  }
 
   /**
   * #### URI: api/lines/:id/sublines
@@ -60,7 +60,7 @@ export class LinesController {
   @UseGuards(AuthGuard('jwt'))
   @Post(':id/sublines')
   createSubline(
-    @Body() body: sublineDTO,
+    @Body() body: newSublineDTO,
     @Param('id') idLine: string
   ): any {
     return this.linesModel.createSubline(body, idLine)
