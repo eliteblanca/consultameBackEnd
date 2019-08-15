@@ -1,6 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, NotAcceptableException } from '@nestjs/common';
 import { SearchModelService } from "../services/search-model.service";
 import { GenericModel } from "../services/generic-model";
+import { LinesModelService } from "../services/lines-model.service";
+import { CategoriesModelService } from "../services/categories-model.service";
 import { ApiResponse } from '@elastic/elasticsearch';
 import {MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, IsOptional, MaxLength, IsIn, Length} from "class-validator";
 import { help } from "../helpers/helper";
@@ -42,8 +44,8 @@ export interface Article {
     disLikes?:string[];//user ids
     favorites?:string[];//user ids
     role?:"noticia"|"articulo";
-    publicationDate?:Date;
-    modificationDate?:Date;
+    publicationDate?:number;
+    modificationDate?:number;
     modificationUser?:string;
     creator?:string;
     id?:string;
@@ -52,7 +54,7 @@ export interface Article {
     line:string;
 }
 
-export class articleDTO implements Article{
+export class articleDTO {
 
     @IsNotEmpty({ message: "debes proporcionar un nombre al articulo"})
     @IsAscii({ message: "el titulo solo debe contener caracteres Ascii"})
@@ -62,7 +64,42 @@ export class articleDTO implements Article{
     @IsNotEmpty({ message: "debes proporcionar un contenido al articulo"})
     @MinLength(3,{ message: "has proporcionado un contenido demasiado corto, debe contener minimo $constraint1 caracteres" })
     public content:string;
-        
+
+    @MinLength(3,{ message: "has proporcionado un tag demasiado corto, debe contener minimo $constraint1 caracteres", each: true })
+    @MaxLength(150,{ message: "has proporcionado un tag demasiado largo, debe contener maximo $constraint1 caracteres", each: true })
+    @IsAscii({ message: "el tag solo debe contener caracteres Ascii", each: true})
+    @IsOptional()
+    public tags?:string[];
+
+    @MinLength(3,{ message: "has proporcionado un resumen demasiado corto, debe contener minimo $constraint1 caracteres"})
+    @IsAscii({ message: "el resumen solo debe contener caracteres Ascii"})
+    @IsOptional()
+    public resume?:string;
+
+    @MinLength(3,{ message: "has proporcionado un vinculo demasiado corto, debe contener minimo $constraint1 caracteres", each: true})
+    @IsOptional()
+    public attached?:string[];
+
+    @IsOptional()
+    @IsIn(["noticia","articulo"])
+    public role?:"noticia"|"articulo";        
+    
+    @IsNotEmpty({ message: "debes proporcionar una categoria"})
+    @Length(20,20,{ message: "debes proporcionar un id valido"})
+    public category:string;
+
+}
+export class articlesBulkDTO implements Article{
+
+    @IsNotEmpty({ message: "debes proporcionar un nombre al articulo"})
+    @IsAscii({ message: "el titulo solo debe contener caracteres Ascii"})
+    @MinLength(3,{ message: "has proporcionado un titulo demasiado corto, debe contener minimo $constraint1 caracteres" })
+    public title:string;
+
+    @IsNotEmpty({ message: "debes proporcionar un contenido al articulo"})
+    @MinLength(3,{ message: "has proporcionado un contenido demasiado corto, debe contener minimo $constraint1 caracteres" })
+    public content:string;
+
     @MinLength(3,{ message: "has proporcionado un tag demasiado corto, debe contener minimo $constraint1 caracteres", each: true })
     @MaxLength(150,{ message: "has proporcionado un tag demasiado largo, debe contener maximo $constraint1 caracteres", each: true })
     @IsAscii({ message: "el tag solo debe contener caracteres Ascii", each: true})
@@ -94,9 +131,9 @@ export class articleDTO implements Article{
     @IsIn(["noticia","articulo"])
     public role?:"noticia"|"articulo";
         
-    public publicationDate?:Date;
+    public publicationDate?:number;
 
-    public modificationDate?:Date;
+    public modificationDate?:number;
 
     @IsOptional()
     @Length(20,20,{ message: "debes proporcionar un id valido"})
@@ -122,7 +159,10 @@ export class articleDTO implements Article{
 @Injectable()
 export class ArticlesModelService extends GenericModel{
 
-    constructor(private searchModel:SearchModelService) {
+    constructor(
+        private searchModel:SearchModelService,
+        private linesModel:LinesModelService,
+        private categoriesModel:CategoriesModelService) {
         super()
     }
 
@@ -139,6 +179,9 @@ export class ArticlesModelService extends GenericModel{
 //#endregion Private
 
 //#region Public
+
+
+
 
     public async getArticlesByCategory(category: string): Promise<Article[]> {
         try {
@@ -191,7 +234,7 @@ export class ArticlesModelService extends GenericModel{
         }
     }
 
-    public async getArticle(articleId: string): Promise<articleDTO> {
+    public async getArticle(articleId: string): Promise<Article> {
 
         try {
             let result = await this.esClient.get({
@@ -208,13 +251,57 @@ export class ArticlesModelService extends GenericModel{
         }
     }
 
-    public async createArticle(article:articleDTO):Promise<any>{
-        try {
-            let result = await this.indexDocument<articleDTO>(article,'articles')
-            return help.combine(article,{id:result.body._id});
-        } catch (error) {
-            console.log(error)
-        }
+    public async createArticle(article:articleDTO,creator:string):Promise<any>{
+
+        let subline:string = null;
+        let line:string = null;
+            try {
+                var category = await this.categoriesModel.getCategory(article.category);
+            } catch (error) {
+                if( error.meta.statusCode == 404 ){
+                    throw new NotFoundException('categoria no encontrada');
+                }
+            }
+
+            try {
+                var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
+            } catch (error) {
+                console.log(error)
+            }
+
+            if(isLeaft){
+                subline = category.sublinea;
+            }else{
+                throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias')
+            }
+
+            try {
+                let sublineAux = await this.linesModel.getSubline(subline)
+                line = sublineAux.line
+                
+            } catch (error) {
+                throw error
+                if( error.meta.statusCode == 404 ){
+                    throw new NotFoundException('error al guardar el articulo');
+                }
+            }
+
+            let articleExtas = {
+                likes:[],
+                disLikes:[],
+                favorites:[],
+                subLine:subline,
+                line:line,
+                creator:creator,
+                modificationUser:creator,
+                publicationDate:(new Date).getTime(),
+                modificationDate:(new Date).getTime()
+            }
+
+            let newArticle:Article = { ...articleExtas ,...article }
+
+            let result = await this.indexDocument<Article>(newArticle,'articles')
+            return help.combine(newArticle,{id:result.body._id});        
     }
 
     public addLike(idArticulo:string,id_usuario:string):string[]{

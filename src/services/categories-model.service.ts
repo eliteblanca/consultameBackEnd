@@ -3,6 +3,7 @@ import { GenericModel } from "../services/generic-model";
 import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, IsOptional, MaxLength, IsIn, MinDate, IsDate, IsEmpty, IsPositive, IsInt, IsString, Length } from "class-validator";
 import { LinesModelService } from "../services/lines-model.service";
 import { help } from "../helpers/helper";
+import { tsRestType } from '@babel/types';
 
 type categories = {
   name: string,
@@ -18,7 +19,7 @@ export class correctParams {
 
 export class getCategoryParams {
   @Length(20, 20, { message: "debes proporcionar un id valido" })
-  idCategory:string;
+  idCategory: string;
 }
 
 export class newCategoryDTO {
@@ -46,6 +47,7 @@ class category {
   name: string;
   position: number;
   icon: string;
+  group: string;
 }
 
 @Injectable()
@@ -54,37 +56,46 @@ export class CategoriesModelService extends GenericModel {
     super()
   }
 
-  private  async getCategory(categoryId: string): Promise<category> {
+  public async isLeaftCategory(categoryId: string): Promise<boolean> {
     try {
-      let result = await this.esClient.get({
-        id: categoryId,
-        index: 'categories',
-        type: '_doc'
+      let result = await this.esClient.search({
+        index: "categories",
+        body: {
+          query: {
+            bool: {
+              filter: [
+                { "term": { "group": categoryId } }
+              ]
+            }
+          }
+        }
       })
 
-      return help.combine(result.body._source, { id: result.body._id });
-    } catch (error) {
-      if (error.meta.statusCode == 404) {
-        throw new NotFoundException('articulo no encontrado');
+      if(result.body.hits.hits.Length){
+        return true
+      }else{
+        return false
       }
+
+    } catch (error) {
+      console.log(error)
     }
   }
 
-  public async createCategory(newCategory: newCategoryDTO, sublineId: string): Promise<any> {
+  public async getCategory(categoryId: string): Promise<category> {
+    let result = await this.esClient.get({
+      id: categoryId,
+      index: 'categories',
+      type: '_doc'
+    })
+
+    return help.combine(result.body._source, { id: result.body._id });
+  }
+
+  public async createCategory(newCategory: newCategoryDTO, sublineId: string): Promise<category> {
     try {
-
+      // --> comprueba si la linea existe
       let subline = await this.linesModel.getSubline(sublineId);
-
-      if (newCategory.group) {
-        '>>-<>--> agregar validacion para el grupo <--<>-<<'
-      }
-
-      let category = help.combine(newCategory, { sublinea: sublineId })
-
-      let result = await this.indexDocument<newCategoryDTO>(category, 'categories')
-
-      return help.combine(category, { id: result.body._id })
-
     } catch (error) {
       if (error.meta.statusCode == 404) {
         throw new NotAcceptableException('la sublinea no existe');
@@ -92,6 +103,27 @@ export class CategoriesModelService extends GenericModel {
         console.log(error)
       }
     }
+
+    try {
+      // --> comprueba si la categoria padre existe
+      if (newCategory.group) {
+        let group = await this.getCategory(newCategory.group)
+      }
+    } catch (error) {
+      if (error.meta.statusCode == 404) {
+        throw new NotAcceptableException('la categoria no existe');
+      } else {
+        console.log(error)
+      }
+    }
+
+
+    let category = help.combine(newCategory, { sublinea: sublineId })
+
+    let result = await this.indexDocument<newCategoryDTO>(category, 'categories')
+
+    return help.combine(category, { id: result.body._id })
+
   }
 
   public async getCategories(sublineId: string): Promise<category[]> {
@@ -127,6 +159,5 @@ export class CategoriesModelService extends GenericModel {
 
     }
   }
-
 
 }

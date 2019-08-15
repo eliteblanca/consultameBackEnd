@@ -156,7 +156,7 @@ export class LinesModelService extends GenericModel{
         }
     }
 
-    public async getSubline(sublineId: string): Promise<newLineDTO> {
+    public async getSubline(sublineId: string): Promise<subline_with_id> {
 
         let result = await this.esClient.get({
                 id: sublineId,

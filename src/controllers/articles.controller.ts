@@ -2,7 +2,7 @@ import { Controller, UseGuards, Request, Post, Get, Query, Param, Body, Delete, 
 import { AuthGuard } from '@nestjs/passport';
 import { User } from "../user.decorator";
 import { User as U } from "../entities/user";
-import { ArticlesModelService, articleDTO, getArticlesDTO, SingleArticleDTO } from "../services/articles-model.service";
+import { ArticlesModelService, articleDTO, articlesBulkDTO, getArticlesDTO, SingleArticleDTO } from "../services/articles-model.service";
 import { isArray } from 'util';
 
 const enum EndPoints {
@@ -79,15 +79,30 @@ export class ArticlesController {
  createArticle(
    @Body() body: articleDTO,
    @User() user: U
-  ):any{
-   if(!isArray(body)){
-       body.creator = user.sub;
-       return this.articlesModel.createArticle(body)
-   }else{
-      throw new NotAcceptableException('No se permiten arrays en el cuerpo de la peticion')
-   }
+  ):any{    
+   return this.articlesModel.createArticle(body,user.sub)   
  }
- 
+
+  /**
+  * #### URI: api/articles/
+  * ***
+  * Agrega un articulo a la BBDD
+  * ***
+  * - Method: `POST`
+  * 
+  * - Body: `Article`
+  *
+  * - return: `none`
+  */
+ @UseGuards(AuthGuard('jwt'))
+ @Post('_migrate')
+ createArticles(
+   @Body() body: articlesBulkDTO,
+   @User() user: U
+  ):any{
+   return this.articlesModel.createArticle(body,user.sub)
+ }
+
   /**
   * #### URI: api/articles/:id/likes
   * ***
