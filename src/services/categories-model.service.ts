@@ -4,6 +4,8 @@ import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, Val
 import { LinesModelService } from "../services/lines-model.service";
 import { help } from "../helpers/helper";
 import { tsRestType } from '@babel/types';
+import { CategoriesIndex, category } from "../indices/categoriesIndex";
+import { SublinesIndex } from "../indices/sublinesIndex";
 
 type categories = {
   name: string,
@@ -41,37 +43,20 @@ export class newCategoryDTO {
   public group: string;
 }
 
-class category {
-  id: string;
-  sublinea: string;
-  name: string;
-  position: number;
-  icon: string;
-  group: string;
-}
-
 @Injectable()
 export class CategoriesModelService extends GenericModel {
-  constructor(private linesModel: LinesModelService) {
+  constructor(
+    private sublinesIndex:SublinesIndex,
+    private categoriesIndex:CategoriesIndex
+  ) {
     super()
   }
 
   public async isLeaftCategory(categoryId: string): Promise<boolean> {
     try {
-      let result = await this.esClient.search({
-        index: "categories",
-        body: {
-          query: {
-            bool: {
-              filter: [
-                { "term": { "group": categoryId } }
-              ]
-            }
-          }
-        }
-      })
+      let result = await this.categoriesIndex.where({group:categoryId})      
 
-      if(result.body.hits.hits.Length){
+      if(result.length){
         return true
       }else{
         return false
@@ -82,20 +67,16 @@ export class CategoriesModelService extends GenericModel {
     }
   }
 
-  public async getCategory(categoryId: string): Promise<category> {
-    let result = await this.esClient.get({
-      id: categoryId,
-      index: 'categories',
-      type: '_doc'
-    })
+  public async getCategory(categoryId: string): Promise<category & { id: string; }> {
 
-    return help.combine(result.body._source, { id: result.body._id });
+    return await this.categoriesIndex.getById(categoryId)
+
   }
 
   public async createCategory(newCategory: newCategoryDTO, sublineId: string): Promise<category> {
     try {
       // --> comprueba si la linea existe
-      let subline = await this.linesModel.getSubline(sublineId);
+      let subline = await this.sublinesIndex()   linesModel.getSubline(sublineId);
     } catch (error) {
       if (error.meta.statusCode == 404) {
         throw new NotAcceptableException('la sublinea no existe');
@@ -126,38 +107,12 @@ export class CategoriesModelService extends GenericModel {
 
   }
 
-  public async getCategories(sublineId: string): Promise<category[]> {
+  public async getCategories(sublineId: string): Promise<(category & { id: string; })[]> {
 
-    try {
+      let subline = await this.sublinesIndex.getById(sublineId);
 
-      let subline = await this.linesModel.getSubline(sublineId);
+      return await this.categoriesIndex.where({sublinea:sublineId})
 
-      let result = await this.esClient.search({
-        index: "categories",
-        body: {
-          query: {
-            bool: {
-              filter: [
-                { term: { sublinea: sublineId } }
-              ]
-            }
-          }
-        }
-      })
-
-      return result.body.hits.hits.map(categoriesSource =>
-        help.combine(categoriesSource._source, { id: categoriesSource._id })
-      )
-
-    } catch (error) {
-
-      if (error.meta.statusCode == 404) {
-        throw new NotAcceptableException('la sublinea no existe');
-      } else {
-        console.log(error)
-      }
-
-    }
   }
 
 }

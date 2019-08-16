@@ -32,9 +32,7 @@ export class ArticlesController {
  @Get()
  getArticles(
    @Query() params:getArticlesDTO
- ):any{   
-
-    
+ ):any{    
   if(params.query){
     return this.articlesModel.getArticlesByQuery({
      query:params.query,

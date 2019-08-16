@@ -16,6 +16,9 @@ import { UserModelService } from './services/user-model.service';
 import { CategoriesModelService } from './services/categories-model.service';
 import { LinesModelService } from './services/lines-model.service';
 import { CategoriesController } from './controllers/categories.controller';
+import { ArticleIndex } from './indices/articleIndex';
+import { LinesIndex } from "./indices/linesIndex";
+import { SublinesIndex } from "./indices/sublinesIndex";
 
 const secretKey = "123";
 
@@ -42,7 +45,10 @@ const secretKey = "123";
     SearchModelService,
     UserModelService,
     CategoriesModelService,
-    LinesModelService
+    LinesModelService,
+    ArticleIndex,
+    LinesIndex,
+    SublinesIndex
   ],
 })
 export class AppModule {}

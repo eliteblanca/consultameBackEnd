@@ -6,6 +6,8 @@ import { CategoriesModelService } from "../services/categories-model.service";
 import { ApiResponse } from '@elastic/elasticsearch';
 import {MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, IsOptional, MaxLength, IsIn, Length} from "class-validator";
 import { help } from "../helpers/helper";
+import { ArticleIndex } from "../indices/articleIndex";
+
 export class getArticlesDTO{
 
     @ValidateIf(o => !o.category)
@@ -162,7 +164,8 @@ export class ArticlesModelService extends GenericModel{
     constructor(
         private searchModel:SearchModelService,
         private linesModel:LinesModelService,
-        private categoriesModel:CategoriesModelService) {
+        private categoriesModel:CategoriesModelService,
+        private articleIndex:ArticleIndex ) {
         super()
     }
 
@@ -180,28 +183,9 @@ export class ArticlesModelService extends GenericModel{
 
 //#region Public
 
-
-
-
     public async getArticlesByCategory(category: string): Promise<Article[]> {
-        try {
-            let result = await this.esClient.search({
-                index: "articles",
-                body: {
-                    query: {
-                        bool: {
-                            filter: [
-                                { term: { category: category } }
-                            ]
-                        }
-                    }
-                }
-            })
 
-            return this.parseEsResultToArticles(result);
-        } catch (err) {
-            console.log(err.meta.body.error);
-        }
+        return await this.articleIndex.getBycategory(category)
     }
 
     public async getArticlesByQuery(options: { query: string; line: string; subline: string; }): Promise<Article[]> {
