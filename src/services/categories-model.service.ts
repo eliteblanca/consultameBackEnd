@@ -46,8 +46,8 @@ export class newCategoryDTO {
 @Injectable()
 export class CategoriesModelService extends GenericModel {
   constructor(
-    private sublinesIndex:SublinesIndex,
-    private categoriesIndex:CategoriesIndex
+    private categoriesIndex:CategoriesIndex,
+    private sublinesIndex:SublinesIndex
   ) {
     super()
   }

@@ -17,7 +17,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({transform: true}));
   app.useGlobalFilters(new DefaultPageFilter())
 
-  console.log("Listen in",`http://localhost:${port}`)
   await app.listen(port);
+  console.log("Listen in",`http://localhost:${port}`)
 }
 bootstrap();

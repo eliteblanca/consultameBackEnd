@@ -19,6 +19,7 @@ import { CategoriesController } from './controllers/categories.controller';
 import { ArticleIndex } from './indices/articleIndex';
 import { LinesIndex } from "./indices/linesIndex";
 import { SublinesIndex } from "./indices/sublinesIndex";
+import { CategoriesIndex } from "./indices/categoriesIndex";
 
 const secretKey = "123";
 
@@ -48,7 +49,8 @@ const secretKey = "123";
     LinesModelService,
     ArticleIndex,
     LinesIndex,
-    SublinesIndex
+    SublinesIndex,
+    CategoriesIndex
   ],
 })
 export class AppModule {}
