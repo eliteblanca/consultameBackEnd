@@ -76,7 +76,7 @@ export class CategoriesModelService extends GenericModel {
   public async createCategory(newCategory: newCategoryDTO, sublineId: string): Promise<category> {
     try {
       // --> comprueba si la linea existe
-      let subline = await this.sublinesIndex()   linesModel.getSubline(sublineId);
+      let subline = await this.sublinesIndex.getById(sublineId)
     } catch (error) {
       if (error.meta.statusCode == 404) {
         throw new NotAcceptableException('la sublinea no existe');
