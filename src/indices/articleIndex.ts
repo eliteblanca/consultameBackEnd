@@ -1,7 +1,7 @@
 import { Esindex } from "./esindex";
 import { Injectable } from "@nestjs/common";
 
-interface Article {
+export interface Article {
     title:string;
     content:string;
     tags?:string[];
@@ -15,7 +15,6 @@ interface Article {
     modificationDate?:number;
     modificationUser?:string;
     creator?:string;
-    id?:string;
     category:string;
     subLine:string;
     line:string;
@@ -25,9 +24,6 @@ interface Article {
 export class ArticleIndex extends Esindex<Article> {
     constructor(){
         super('articles')
-    }
-
-    public async getBycategory(category:string):Promise<Article[]>{
-        return await this.where({category:category})
-    }
+    }   
+     
 }

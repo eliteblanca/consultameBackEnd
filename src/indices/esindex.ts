@@ -1,7 +1,5 @@
 import { Client, ClientOptions, ApiResponse, RequestParams } from "@elastic/elasticsearch";
-import { help } from "../helpers/helper";
 import * as R from 'remeda';
-import { Article } from "src/services/articles-model.service";
 
 const PUNTO_DE_ENLACE: string = "https://search-multiconsulta-focy72himmej26z3i6sqv56pp4.us-west-1.es.amazonaws.com";
 
@@ -15,6 +13,10 @@ export class Esindex<T> {
     }
 
     protected readonly esClient: Client;
+
+    private createBody = R.objOf('body')    
+
+    private createRequest = x => R.addProp(R.objOf('body')(x),'index',this.index)   
 
     public async create(doc: T):Promise<T & { id: string; }> {
         let result = await this.esClient.index({
@@ -36,10 +38,14 @@ export class Esindex<T> {
         return R.addProp(result.body._source,'id',result.body._id);
     }
 
-    protected async query(query:RequestParams.Search):Promise<(T & { id: string; })[]>{
-        let result = await this.esClient.search(query)
+    public async query(query:object):Promise<(T & { id: string; })[]>{
         
-        return R.map(result.body.hits.hits, (x:any) => R.addProp(x._source,'id',x._id) )
+        let queryObj:RequestParams.Search =  this.createRequest(query)
+
+        let result = await this.esClient.search(queryObj)
+        
+        return R.map((x:any) => R.addProp(x._source,'id',x._id))
+              (result.body.hits.hits, )
     }
 
     public async where(ops:Partial<T>):Promise<(T & { id: string; })[]>{
@@ -72,6 +78,12 @@ export class Esindex<T> {
                 }
             }
         })
+    }
+
+    public async update(id:string, script:object):Promise<void>{
+
+        let queryObj:RequestParams.Update = R.addProp(this.createRequest({script:script}),'id',id)
+        await this.esClient.update(queryObj)
     }
 
 }

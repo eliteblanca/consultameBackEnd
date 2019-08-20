@@ -1,11 +1,10 @@
 import { Injectable, Optional, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
-import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, IsOptional, MaxLength, IsIn, MinDate, IsDate, IsEmpty, IsPositive, IsInt, IsString, Length } from "class-validator";
-import { LinesModelService } from "../services/lines-model.service";
 import { help } from "../helpers/helper";
-import { tsRestType } from '@babel/types';
 import { CategoriesIndex, category } from "../indices/categoriesIndex";
 import { SublinesIndex } from "../indices/sublinesIndex";
+import * as R from 'remeda';
+import { Length, IsNotEmpty, IsPositive, IsInt, IsOptional, IsString } from 'class-validator';
 
 type categories = {
   name: string,
@@ -44,12 +43,11 @@ export class newCategoryDTO {
 }
 
 @Injectable()
-export class CategoriesModelService extends GenericModel {
+export class CategoriesModelService {
   constructor(
     private categoriesIndex:CategoriesIndex,
     private sublinesIndex:SublinesIndex
   ) {
-    super()
   }
 
   public async isLeaftCategory(categoryId: string): Promise<boolean> {
@@ -57,9 +55,9 @@ export class CategoriesModelService extends GenericModel {
       let result = await this.categoriesIndex.where({group:categoryId})      
 
       if(result.length){
-        return true
-      }else{
         return false
+      }else{
+        return true
       }
 
     } catch (error) {
@@ -68,12 +66,10 @@ export class CategoriesModelService extends GenericModel {
   }
 
   public async getCategory(categoryId: string): Promise<category & { id: string; }> {
-
     return await this.categoriesIndex.getById(categoryId)
-
   }
 
-  public async createCategory(newCategory: newCategoryDTO, sublineId: string): Promise<category> {
+  public async createCategory(newCategory: newCategoryDTO, sublineId: string): Promise<category & { id: string; }> {
     try {
       // --> comprueba si la linea existe
       let subline = await this.sublinesIndex.getById(sublineId)
@@ -99,11 +95,11 @@ export class CategoriesModelService extends GenericModel {
     }
 
 
-    let category = help.combine(newCategory, { sublinea: sublineId })
+    let category =  help.combine(newCategory, { sublinea: sublineId })
 
-    let result = await this.indexDocument<newCategoryDTO>(category, 'categories')
+    let result = await this.categoriesIndex.create(category)
 
-    return help.combine(category, { id: result.body._id })
+    return R.addProp(category, 'id', result.id)
 
   }
 

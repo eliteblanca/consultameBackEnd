@@ -46,14 +46,29 @@ export class EsClientService extends GenericModel{
                         index: index,
                         include_type_name: false,
                         body:{
-                            "mappings" : {
-                                "properties" : {
-                                    "line"     : { "type": "keyword" },
-                                    "subline"  : { "type": "keyword" },
-                                    "query"    : { "type": "keyword" },
-                                    "searches" : { "type": "integer" },
+                            // "mappings" : {
+                            //     "properties" : {
+                            //         "subline"  : { "type": "keyword" },
+                            //         "query"    : { 
+                            //             "type": "search_as_you_type",
+                            //             "fields": {
+                            //                 "raw": {
+                            //                     "type": "keyword"
+                            //                 }
+                            //             }
+                            //         },
+
+
+                            //         "searches" : { "type": "integer" }
+                            //     }
+                            // }
+                            "mappings": {
+                                "properties": {
+                                  "my_field": {
+                                    "type": "search_as_you_type"
+                                  }
                                 }
-                            }
+                              }
                         }
                     })
                 break;
@@ -92,7 +107,7 @@ export class EsClientService extends GenericModel{
                                 "properties" : {
                                     "username" : { "type": "keyword" },
                                     "password" : { "type": "keyword" },
-                                    "rol" : { "type": "keyword" },
+                                    "rol"      : { "type": "keyword" },
                                     "subLines" : { "type": "keyword" }
                                 }
                             }

@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { SearchModelService } from "../services/search-model.service";
 
 @Controller('api/suggestions')
-export class SuggestionsController {
+export class searchController {
 
     constructor(private searchModel:SearchModelService) {}
 
@@ -21,9 +21,8 @@ export class SuggestionsController {
     @UseGuards(AuthGuard('jwt'))
     @Get()
     getSuggestions(
-        @Query('input') input:string, 
-        @Query('line') line:string, 
-        @Query('subLine') subline:string){
+        @Query('input') input:string,
+        @Query('subline') subline:string){
 
         return this.searchModel.getSuggestions(input, subline);
     }

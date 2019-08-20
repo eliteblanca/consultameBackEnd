@@ -3,8 +3,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from "../user.decorator";
 import { User as U } from "../entities/user";
 import { ArticlesModelService, articleDTO, articlesBulkDTO, getArticlesDTO, SingleArticleDTO } from "../services/articles-model.service";
-import { isArray } from 'util';
-
+import { SearchModelService } from "../services/search-model.service";
+import { timingSafeEqual } from 'crypto';
 const enum EndPoints {
     articles = "articles",
     article = "articles/:id",
@@ -15,7 +15,7 @@ const enum EndPoints {
 @Controller('api/articles')
 export class ArticlesController {
 
-  constructor(private articlesModel:ArticlesModelService) {}
+  constructor(private articlesModel:ArticlesModelService, private searchModel:SearchModelService ) {}
 
   /**
   * #### URI: api/articles
@@ -30,15 +30,17 @@ export class ArticlesController {
   */
  @UseGuards(AuthGuard('jwt'))
  @Get()
- getArticles(
+ async getArticles(
    @Query() params:getArticlesDTO
- ):any{    
-  if(params.query){
-    return this.articlesModel.getArticlesByQuery({
-     query:params.query,
-     line:params.line,
-     subline:params.subline
-    });
+ ):Promise<any>{
+   if(params.query){
+     
+    let {category, ...info} = params;    
+
+    await this.searchModel.newSearch(info)
+
+    return this.articlesModel.getArticlesByQuery(info);
+
   }else if(params.category){
       return this.articlesModel.getArticlesByCategory(params.category);
   }

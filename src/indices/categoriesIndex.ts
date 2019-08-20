@@ -12,7 +12,7 @@ export class category {
 @Injectable()
 export class CategoriesIndex extends Esindex<category> {
     constructor(){
-        super('sublines')
+        super('categories')
     }
 
 }

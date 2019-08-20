@@ -5,7 +5,7 @@ import { AppController } from './controllers/app.controller';
 import { AuthService, JwtValidator } from './services/auth.service';
 import { ArticlesController } from './controllers/articles.controller';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { SuggestionsController } from './controllers/suggestions.controller';
+import { searchController } from './controllers/search.controller';
 import { UsersController } from './controllers/users.controller';
 import { LinesController } from './controllers/lines.controller';
 import { EsClientController } from './controllers/es-client.controller';
@@ -20,6 +20,7 @@ import { ArticleIndex } from './indices/articleIndex';
 import { LinesIndex } from "./indices/linesIndex";
 import { SublinesIndex } from "./indices/sublinesIndex";
 import { CategoriesIndex } from "./indices/categoriesIndex";
+import { SearchsIndex } from './indices/searchIndex';
 
 const secretKey = "123";
 
@@ -33,7 +34,7 @@ const secretKey = "123";
     }),
     MorganModule.forRoot(),
   ],
-  controllers: [AppController, ArticlesController, SuggestionsController, UsersController, LinesController, EsClientController, CategoriesController],
+  controllers: [AppController, ArticlesController, searchController, UsersController, LinesController, EsClientController, CategoriesController],
   providers: [    
     {
       provide: APP_INTERCEPTOR,
@@ -50,7 +51,8 @@ const secretKey = "123";
     ArticleIndex,
     LinesIndex,
     SublinesIndex,
-    CategoriesIndex
+    CategoriesIndex,
+    SearchsIndex
   ],
 })
 export class AppModule {}

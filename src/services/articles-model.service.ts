@@ -1,12 +1,10 @@
 import { Injectable, NotFoundException, InternalServerErrorException, NotAcceptableException } from '@nestjs/common';
-import { SearchModelService } from "../services/search-model.service";
-import { GenericModel } from "../services/generic-model";
-import { LinesModelService } from "../services/lines-model.service";
 import { CategoriesModelService } from "../services/categories-model.service";
-import { ApiResponse } from '@elastic/elasticsearch';
-import {MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, IsOptional, MaxLength, IsIn, Length} from "class-validator";
-import { help } from "../helpers/helper";
-import { ArticleIndex } from "../indices/articleIndex";
+import { RequestParams } from '@elastic/elasticsearch';
+import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn, Length} from "class-validator";
+import { ArticleIndex, Article } from "../indices/articleIndex";
+import { SublinesIndex } from "../indices/sublinesIndex";
+import { CategoriesIndex } from "../indices/categoriesIndex";
 
 export class getArticlesDTO{
 
@@ -14,7 +12,7 @@ export class getArticlesDTO{
     @IsNotEmpty({ message: "si no se proporciona una categoria se debe proporcionar una query" })
     @IsAscii({ message: "la query debe contener carecteres Ascii" })
     @MinLength(3,{ message: "has proporcionado una query demasiado corta, debe contener minimo $constraint1 caracteres" })
-    query?:string;
+    query:string;
     
     @IsNotEmpty({ message: "debes proporcionar una linea en la cual buscar los articulos" })
     @Length(20,20,{ message: "debes proporcionar un id valido" })
@@ -34,26 +32,6 @@ export class SingleArticleDTO {
     @IsNotEmpty({ message: "debes proporcionar un id de articulo" })
     @Length(20,20,{ message: "debes proporcionar un id valido" })
     id:string
-}
-
-export interface Article {
-    title:string;
-    content:string;
-    tags?:string[];
-    resume?:string;
-    attached?:string[];
-    likes?:string[];//user ids
-    disLikes?:string[];//user ids
-    favorites?:string[];//user ids
-    role?:"noticia"|"articulo";
-    publicationDate?:number;
-    modificationDate?:number;
-    modificationUser?:string;
-    creator?:string;
-    id?:string;
-    category:string;
-    subLine:string;
-    line:string;
 }
 
 export class articleDTO {
@@ -159,40 +137,28 @@ export class articlesBulkDTO implements Article{
 
 }
 @Injectable()
-export class ArticlesModelService extends GenericModel{
+export class ArticlesModelService{
 
     constructor(
-        private searchModel:SearchModelService,
-        private linesModel:LinesModelService,
         private categoriesModel:CategoriesModelService,
-        private articleIndex:ArticleIndex ) {
-        super()
+        private articleIndex:ArticleIndex,
+        private sublinesIndex:SublinesIndex,
+        private categoriesIndex:CategoriesIndex
+        ) {
     }
-
-//#region Private
-
-    private parseEsResultToArticles(result: ApiResponse<any, any>): Article[] {
-        return result.body.hits.hits.map(articleSource => {
-            let articleAux = articleSource._source;
-            articleAux.id = articleSource['_id'];
-            return articleAux;
-        })
-    }
-   
-//#endregion Private
 
 //#region Public
 
-    public async getArticlesByCategory(category: string): Promise<Article[]> {
+    public async getArticlesByCategory(category: string): Promise<(Article & { id: string; })[]> {
 
-        return await this.articleIndex.getBycategory(category)
+        return await this.articleIndex.where({category:category})
+
     }
 
-    public async getArticlesByQuery(options: { query: string; line: string; subline: string; }): Promise<Article[]> {
+    public async getArticlesByQuery(options: { query: string; line: string; subline: string; }): Promise<(Article & { id: string; })[]> {
         try {
-            let result = await this.esClient.search({
-                index: "articles",
-                body: {
+
+            let query = {
                     query: {
                         bool: {
                             must: [
@@ -210,24 +176,18 @@ export class ArticlesModelService extends GenericModel{
                         }
                     }
                 }
-            })
+            
 
-            return this.parseEsResultToArticles(result);
+            return await this.articleIndex.query(query)
+
         } catch (err) {
             console.log(err)
         }
     }
 
-    public async getArticle(articleId: string): Promise<Article> {
-
+    public async getArticle(articleId: string): Promise<Article & { id: string; }> {
         try {
-            let result = await this.esClient.get({
-                id: articleId,
-                index: 'articles',
-                type: '_doc'
-            })        
-
-            return help.combine(result.body._source, {id:result.body._id});
+            return await this.articleIndex.getById(articleId)
         } catch (error) {
             if( error.meta.statusCode == 404 ){
                 throw new NotFoundException('articulo no encontrado');
@@ -240,7 +200,7 @@ export class ArticlesModelService extends GenericModel{
         let subline:string = null;
         let line:string = null;
             try {
-                var category = await this.categoriesModel.getCategory(article.category);
+                var category = await this.categoriesIndex.getById(article.category)
             } catch (error) {
                 if( error.meta.statusCode == 404 ){
                     throw new NotFoundException('categoria no encontrada');
@@ -254,15 +214,15 @@ export class ArticlesModelService extends GenericModel{
             }
 
             if(isLeaft){
-                subline = category.sublinea;
+                subline = category.sublinea
             }else{
                 throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias')
             }
 
             try {
-                let sublineAux = await this.linesModel.getSubline(subline)
-                line = sublineAux.line
-                
+                let sublineAux = await this.sublinesIndex.getById(subline)
+                console.log(sublineAux)
+                line = sublineAux.line                
             } catch (error) {
                 throw error
                 if( error.meta.statusCode == 404 ){
@@ -281,11 +241,10 @@ export class ArticlesModelService extends GenericModel{
                 publicationDate:(new Date).getTime(),
                 modificationDate:(new Date).getTime()
             }
-
+            
             let newArticle:Article = { ...articleExtas ,...article }
-
-            let result = await this.indexDocument<Article>(newArticle,'articles')
-            return help.combine(newArticle,{id:result.body._id});        
+             
+            return await this.articleIndex.create(newArticle)
     }
 
     public addLike(idArticulo:string,id_usuario:string):string[]{

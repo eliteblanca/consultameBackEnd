@@ -1,10 +1,9 @@
 import { Injectable, ConflictException, HttpException, NotFoundException } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
-import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, MaxLength, IsIn, IsEmpty, IsOptional, Equals, IsString, IsAlphanumeric } from "class-validator";
-import { help } from "../helpers/helper";
-import * as async from 'async';
 import { LinesIndex, line } from "../indices/linesIndex";
 import { SublinesIndex, subline } from "../indices/sublinesIndex";
+import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, MaxLength, IsIn, IsEmpty, IsOptional, Equals, IsString, IsAlphanumeric } from "class-validator";
+import * as async from 'async';
 import * as R from 'remeda';
 
 export class newLineDTO {

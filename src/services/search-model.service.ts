@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
+import { SearchsIndex } from "../indices/searchIndex";
+import * as R from 'remeda';
 
 type search = {
     query:string,
@@ -11,7 +13,7 @@ type search = {
 @Injectable()
 export class SearchModelService extends GenericModel{
     
-    constructor() {
+    constructor(private searchsIndex:SearchsIndex) {
         super()
     }
 
@@ -21,52 +23,43 @@ export class SearchModelService extends GenericModel{
         'prueba 3',
         'prueba 4',
         'prueba 5'];
-  
-
-    public async getSearch(options: { query: string; line: string; subline: string; }): Promise<any[]> {
-        let result = await this.esClient.search({
-            index: "searchs",
-            body: {
-                query: {
-                    bool: {
-                        filter: [
-                            { term: { line: options.line } },
-                            { term: { subline: options.subline } },
-                            { term: { query: options.query } }
-                        ]
-                    }
-                }
-            }
-        })
-
-        return result.body.hits.hits.map(searchSource => {
-            return { id: searchSource._id, ...searchSource._source }
-        })
-
-    }
-
+   
     public increaseSearchCount(id: string): Promise<any> {
-        return this.esClient.update({
-            id: id, index: 'searchs', type: '_doc', body: {
-                script: {
-                    "source": "ctx._source.searches += 1"
-                }
-            }
-        })
+        return this.searchsIndex.update(id,{ "source": "ctx._source.searches += 1"})
     }
 
     public async newSearch(options: { query: string; line: string; subline: string; }):Promise<any>{
-        let searchs = await this.getSearch(options)
+        let searchs = await this.searchsIndex.where(R.omit(options,['line']))
 
         if (searchs.length) {
             await this.increaseSearchCount(searchs[0]['id'])
         } else {
-            await this.indexDocument<search>({ searches: 1, ...options }, 'searchs')
+            await this.searchsIndex.create({ searches: 1, ...options })
         }
     }
 
-    public getSuggestions(input:string, subline:string):String[]{
-        return this.suggestionList;
+    public async getSuggestions(input:string, subline:string):Promise<(search & { id: string; })[]>  {
+
+        let query = {
+            query: {
+                bool: {
+                    must: [
+                        {
+                            multi_match: {
+                                "query": input,
+                                "type": "bool_prefix",
+                                "fields": ["query.full", "query.full._2gram", "query.full._3gram"]
+                            }
+                        }
+                    ],
+                    filter: [
+                        { "term": { "subline": subline } }
+                    ]
+                }
+            }
+        }
+
+        return await this.searchsIndex.query(query)
     }
 
 }
