@@ -14,17 +14,4 @@ export class SearchsIndex extends Esindex<search> {
         super('searchs')
     }
 
-    public increaseSearchCount(id: string): Promise<any> {
-        return this.esClient.update({
-            id: id,
-            index: this.index,
-            type: '_doc',
-            body: {
-                script: {
-                    "source": "ctx._source.searches += 1"
-                }
-            }
-        })
-    }  
-
 }

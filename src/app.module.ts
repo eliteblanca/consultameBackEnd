@@ -21,6 +21,7 @@ import { LinesIndex } from "./indices/linesIndex";
 import { SublinesIndex } from "./indices/sublinesIndex";
 import { CategoriesIndex } from "./indices/categoriesIndex";
 import { SearchsIndex } from './indices/searchIndex';
+import { LikeUserIndex } from './indices/likeUserIndex';
 
 const secretKey = "123";
 
@@ -52,7 +53,8 @@ const secretKey = "123";
     LinesIndex,
     SublinesIndex,
     CategoriesIndex,
-    SearchsIndex
+    SearchsIndex,
+    LikeUserIndex
   ],
 })
 export class AppModule {}

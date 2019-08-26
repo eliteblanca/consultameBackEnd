@@ -5,6 +5,9 @@ import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn
 import { ArticleIndex, Article } from "../indices/articleIndex";
 import { SublinesIndex } from "../indices/sublinesIndex";
 import { CategoriesIndex } from "../indices/categoriesIndex";
+import { LikeUserIndex } from "../indices/likeUserIndex";
+
+
 
 export class getArticlesDTO{
 
@@ -143,7 +146,8 @@ export class ArticlesModelService{
         private categoriesModel:CategoriesModelService,
         private articleIndex:ArticleIndex,
         private sublinesIndex:SublinesIndex,
-        private categoriesIndex:CategoriesIndex
+        private categoriesIndex:CategoriesIndex,
+        private likeUserIndex:LikeUserIndex
         ) {
     }
 
@@ -247,8 +251,11 @@ export class ArticlesModelService{
             return await this.articleIndex.create(newArticle)
     }
 
-    public addLike(idArticulo:string,id_usuario:string):string[]{
-        return ['id1' ,'id2'];
+    public async addLike(idArticulo:string,id_usuario:string):string[]{
+        let likes = await this.likeUserIndex.where({type:"like",article:idArticulo,user:id_usuario})
+
+        
+
     }
 
     public addDisLike(idArticulo:string,id_usuario:string):string[]{

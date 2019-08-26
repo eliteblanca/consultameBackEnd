@@ -7,23 +7,19 @@ export class searchController {
 
     constructor(private searchModel:SearchModelService) {}
 
-    /**
-    * #### URI: api/suggestions
-    * ***
-    * Retorna una lista de sugerencias acerca de la busqueda actual
-    * ***
-    * - Method: `GET`
-    * 
-    * - Body: `none`
-    *
-    * - return: `Article[]`
-    */
     @UseGuards(AuthGuard('jwt'))
     @Get()
     getSuggestions(
         @Query('input') input:string,
         @Query('subline') subline:string){
 
-        return this.searchModel.getSuggestions(input, subline);
+        if(subline && input){
+            return this.searchModel.getSuggestions(input, subline);
+        }else if (subline) {
+            return this.searchModel.getBySubline(subline);
+        }else{
+            return this.searchModel.getAll();
+        }
     }
 }
+            
