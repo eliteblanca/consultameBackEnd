@@ -162,7 +162,7 @@ export class EsClientService extends GenericModel {
 						}
 					})
 					break;
-				case 'likeUser':
+				case 'userlike':
 					return await this.esClient.indices.create({
 						index: index,
 						include_type_name: false,
@@ -172,6 +172,20 @@ export class EsClientService extends GenericModel {
 									"user": { "type": "keyword" },
 									"article": { "type": "keyword" },
 									"type": { "type": "keyword" }
+								}
+							}
+						}
+					})
+					break;
+				case 'userfavorites':
+					return await this.esClient.indices.create({
+						index: index,
+						include_type_name: false,
+						body: {
+							"mappings": {
+								"properties": {
+									"user": { "type": "keyword" },
+									"article": { "type": "keyword" }
 								}
 							}
 						}

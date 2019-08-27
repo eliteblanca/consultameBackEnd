@@ -1,7 +1,9 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
 import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, MaxLength, IsIn, IsEmpty } from "class-validator";
-
+import { LikeUserIndex, likeUser } from "../indices/likeUserIndex";
+import { FavoriteUserIndex, favoriteUser } from "../indices/favoritesUserIndex";
+import * as R from 'remeda';
 export class newUserDTO {
 
   @IsNotEmpty({ message: "Debes proporcionar un username" })
@@ -36,7 +38,10 @@ export class deleteUserDTO {
 @Injectable()
 export class UserModelService extends GenericModel {
 
-  constructor() {
+  constructor(
+    private likeUserIndex:LikeUserIndex,
+    private favoriteUserIndex:FavoriteUserIndex
+    ) {
     super()
   }
 
@@ -129,4 +134,20 @@ export class UserModelService extends GenericModel {
       console.log(error)
     }
   }
+
+  public async getUserLikes(userId:string):Promise<any>{
+    let result = await this.likeUserIndex.where({user:userId,type:'like'})
+    return R.map(result,(likeUser:likeUser)=>likeUser.article)
+  }
+
+  public async getUserDisLikes(userId:string):Promise<any>{
+    let result = await this.likeUserIndex.where({user:userId,type:'dislike'})
+    return R.map(result,(dislikeUser:likeUser) => dislikeUser.article)
+  }
+
+  public async getUserFavorites(userId:string):Promise<any>{
+    let result = await this.favoriteUserIndex.where({user:userId})
+    return R.map(result,(favoriteUser:favoriteUser) => favoriteUser.article)
+  }
+
 }

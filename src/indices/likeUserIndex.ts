@@ -10,7 +10,7 @@ export interface likeUser {
 @Injectable()
 export class LikeUserIndex extends Esindex<likeUser> {
     constructor(){
-        super('likeUser')
+        super('userlike')
     }
 
 }

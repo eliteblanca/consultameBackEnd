@@ -81,6 +81,17 @@ export class ArticlesController {
  @Delete(':id/likes')
  removeLike(@Param('id') idArticulo , @User() user:U):any{
     return this.articlesModel.removeLike(idArticulo,user.sub);
+ } 
+
+ @UseGuards(AuthGuard('jwt'))
+ @Post(':id/favorites')
+ addFavorite(@Param('id') idArticulo , @User() user:U):any{
+    return this.articlesModel.addFavorite(idArticulo,user.sub);
  }
 
+ @UseGuards(AuthGuard('jwt'))
+ @Delete(':id/favorites')
+ removeFavorite(@Param('id') idArticulo , @User() user:U):any{
+    return this.articlesModel.removeFavorite(idArticulo,user.sub);
+ }
 }

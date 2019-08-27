@@ -69,6 +69,26 @@ export class Esindex<T> {
 
     }
 
+    public async deleteWhere(ops:Partial<T>):Promise<{deleted:number}>{
+
+        let queryObj:RequestParams.DeleteByQuery = this.createRequest({
+            query: {
+                bool: {
+                    filter: R.pipe(
+                        R.toPairs(ops),
+                        R.map(pair=>R.objOf(pair[1],pair[0])),
+                        R.map(obj=>R.objOf(obj,'term'))
+                    )
+                }
+            }
+        })
+
+        let result = await this.esClient.deleteByQuery(queryObj)
+
+        return {deleted:result.body.deleted}
+
+    }
+
     public async all():Promise<(T & { id: string; })[]>{
         return this.query({            
                 query: {

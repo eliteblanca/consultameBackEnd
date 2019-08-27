@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, InternalServerErrorException, NotAcceptableException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, NotAcceptableException, ConflictException } from '@nestjs/common';
 import { CategoriesModelService } from "../services/categories-model.service";
 import { RequestParams } from '@elastic/elasticsearch';
 import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn, Length} from "class-validator";
@@ -6,6 +6,7 @@ import { ArticleIndex, Article } from "../indices/articleIndex";
 import { SublinesIndex } from "../indices/sublinesIndex";
 import { CategoriesIndex } from "../indices/categoriesIndex";
 import { LikeUserIndex } from "../indices/likeUserIndex";
+import { FavoriteUserIndex } from "../indices/favoritesUserIndex";
 
 
 
@@ -147,7 +148,8 @@ export class ArticlesModelService{
         private articleIndex:ArticleIndex,
         private sublinesIndex:SublinesIndex,
         private categoriesIndex:CategoriesIndex,
-        private likeUserIndex:LikeUserIndex
+        private likeUserIndex:LikeUserIndex,
+        private favoriteUserIndex:FavoriteUserIndex
         ) {
     }
 
@@ -251,23 +253,183 @@ export class ArticlesModelService{
             return await this.articleIndex.create(newArticle)
     }
 
-    public async addLike(idArticulo:string,id_usuario:string):string[]{
-        let likes = await this.likeUserIndex.where({type:"like",article:idArticulo,user:id_usuario})
+    public async addLike(articleId:string,id_usuario:string):Promise<any>{
 
+        await this.removeDisLike(articleId, id_usuario)
+
+        try {
+            let article = await this.articleIndex.getById(articleId)
+        } catch (error) {
+            throw new NotAcceptableException('el articulo no existe');
+        }
+
+        let existinglikes = await this.likeUserIndex.where({type:"like",article:articleId,user:id_usuario})
+
+        if(!existinglikes.length){
+            this.likeUserIndex.create({article:articleId,type:'like',user:id_usuario})
+
+            let updateQuery = {                
+                "source": "ctx._source.likes.add(params.user)",
+                "lang": "painless",
+                "params" : {
+                    "user" : id_usuario
+                }
+            }
+
+            this.articleIndex.update(articleId,updateQuery)
+        }else{
+            return new ConflictException('ya has dado like en este articulo')
+        }
+
+        return true
+
+    }
+
+    public async addDisLike(articleId:string,id_usuario:string):Promise<any>{
+
+        await this.removeLike(articleId,id_usuario)
+
+        try {
+            let article = await this.articleIndex.getById(articleId)
+        } catch (error) {
+            throw new NotAcceptableException('el articulo no existe');
+        }
+
+        let existingDislikes = await this.likeUserIndex.where({type:"dislike",article:articleId,user:id_usuario})
+
+        if(!existingDislikes.length){
+            this.likeUserIndex.create({article:articleId,type:'dislike',user:id_usuario})
+
+            let updateQuery = {                
+                "source": "ctx._source.disLikes.add(params.user)",
+                "lang": "painless",
+                "params" : {
+                    "user" : id_usuario
+                }
+            }
+
+            this.articleIndex.update(articleId,updateQuery)
+        }else{
+            return new ConflictException('ya has dado like en este articulo')
+        }
+
+        return true
+
+    }
+
+    public async removeDisLike(articleId:string, id_usuario:string):Promise<any>{
+        let result = await this.likeUserIndex.deleteWhere({article:articleId,user:id_usuario,type:'dislike'})
         
+        console.log(result)
 
+        if(result.deleted){
+            try {
+                var article = await this.getArticle(articleId)
+            } catch (error) {
+                throw new NotAcceptableException('el articulo no existe');
+            }
+
+            let index = article.disLikes.findIndex(userId => userId == id_usuario)
+            if(index >= 0){
+                
+                let updateQuery = {
+                    "source": "ctx._source.disLikes.remove(" + index + ")",
+                    "lang": "painless"
+                }
+
+                try {
+                    await this.articleIndex.update(articleId,updateQuery)
+                } catch (error) {
+                    console.log(error.meta.body.error)
+                }
+            }
+        }
     }
 
-    public addDisLike(idArticulo:string,id_usuario:string):string[]{
-        return ['id1' ,'id2'];
+    public async removeLike(articleId:string, id_usuario:string):Promise<any>{
+
+        let result = await this.likeUserIndex.deleteWhere({article:articleId,user:id_usuario,type:'like'})
+        
+        console.log(result)
+
+        if(result.deleted){
+            try {
+                var article = await this.getArticle(articleId)
+            } catch (error) {
+                throw new NotAcceptableException('el articulo no existe');
+            }
+
+            let index = article.likes.findIndex(userId => userId == id_usuario)
+            if(index >= 0){
+                
+                let updateQuery = {
+                    "source": "ctx._source.likes.remove(" + index + ")",
+                    "lang": "painless"
+                }
+
+                try {
+                    await this.articleIndex.update(articleId,updateQuery)
+                } catch (error) {
+                    console.log(error.meta.body.error)
+                }
+            }
+        }
     }
 
-    public removeDisLike(idArticulo:string, id_usuario:string):string[]{
-        return ['id1'];
+    public async addFavorite(articleId:string, id_usuario:string):Promise<any>{
+
+        try {
+            let article = await this.articleIndex.getById(articleId)
+        } catch (error) {
+            throw new NotAcceptableException('el articulo no existe');
+        }
+
+        let existingFavorites = await this.favoriteUserIndex.where({article:articleId, user:id_usuario})
+
+        if(!existingFavorites.length){
+            this.favoriteUserIndex.create({article:articleId, user:id_usuario})
+
+            let updateQuery = {
+                "source": "ctx._source.favorites.add(params.user)",
+                "lang": "painless",
+                "params" : {
+                    "user" : id_usuario
+                }
+            }
+
+            this.articleIndex.update(articleId, updateQuery)
+        }else{
+            return new ConflictException('ya has agregado este articulo a tus favoritos')
+        }
+
+        return true
     }
 
-    public removeLike(idArticulo:string, id_usuario:string):string[]{
-        return ['id1'];
+    public async removeFavorite(articleId:string, id_usuario:string):Promise<any>{
+
+        let result = await this.favoriteUserIndex.deleteWhere({ article:articleId, user:id_usuario })
+
+        if(result.deleted){
+            try {
+                var article = await this.getArticle(articleId)
+            } catch (error) {
+                throw new NotAcceptableException('el articulo no existe');
+            }
+
+            let index = article.favorites.findIndex(userId => userId == id_usuario)
+            if(index >= 0){
+                let updateQuery = {
+                    "source": "ctx._source.favorites.remove(" + index + ")",
+                    "lang": "painless"
+                }
+
+                try {
+                    await this.articleIndex.update(articleId,updateQuery)
+                } catch (error) {
+                    console.log(error.meta.body.error)
+                }
+            }
+        }
     }
 
 //#endregion Public
