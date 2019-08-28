@@ -86,7 +86,24 @@ export class Esindex<T> {
         let result = await this.esClient.deleteByQuery(queryObj)
 
         return {deleted:result.body.deleted}
+    }
 
+    public async deleteByQuery(query:object):Promise<{deleted:number}>{
+
+        let queryObj:RequestParams.DeleteByQuery = this.createRequest(query)
+
+        let result = await this.esClient.deleteByQuery(queryObj)
+
+        return {deleted:result.body.deleted}
+    }
+    
+    public async delete(id:string):Promise<any>{
+        await this.esClient.delete({
+            id: id,
+            index: this.index
+        })
+
+        return true
     }
 
     public async all():Promise<(T & { id: string; })[]>{

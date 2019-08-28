@@ -1,10 +1,13 @@
-import { Injectable, Optional, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import { Injectable, Optional, NotAcceptableException, NotFoundException, forwardRef, Inject } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
 import { help } from "../helpers/helper";
 import { CategoriesIndex, category } from "../indices/categoriesIndex";
 import { SublinesIndex } from "../indices/sublinesIndex";
-import * as R from 'remeda';
+import { ArticleIndex } from "../indices/articleIndex";
 import { Length, IsNotEmpty, IsPositive, IsInt, IsOptional, IsString } from 'class-validator';
+import { ArticlesModelService } from "./articles-model.service";
+import * as R from 'remeda';
+import * as async from 'async';
 
 type categories = {
   name: string,
@@ -45,18 +48,20 @@ export class newCategoryDTO {
 @Injectable()
 export class CategoriesModelService {
   constructor(
-    private categoriesIndex:CategoriesIndex,
-    private sublinesIndex:SublinesIndex
-  ) {
-  }
+    private categoriesIndex: CategoriesIndex,
+    private sublinesIndex: SublinesIndex,
+    private articleIndex: ArticleIndex,
+    @Inject(forwardRef(() => ArticlesModelService))
+    private articlesModel: ArticlesModelService
+  ) { }
 
   public async isLeaftCategory(categoryId: string): Promise<boolean> {
     try {
-      let result = await this.categoriesIndex.where({group:categoryId})      
+      let result = await this.categoriesIndex.where({ group: categoryId })
 
-      if(result.length){
+      if (result.length) {
         return false
-      }else{
+      } else {
         return true
       }
 
@@ -95,7 +100,7 @@ export class CategoriesModelService {
     }
 
 
-    let category =  help.combine(newCategory, { sublinea: sublineId })
+    let category = help.combine(newCategory, { sublinea: sublineId })
 
     let result = await this.categoriesIndex.create(category)
 
@@ -105,10 +110,62 @@ export class CategoriesModelService {
 
   public async getCategories(sublineId: string): Promise<(category & { id: string; })[]> {
 
+    try {
+
       let subline = await this.sublinesIndex.getById(sublineId);
 
-      return await this.categoriesIndex.where({sublinea:sublineId})
+      return await this.categoriesIndex.where({ sublinea: sublineId })
 
+    } catch (error) {
+      if (error && error.meta && error.meta.body && error.meta.statusCode == 404) {
+        throw new NotFoundException('sublinea no encontrada')
+      } else {
+        console.log(error)
+      }
+    }
   }
 
+  private async getCategoriesByGroup(categoryId): Promise<(category & { id: string; })[]> {
+    return await this.categoriesIndex.where({ group: categoryId })
+  }
+
+  private async getTree(groupId): Promise<string[]> {
+
+    let isLeaftCategory = await this.isLeaftCategory(groupId)
+
+    if (isLeaftCategory) {
+      return [groupId]
+    } else {
+      let nodes = await this.getCategoriesByGroup(groupId)
+      let result = [groupId]
+      for (var i = 0; i < nodes.length; i++) {
+        let newNodes = await this.getTree(nodes[i].id)
+        result = result.concat(newNodes)
+      }
+      return result
+    }
+  }
+
+  public deleteCategory = async (categoryId): Promise<any> => {
+
+    let listOfCategories = await this.getTree(categoryId);
+
+    let articulosPorBorrar: any[] = await async.map(listOfCategories, async (catId) => this.articleIndex.where({ category: catId }))
+
+    let result = await async.each(R.flatten(articulosPorBorrar).map(article => article.id), this.articlesModel.deleteArticle);
+
+    let deleteCategoriesQuery = {
+      "query": {
+        "bool": {
+          "filter": {
+            "terms": {
+              "_id": listOfCategories
+            }
+          }
+        }
+      }
+    }
+
+    return await this.categoriesIndex.deleteByQuery(deleteCategoriesQuery)
+  }
 }

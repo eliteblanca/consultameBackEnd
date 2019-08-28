@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, InternalServerErrorException, NotAcceptableException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, NotAcceptableException, ConflictException, forwardRef, Inject } from '@nestjs/common';
 import { CategoriesModelService } from "../services/categories-model.service";
 import { RequestParams } from '@elastic/elasticsearch';
 import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn, Length} from "class-validator";
@@ -143,7 +143,9 @@ export class articlesBulkDTO implements Article{
 @Injectable()
 export class ArticlesModelService{
 
-    constructor(
+
+    constructor(        
+        @Inject(forwardRef(() => CategoriesModelService))
         private categoriesModel:CategoriesModelService,
         private articleIndex:ArticleIndex,
         private sublinesIndex:SublinesIndex,
@@ -430,6 +432,18 @@ export class ArticlesModelService{
                 }
             }
         }
+    }
+
+    public deleteArticle = async (id: string): Promise<any> => {
+        try {            
+            await this.articleIndex.delete(id)
+        } catch (error) {
+            console.log(error)
+        }
+
+        await this.favoriteUserIndex.deleteWhere({article:id})
+
+        await this.likeUserIndex.deleteWhere({article:id})
     }
 
 //#endregion Public

@@ -42,6 +42,12 @@ export class ArticlesController {
  }
 
  @UseGuards(AuthGuard('jwt'))
+ @Delete(':id')
+ deleteArticle(@Param() singleArticleDTO:SingleArticleDTO ):any{
+    return this.articlesModel.deleteArticle(singleArticleDTO.id);
+ }
+
+ @UseGuards(AuthGuard('jwt'))
  @Post()
  createArticle(
    @Body() body: articleDTO,

@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Query, Param, Post, Body } from '@nestjs/common';
+import { Controller, UseGuards, Get, Query, Param, Post, Body, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { LinesModelService, newLineDTO, newSublineDTO, GetLinesDTO, GetSublinesDTO } from "../services/lines-model.service";
 @Controller('api/lines')
@@ -22,6 +22,14 @@ export class LinesController {
   ): Promise<any> {
     return this.linesModel.getLines(Params.include)
   }  
+
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':id')
+  deleteLine(
+    @Param('id') id: string
+  ): Promise<any> {
+    return this.linesModel.deleteLine(id)
+  }
 
   @UseGuards(AuthGuard('jwt'))
   @Post(':id/sublines')

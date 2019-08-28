@@ -8,6 +8,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { searchController } from './controllers/search.controller';
 import { UsersController } from './controllers/users.controller';
 import { LinesController } from './controllers/lines.controller';
+import { SubLinesController } from './controllers/sublines.controller';
 import { EsClientController } from './controllers/es-client.controller';
 import { EsClientService } from './services/es-client.service';
 import { ArticlesModelService } from './services/articles-model.service';
@@ -36,7 +37,16 @@ const secretKey = "123";
     }),
     MorganModule.forRoot(),
   ],
-  controllers: [AppController, ArticlesController, searchController, UsersController, LinesController, EsClientController, CategoriesController],
+  controllers: [
+    AppController,
+    ArticlesController,
+    searchController,
+    UsersController,
+    LinesController,
+    EsClientController,
+    CategoriesController,
+    SubLinesController
+  ],
   providers: [    
     {
       provide: APP_INTERCEPTOR,

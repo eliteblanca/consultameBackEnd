@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Query, Param, Post, Body } from '@nestjs/common';
+import { Controller, UseGuards, Get, Query, Param, Post, Body, Delete } from '@nestjs/common';
 import { CategoriesModelService, correctParams, newCategoryDTO, getCategoryParams } from "../services/categories-model.service";
 import { AuthGuard } from '@nestjs/passport';
 
@@ -23,4 +23,17 @@ export class CategoriesController {
     ): Promise<any> {
         return this.categoriesModel.getCategories(Params.sublineId);
     }  
+
+    @UseGuards(AuthGuard('jwt'))
+    @Delete(':id')
+    deleteCategory(
+        @Param("id") id:string
+    ): Promise<any> {
+        try {
+            
+            return this.categoriesModel.deleteCategory(id);
+        } catch (error) {
+            console.log(error)
+        }
+    }
 }
