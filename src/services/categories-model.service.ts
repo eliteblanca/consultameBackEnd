@@ -43,6 +43,10 @@ export class newCategoryDTO {
   @IsOptional()
   @Length(20, 20, { message: "debes proporcionar un id valido" })
   public group: string;
+
+  @IsNotEmpty({ message: "Debes proporcionar una sublinea en la que agregar la categoria"})
+  @Length(20, 20, { message: "debes proporcionar un id valido para la sublinea" })
+  public sublinea: string
 }
 
 @Injectable()
@@ -74,10 +78,10 @@ export class CategoriesModelService {
     return await this.categoriesIndex.getById(categoryId)
   }
 
-  public async createCategory(newCategory: newCategoryDTO, sublineId: string): Promise<category & { id: string; }> {
+  public async createCategory(newCategory: newCategoryDTO): Promise<category & { id: string; }> {
     try {
       // --> comprueba si la linea existe
-      let subline = await this.sublinesIndex.getById(sublineId)
+      let subline = await this.sublinesIndex.getById(newCategory.sublinea)
     } catch (error) {
       if (error.meta.statusCode == 404) {
         throw new NotAcceptableException('la sublinea no existe');
@@ -99,12 +103,9 @@ export class CategoriesModelService {
       }
     }
 
+    let result = await this.categoriesIndex.create(newCategory)
 
-    let category = help.combine(newCategory, { sublinea: sublineId })
-
-    let result = await this.categoriesIndex.create(category)
-
-    return R.addProp(category, 'id', result.id)
+    return result
 
   }
 
@@ -167,5 +168,20 @@ export class CategoriesModelService {
     }
 
     return await this.categoriesIndex.deleteByQuery(deleteCategoriesQuery)
+  }
+
+  public updateCategory = async(id, newCategory):Promise<any> =>{
+    try {
+      // --> comprueba si la linea existe
+      let subline = await this.sublinesIndex.getById(newCategory.sublinea)
+    } catch (error) {
+      if (error.meta.statusCode == 404) {
+        throw new NotAcceptableException('la sublinea no existe');
+      } else {
+        console.log(error)
+      }
+    }
+
+    return await this.categoriesIndex.updatePartialDocument(id, newCategory)
   }
 }

@@ -114,9 +114,26 @@ export class Esindex<T> {
         })
     }
 
-    public async update(id:string, script:object):Promise<void>{
+    public async updateScript(id:string, script:object):Promise<void>{
         let queryObj:RequestParams.Update = R.addProp(this.createRequest({script:script}),'id',id)
         await this.esClient.update(queryObj)
     }
+
+    // public async updateFullDocument(id:string, doc: T):Promise<any>{
+        
+    // }
+
+    public async updatePartialDocument(id:string, partial:Partial<T>):Promise<any>{
+        let result = await this.esClient.index({
+            id: id,
+            index: this.index,
+            refresh: 'true',
+            body: partial
+        })
+
+        return result.body.result
+    }
+
+    
 
 }

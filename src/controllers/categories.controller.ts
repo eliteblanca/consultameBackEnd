@@ -1,8 +1,8 @@
-import { Controller, UseGuards, Get, Query, Param, Post, Body, Delete } from '@nestjs/common';
+import { Controller, UseGuards, Get, Query, Param, Post, Body, Delete, Put } from '@nestjs/common';
 import { CategoriesModelService, correctParams, newCategoryDTO, getCategoryParams } from "../services/categories-model.service";
 import { AuthGuard } from '@nestjs/passport';
 
-@Controller('api/sublines/:sublineId/categories')
+@Controller('api/categories')
 export class CategoriesController {
 
     constructor(private categoriesModel: CategoriesModelService) { }
@@ -10,30 +10,29 @@ export class CategoriesController {
     @UseGuards(AuthGuard('jwt'))
     @Post()
     createCategory(
-        @Param() Params: correctParams,
         @Body() Body: newCategoryDTO
     ): Promise<any> {
-        return this.categoriesModel.createCategory(Body,Params.sublineId);
+        return this.categoriesModel.createCategory(Body);
     }
-
-    @UseGuards(AuthGuard('jwt'))
-    @Get()
-    getCategories(
-        @Param() Params: correctParams
-    ): Promise<any> {
-        return this.categoriesModel.getCategories(Params.sublineId);
-    }  
 
     @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
     deleteCategory(
         @Param("id") id:string
     ): Promise<any> {
-        try {
-            
+        try {            
             return this.categoriesModel.deleteCategory(id);
         } catch (error) {
             console.log(error)
         }
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Put(':id')
+    updateCategory(
+        @Param('id') id: string,
+        @Body() Body: newCategoryDTO
+    ): Promise<any> {
+        return this.categoriesModel.updateCategory(id, Body);
     }
 }

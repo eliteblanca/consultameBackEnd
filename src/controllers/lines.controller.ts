@@ -1,11 +1,10 @@
-import { Controller, UseGuards, Get, Query, Param, Post, Body, Delete } from '@nestjs/common';
+import { Controller, UseGuards, Get, Query, Param, Post, Body, Delete, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { LinesModelService, newLineDTO, newSublineDTO, GetLinesDTO, GetSublinesDTO } from "../services/lines-model.service";
 @Controller('api/lines')
 export class LinesController {
 
-  constructor(private linesModel: LinesModelService) { }
-
+  constructor( private linesModel: LinesModelService ) { }
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
@@ -48,4 +47,12 @@ export class LinesController {
     return this.linesModel.getSublines(params.lineId)
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @Put(':id')
+  updateLine(
+    @Param('id') id: string,
+    @Body() body: newLineDTO
+  ): Promise<any> {
+    return this.linesModel.updateLine(id, body)
+  }
 }

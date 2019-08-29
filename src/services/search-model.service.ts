@@ -40,7 +40,7 @@ export class SearchModelService extends GenericModel{
     }
 
     public increaseSearchCount(id: string): Promise<any> {
-        return this.searchsIndex.update(id,{ "source": "ctx._source.searches += 1"})
+        return this.searchsIndex.updateScript(id,{ "source": "ctx._source.searches += 1"})
     }
 
     public async newSearch(options: { query: string; line: string; subline: string; }):Promise<any>{

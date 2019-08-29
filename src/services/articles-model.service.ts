@@ -7,6 +7,7 @@ import { SublinesIndex } from "../indices/sublinesIndex";
 import { CategoriesIndex } from "../indices/categoriesIndex";
 import { LikeUserIndex } from "../indices/likeUserIndex";
 import { FavoriteUserIndex } from "../indices/favoritesUserIndex";
+import { async } from 'rxjs/internal/scheduler/async';
 
 
 
@@ -229,7 +230,6 @@ export class ArticlesModelService{
 
             try {
                 let sublineAux = await this.sublinesIndex.getById(subline)
-                console.log(sublineAux)
                 line = sublineAux.line                
             } catch (error) {
                 throw error
@@ -278,7 +278,7 @@ export class ArticlesModelService{
                 }
             }
 
-            this.articleIndex.update(articleId,updateQuery)
+            this.articleIndex.updateScript(articleId,updateQuery)
         }else{
             return new ConflictException('ya has dado like en este articulo')
         }
@@ -310,7 +310,7 @@ export class ArticlesModelService{
                 }
             }
 
-            this.articleIndex.update(articleId,updateQuery)
+            this.articleIndex.updateScript(articleId,updateQuery)
         }else{
             return new ConflictException('ya has dado like en este articulo')
         }
@@ -340,7 +340,7 @@ export class ArticlesModelService{
                 }
 
                 try {
-                    await this.articleIndex.update(articleId,updateQuery)
+                    await this.articleIndex.updateScript(articleId,updateQuery)
                 } catch (error) {
                     console.log(error.meta.body.error)
                 }
@@ -370,7 +370,7 @@ export class ArticlesModelService{
                 }
 
                 try {
-                    await this.articleIndex.update(articleId,updateQuery)
+                    await this.articleIndex.updateScript(articleId,updateQuery)
                 } catch (error) {
                     console.log(error.meta.body.error)
                 }
@@ -399,7 +399,7 @@ export class ArticlesModelService{
                 }
             }
 
-            this.articleIndex.update(articleId, updateQuery)
+            this.articleIndex.updateScript(articleId, updateQuery)
         }else{
             return new ConflictException('ya has agregado este articulo a tus favoritos')
         }
@@ -426,7 +426,7 @@ export class ArticlesModelService{
                 }
 
                 try {
-                    await this.articleIndex.update(articleId,updateQuery)
+                    await this.articleIndex.updateScript(articleId,updateQuery)
                 } catch (error) {
                     console.log(error.meta.body.error)
                 }
@@ -444,6 +444,52 @@ export class ArticlesModelService{
         await this.favoriteUserIndex.deleteWhere({article:id})
 
         await this.likeUserIndex.deleteWhere({article:id})
+    }
+
+    public updateArticle = async ( id:string ,article:articleDTO ,modificationUser:string ):Promise<any> => {
+        
+        let subline:string = null;
+        let line:string = null;
+            try {
+                var category = await this.categoriesIndex.getById(article.category)
+            } catch (error) {
+                if( error.meta.statusCode == 404 ){
+                    throw new NotFoundException('categoria no encontrada');
+                }
+            }
+
+            try {
+                var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
+            } catch (error) {
+                console.log(error)
+            }
+
+            if(isLeaft){
+                subline = category.sublinea
+            }else{
+                throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias')
+            }
+
+            try {
+                let sublineAux = await this.sublinesIndex.getById(subline)
+                line = sublineAux.line                
+            } catch (error) {
+                throw error
+                if( error.meta.statusCode == 404 ){
+                    throw new NotFoundException('error al guardar el articulo');
+                }
+            }
+
+            let articleExtas = {
+                subLine:subline,
+                line:line,
+                modificationUser:modificationUser,
+                modificationDate:(new Date).getTime()
+            }
+            
+            let newArticle:Article = { ...articleExtas ,...article }
+             
+            return await this.articleIndex.updatePartialDocument(id,newArticle)
     }
 
 //#endregion Public

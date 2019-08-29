@@ -48,7 +48,6 @@ export class GetSublinesDTO {
 @Injectable()
 export class LinesModelService extends GenericModel {
 
-
     constructor(
         private linesIndex: LinesIndex,
         private sublinesIndex: SublinesIndex,
@@ -173,5 +172,13 @@ export class LinesModelService extends GenericModel {
         } else {
             throw new NotFoundException('no existe la linea')
         }
+    }
+
+    public updateLine = async (id:string, body:newLineDTO):Promise<any> => {
+        return await this.linesIndex.updatePartialDocument(id, body)
+    }
+
+    public updateSubline = async ( iSubline:string, body:newSublineDTO ):Promise<any> => {
+        return await this.sublinesIndex.updatePartialDocument( iSubline, body )
     }
 }

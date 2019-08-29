@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Request, Post, Get, Query, Param, Body, Delete, NotAcceptableException } from '@nestjs/common';
+import { Controller, UseGuards, Request, Post, Get, Query, Param, Body, Delete, NotAcceptableException, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from "../user.decorator";
 import { User as U } from "../entities/user";
@@ -52,8 +52,18 @@ export class ArticlesController {
  createArticle(
    @Body() body: articleDTO,
    @User() user: U
-  ):any{    
-   return this.articlesModel.createArticle(body,user.sub)   
+  ):any{
+   return this.articlesModel.createArticle(body,user.sub)
+ }
+
+ @UseGuards(AuthGuard('jwt'))
+ @Put(':id')
+ updateArticle(
+   @Body() body: articleDTO,
+   @User() user: U,
+   @Param('id') id:string
+  ):any{
+   return this.articlesModel.updateArticle(id, body, user.sub)
  }
 
  @UseGuards(AuthGuard('jwt'))
