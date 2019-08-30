@@ -1,14 +1,13 @@
-import { Controller, UseGuards, Get, Query, Param, Body, Delete, Post } from '@nestjs/common';
+import { Controller, UseGuards, Get, Query, Param, Body, Delete, Post, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { UserModelService , deleteUserDTO, newUserDTO} from "../services/user-model.service";
+import { UserModelService , deleteUserDTO, newUserDTO, updateUserRolDTO} from "../services/user-model.service";
 import { User } from "../user.decorator";
 import { User as U } from "../entities/user";
 
 @Controller('api/users')
 export class UsersController {
 
-  constructor(private userModel:UserModelService) {  }
-
+ constructor(private userModel:UserModelService) {  }
  
  @UseGuards(AuthGuard('jwt'))
  @Get()
@@ -30,22 +29,40 @@ export class UsersController {
    return this.userModel.createUser(newUser);
  }
 
+
  @UseGuards(AuthGuard('jwt'))
- @Get(':idUsuario/lines')
- getUserLines(
-    @Param('idUsuario') id_usuario
- ):any{
-   console.log('id_usuario')
-   return this.userModel.userLines(id_usuario);
+ @Put(':idUsuario')
+ actualizarUsuario(
+   @Body() newUser: updateUserRolDTO,
+   @Param('idUsuario') idUsuario:string
+   ):Promise<any> {
+   return this.userModel.updateUserRol(idUsuario, newUser);
  }
 
  @UseGuards(AuthGuard('jwt'))
- @Get(':idUsuario/lines/:idLinea/sublines')
+ @Get(':idUsuario/allowedlines')
  getUserSubLines(
-    @Param('idUsuario') id_usuario,
-    @Param('idLinea') id_linea,
+    @Param('idUsuario') id_usuario
  ):any{
-   return this.userModel.userSubLines(id_usuario, id_linea);
+   return this.userModel.getUserSubLines(id_usuario)
+ }
+
+ @UseGuards(AuthGuard('jwt'))
+ @Post(':idUsuario/allowedlines')
+ postUserSubline(
+    @Param('idUsuario') id_usuario,
+    @Body() body:{ subline:string }
+ ):any{
+   return this.userModel.postUserSubline(id_usuario,body.subline)
+ }
+
+ @UseGuards(AuthGuard('jwt'))
+ @Delete(':idUsuario/allowedlines/:idSubline')
+ deleteUserSubline(
+    @Param('idUsuario') id_usuario,
+    @Param('idSubline') idSubline
+ ):any{
+   return this.userModel.deleteUserSubline(id_usuario, idSubline)
  }
 
  @UseGuards(AuthGuard('jwt'))

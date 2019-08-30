@@ -5,7 +5,7 @@ const PUNTO_DE_ENLACE: string = "https://search-multiconsulta-konecta-oxehhr2nsd
 
 export class Esindex<T> {
 
-    constructor(protected index:string) {
+    constructor(protected index: string) {
         this.esClient = new Client({
             node: PUNTO_DE_ENLACE,
             requestTimeout: 3000
@@ -14,11 +14,11 @@ export class Esindex<T> {
 
     protected readonly esClient: Client;
 
-    private createBody = R.objOf('body')    
+    private createBody = R.objOf('body')
 
-    private createRequest = x => R.addProp(R.objOf('body')(x),'index',this.index)   
+    private createRequest = x => R.addProp(R.objOf('body')(x), 'index', this.index)
 
-    public async create(doc: T):Promise<T & { id: string; }> {
+    public create = async (doc: T): Promise<T & { id: string; }> => {
         let result = await this.esClient.index({
             index: this.index,
             refresh: 'true',
@@ -28,27 +28,27 @@ export class Esindex<T> {
         return R.addProp(doc, 'id', result.body._id)
     }
 
-    public async getById(id:string):Promise<T & { id: string; }>{
+    public getById = async (id: string): Promise<T & { id: string; }> => {
         let result = await this.esClient.get({
             id: id,
             index: this.index,
             type: '_doc'
         })
 
-        return R.addProp(result.body._source,'id',result.body._id);
+        return R.addProp(result.body._source, 'id', result.body._id);
     }
 
-    public async query(query:object):Promise<(T & { id: string; })[]>{
-        
-        let queryObj:RequestParams.Search =  this.createRequest(query)
+    public query = async (query: object): Promise<(T & { id: string; })[]> => {
+
+        let queryObj: RequestParams.Search = this.createRequest(query)
 
         let result = await this.esClient.search(queryObj)
-        
-        return R.map((x:any) => R.addProp(x._source,'id',x._id))
-              (result.body.hits.hits, )
+
+        return R.map((x: any) => R.addProp(x._source, 'id', x._id))
+            (result.body.hits.hits)
     }
 
-    public async where(ops:Partial<T>):Promise<(T & { id: string; })[]>{
+    public where = async (ops: Partial<T>): Promise<(T & { id: string; })[]> => {
 
         let result = await this.esClient.search({
             index: this.index,
@@ -57,27 +57,27 @@ export class Esindex<T> {
                     bool: {
                         filter: R.pipe(
                             R.toPairs(ops),
-                            R.map(pair=>R.objOf(pair[1],pair[0])),
-                            R.map(obj=>R.objOf(obj,'term'))
+                            R.map(pair => R.objOf(pair[1], pair[0])),
+                            R.map(obj => R.objOf(obj, 'term'))
                         )
                     }
                 }
             }
         })
 
-        return R.map(result.body.hits.hits, (x:any) => R.addProp(x._source,'id',x._id) )
+        return R.map(result.body.hits.hits, (x: any) => R.addProp(x._source, 'id', x._id))
 
     }
 
-    public async deleteWhere(ops:Partial<T>):Promise<{deleted:number}>{
+    public deleteWhere = async (ops: Partial<T>): Promise<{ deleted: number }> => {
 
-        let queryObj:RequestParams.DeleteByQuery = this.createRequest({
+        let queryObj: RequestParams.DeleteByQuery = this.createRequest({
             query: {
                 bool: {
                     filter: R.pipe(
                         R.toPairs(ops),
-                        R.map(pair=>R.objOf(pair[1],pair[0])),
-                        R.map(obj=>R.objOf(obj,'term'))
+                        R.map(pair => R.objOf(pair[1], pair[0])),
+                        R.map(obj => R.objOf(obj, 'term'))
                     )
                 }
             }
@@ -85,19 +85,19 @@ export class Esindex<T> {
 
         let result = await this.esClient.deleteByQuery(queryObj)
 
-        return {deleted:result.body.deleted}
+        return { deleted: result.body.deleted }
     }
 
-    public async deleteByQuery(query:object):Promise<{deleted:number}>{
+    public deleteByQuery = async (query: object): Promise<{ deleted: number }> => {
 
-        let queryObj:RequestParams.DeleteByQuery = this.createRequest(query)
+        let queryObj: RequestParams.DeleteByQuery = this.createRequest(query)
 
         let result = await this.esClient.deleteByQuery(queryObj)
 
-        return {deleted:result.body.deleted}
+        return { deleted: result.body.deleted }
     }
-    
-    public async delete(id:string):Promise<any>{
+
+    public delete = async (id: string): Promise<any> => {
         await this.esClient.delete({
             id: id,
             index: this.index
@@ -106,34 +106,34 @@ export class Esindex<T> {
         return true
     }
 
-    public async all():Promise<(T & { id: string; })[]>{
-        return this.query({            
-                query: {
-                    "match_all": {}
-                }            
+    public all = async (): Promise<(T & { id: string; })[]> => {
+        return this.query({
+            query: {
+                "match_all": {}
+            }
         })
     }
 
-    public async updateScript(id:string, script:object):Promise<void>{
-        let queryObj:RequestParams.Update = R.addProp(this.createRequest({script:script}),'id',id)
+    public updateScript = async (id: string, script: object): Promise<void> => {
+        let queryObj: RequestParams.Update = R.addProp(this.createRequest({ script: script }), 'id', id)
         await this.esClient.update(queryObj)
     }
 
-    // public async updateFullDocument(id:string, doc: T):Promise<any>{
-        
+    // public  updateFullDocument(id:string, doc: T):Promise<any>{
+
     // }
 
-    public async updatePartialDocument(id:string, partial:Partial<T>):Promise<any>{
-        let result = await this.esClient.index({
+    public updatePartialDocument = async (id: string, partial: Partial<T>): Promise<any> => {
+        let result = await this.esClient.update({
             id: id,
             index: this.index,
             refresh: 'true',
-            body: partial
+            body: { doc: partial } 
         })
 
         return result.body.result
     }
 
-    
+
 
 }

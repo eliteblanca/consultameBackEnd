@@ -34,7 +34,7 @@ export class EsClientService extends GenericModel {
 									"creator": { "type": "keyword" },
 									"commentsList": { "type": "keyword" },
 									"line": { "type": "keyword" },
-									"subLine": { "type": "keyword" },
+									"subline": { "type": "keyword" },
 									"category": { "type": "keyword" }
 								}
 							}
@@ -138,8 +138,7 @@ export class EsClientService extends GenericModel {
 								"properties": {
 									"username": { "type": "keyword" },
 									"password": { "type": "keyword" },
-									"rol": { "type": "keyword" },
-									"subLines": { "type": "keyword" }
+									"rol": { "type": "keyword" }
 								}
 							}
 						}
@@ -190,6 +189,20 @@ export class EsClientService extends GenericModel {
 							}
 						}
 					})
+					break;
+				case 'usersublines':
+					return await this.esClient.indices.create({
+						index: index,
+						include_type_name: false,
+						body: {
+							"mappings": {
+								"properties": {
+									"user": { "type": "keyword" },
+									"subline": { "type": "keyword" }
+								}
+							}
+						}
+					})						
 					break;
 				default:
 					break;

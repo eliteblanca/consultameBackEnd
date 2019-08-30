@@ -46,7 +46,8 @@ export class GetSublinesDTO {
 }
 
 @Injectable()
-export class LinesModelService extends GenericModel {
+export class LinesModelService {
+
 
     constructor(
         private linesIndex: LinesIndex,
@@ -54,9 +55,7 @@ export class LinesModelService extends GenericModel {
         private articleIndex: ArticleIndex,
         private categoriesIndex: CategoriesIndex,
         private categoriesModel:CategoriesModelService
-    ) {
-        super()
-    }
+    ) { }
 
     private populateWithSublines = async (line: line & { id: string; }): Promise<line_with_sublines> => {
         try {

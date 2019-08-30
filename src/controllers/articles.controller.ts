@@ -59,7 +59,7 @@ export class ArticlesController {
  @UseGuards(AuthGuard('jwt'))
  @Put(':id')
  updateArticle(
-   @Body() body: articleDTO,
+   @Body() body,
    @User() user: U,
    @Param('id') id:string
   ):any{

@@ -38,7 +38,8 @@
     "reflect-metadata": "^0.1.12",
     "remeda": "0.0.11",
     "rimraf": "^2.6.2",
-    "rxjs": "^6.3.3"
+    "rxjs": "^6.3.3",
+    "tsutils": "^3.17.1"
   },
   "devDependencies": {
     "@nestjs/testing": "6.1.1",

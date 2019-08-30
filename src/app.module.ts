@@ -24,6 +24,8 @@ import { CategoriesIndex } from "./indices/categoriesIndex";
 import { SearchsIndex } from './indices/searchIndex';
 import { LikeUserIndex } from './indices/likeUserIndex';
 import { FavoriteUserIndex } from './indices/favoritesUserIndex';
+import { UserIndex } from './indices/userIndex';
+import { UserSubLinesIndex } from './indices/userSubLinesIndex';
 
 const secretKey = "123";
 
@@ -66,7 +68,9 @@ const secretKey = "123";
     CategoriesIndex,
     SearchsIndex,
     LikeUserIndex,
-    FavoriteUserIndex
+    FavoriteUserIndex,
+    UserIndex,
+    UserSubLinesIndex
   ],
 })
 export class AppModule {}

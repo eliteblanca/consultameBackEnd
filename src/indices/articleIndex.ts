@@ -16,7 +16,7 @@ export interface Article {
     modificationUser?:string;
     creator?:string;
     category:string;
-    subLine:string;
+    subline:string;
     line:string;
 }
 

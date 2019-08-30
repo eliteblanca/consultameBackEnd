@@ -7,9 +7,6 @@ import { SublinesIndex } from "../indices/sublinesIndex";
 import { CategoriesIndex } from "../indices/categoriesIndex";
 import { LikeUserIndex } from "../indices/likeUserIndex";
 import { FavoriteUserIndex } from "../indices/favoritesUserIndex";
-import { async } from 'rxjs/internal/scheduler/async';
-
-
 
 export class getArticlesDTO{
 
@@ -134,7 +131,7 @@ export class articlesBulkDTO implements Article{
 
     @IsNotEmpty({ message: "debes proporcionar una sublinea"})
     @Length(20,20,{ message: "debes proporcionar un id valido"})
-    public subLine:string;
+    public subline:string;
 
     @IsNotEmpty({ message: "debes proporcionar una linea"})
     @Length(20,20,{ message: "debes proporcionar un id valido"})
@@ -242,7 +239,7 @@ export class ArticlesModelService{
                 likes:[],
                 disLikes:[],
                 favorites:[],
-                subLine:subline,
+                subline:subline,
                 line:line,
                 creator:creator,
                 modificationUser:creator,
@@ -481,15 +478,21 @@ export class ArticlesModelService{
             }
 
             let articleExtas = {
-                subLine:subline,
+                subline:subline,
                 line:line,
                 modificationUser:modificationUser,
                 modificationDate:(new Date).getTime()
             }
             
             let newArticle:Article = { ...articleExtas ,...article }
-             
-            return await this.articleIndex.updatePartialDocument(id,newArticle)
+             try {
+                
+                console.log(newArticle)
+
+                 return await this.articleIndex.updatePartialDocument(id,newArticle)
+            } catch (error) {
+                console.log(error.meta.body.error)
+            }
     }
 
 //#endregion Public
