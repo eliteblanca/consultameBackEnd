@@ -1,14 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
-import { SearchsIndex } from "../indices/searchIndex";
+import { SearchsIndex,search } from "../indices/searchIndex";
 import * as R from 'remeda';
 
-type search = {
-    query:string,
-    line:string,
-    subline:string,
-    searches:number
-};  
+
 
 @Injectable()
 export class SearchModelService extends GenericModel{
@@ -43,7 +38,7 @@ export class SearchModelService extends GenericModel{
         return this.searchsIndex.updateScript(id,{ "source": "ctx._source.searches += 1"})
     }
 
-    public async newSearch(options: { query: string; line: string; subline: string; }):Promise<any>{
+    public async newSearch(options: { query: string; subline: string; }):Promise<any>{
         let searchs = await this.getByQuery(options.subline, options.query)
 
         if (searchs.length) {

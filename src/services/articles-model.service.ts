@@ -1,6 +1,5 @@
-import { Injectable, NotFoundException, InternalServerErrorException, NotAcceptableException, ConflictException, forwardRef, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, NotAcceptableException, ConflictException, forwardRef, Inject } from '@nestjs/common';
 import { CategoriesModelService } from "../services/categories-model.service";
-import { RequestParams } from '@elastic/elasticsearch';
 import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn, Length} from "class-validator";
 import { ArticleIndex, Article } from "../indices/articleIndex";
 import { SublinesIndex } from "../indices/sublinesIndex";
@@ -16,10 +15,6 @@ export class getArticlesDTO{
     @MinLength(3,{ message: "has proporcionado una query demasiado corta, debe contener minimo $constraint1 caracteres" })
     query:string;
     
-    @IsNotEmpty({ message: "debes proporcionar una linea en la cual buscar los articulos" })
-    @Length(20,20,{ message: "debes proporcionar un id valido" })
-    line:string;
-
     @IsNotEmpty({ message: "debes proporcionar una sublinea en la cual buscar los articulos" })
     @Length(20,20,{ message: "debes proporcionar un id valido" })
     subline:string;
@@ -161,7 +156,7 @@ export class ArticlesModelService{
 
     }
 
-    public async getArticlesByQuery(options: { query: string; line: string; subline: string; }): Promise<(Article & { id: string; })[]> {
+    public async getArticlesByQuery(options: { query: string; subline: string; }): Promise<(Article & { id: string; })[]> {
         try {
 
             let query = {
@@ -176,7 +171,6 @@ export class ArticlesModelService{
                                 }
                             ],
                             filter: [
-                                { "term": { "line": options.line } },
                                 { "term": { "subLine": options.subline } }
                             ]
                         }
@@ -257,7 +251,6 @@ export class ArticlesModelService{
         await this.removeDisLike(articleId, id_usuario)
 
         try {
-            let article = await this.articleIndex.getById(articleId)
         } catch (error) {
             throw new NotAcceptableException('el articulo no existe');
         }
@@ -289,7 +282,6 @@ export class ArticlesModelService{
         await this.removeLike(articleId,id_usuario)
 
         try {
-            let article = await this.articleIndex.getById(articleId)
         } catch (error) {
             throw new NotAcceptableException('el articulo no existe');
         }
@@ -378,7 +370,6 @@ export class ArticlesModelService{
     public async addFavorite(articleId:string, id_usuario:string):Promise<any>{
 
         try {
-            let article = await this.articleIndex.getById(articleId)
         } catch (error) {
             throw new NotAcceptableException('el articulo no existe');
         }

@@ -10,10 +10,6 @@
 * `name`: `String`
 * ***
 * `rol`: `String`
-* ***
-* `line`: `String`
-* ***
-* `subLine`: `String`
 */
 export class User {
 "sub":string

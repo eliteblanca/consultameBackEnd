@@ -10,11 +10,13 @@ import { UsersController } from './controllers/users.controller';
 import { LinesController } from './controllers/lines.controller';
 import { SubLinesController } from './controllers/sublines.controller';
 import { EsClientController } from './controllers/es-client.controller';
+import { rolesController } from './controllers/roles.controller';
 import { EsClientService } from './services/es-client.service';
 import { ArticlesModelService } from './services/articles-model.service';
 import { SearchModelService } from './services/search-model.service';
 import { UserModelService } from './services/user-model.service';
 import { CategoriesModelService } from './services/categories-model.service';
+import { PermissionsModelService } from './services/permissions-model.service';
 import { LinesModelService } from './services/lines-model.service';
 import { CategoriesController } from './controllers/categories.controller';
 import { ArticleIndex } from './indices/articleIndex';
@@ -26,6 +28,7 @@ import { LikeUserIndex } from './indices/likeUserIndex';
 import { FavoriteUserIndex } from './indices/favoritesUserIndex';
 import { UserIndex } from './indices/userIndex';
 import { UserSubLinesIndex } from './indices/userSubLinesIndex';
+import { RolesIndex } from './indices/rolesIndex';
 
 const secretKey = "123";
 
@@ -47,7 +50,8 @@ const secretKey = "123";
     LinesController,
     EsClientController,
     CategoriesController,
-    SubLinesController
+    SubLinesController,
+    rolesController
   ],
   providers: [    
     {
@@ -62,6 +66,7 @@ const secretKey = "123";
     UserModelService,
     CategoriesModelService,
     LinesModelService,
+    PermissionsModelService,
     ArticleIndex,
     LinesIndex,
     SublinesIndex,
@@ -70,7 +75,8 @@ const secretKey = "123";
     LikeUserIndex,
     FavoriteUserIndex,
     UserIndex,
-    UserSubLinesIndex
+    UserSubLinesIndex,
+    RolesIndex
   ],
 })
 export class AppModule {}

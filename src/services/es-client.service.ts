@@ -68,14 +68,13 @@ export class EsClientService extends GenericModel {
 										type: "text",
 										analyzer: "autocomplete",
 										fields: {
-											raw: { 
-											  "type": "keyword"
+											raw: {
+												"type": "keyword"
 											}
-										  }
+										}
 									},
-									line:{	type:"keyword"	},
-									subline:{	type:"keyword"	},
-									searches:{	type:"integer"	}
+									subline: { type: "keyword" },
+									searches: { type: "integer" }
 								}
 							},
 							settings: {
@@ -202,7 +201,36 @@ export class EsClientService extends GenericModel {
 								}
 							}
 						}
-					})						
+					})
+					break;
+				case 'permissions':
+					return await this.esClient.indices.create({
+						index: index,
+						include_type_name: false,
+						body: {
+							"mappings": {
+								"properties": {
+									"role": { "type": "keyword" },
+									"resource": { "type": "keyword" },
+									"action": { "type": "keyword" },
+									"attributes": { "type": "keyword" }
+								}
+							}
+						}
+					})
+					break;
+				case 'roles':
+					return await this.esClient.indices.create({
+						index: index,
+						include_type_name: false,
+						body: {
+							"mappings": {
+								"properties": {
+									"role": { "type": "keyword" }
+								}
+							}
+						}
+					})
 					break;
 				default:
 					break;
@@ -224,4 +252,3 @@ export class EsClientService extends GenericModel {
 		return this.esClient.ping()
 	}
 }
-
