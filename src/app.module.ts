@@ -19,6 +19,8 @@ import { CategoriesModelService } from './services/categories-model.service';
 import { PermissionsModelService } from './services/permissions-model.service';
 import { LinesModelService } from './services/lines-model.service';
 import { CategoriesController } from './controllers/categories.controller';
+import { ResourcesController } from './controllers/resources.controller';
+import { PermissionsController } from './controllers/permissions.controller';
 import { ArticleIndex } from './indices/articleIndex';
 import { LinesIndex } from "./indices/linesIndex";
 import { SublinesIndex } from "./indices/sublinesIndex";
@@ -29,6 +31,8 @@ import { FavoriteUserIndex } from './indices/favoritesUserIndex';
 import { UserIndex } from './indices/userIndex';
 import { UserSubLinesIndex } from './indices/userSubLinesIndex';
 import { RolesIndex } from './indices/rolesIndex';
+import { ResourcesIndex } from './indices/resourcesIndex';
+import { PermissionsIndex } from './indices/permissionsIndex';
 
 const secretKey = "123";
 
@@ -51,7 +55,9 @@ const secretKey = "123";
     EsClientController,
     CategoriesController,
     SubLinesController,
-    rolesController
+    rolesController,
+    ResourcesController,
+    PermissionsController
   ],
   providers: [    
     {
@@ -76,7 +82,9 @@ const secretKey = "123";
     FavoriteUserIndex,
     UserIndex,
     UserSubLinesIndex,
-    RolesIndex
+    RolesIndex,
+    ResourcesIndex,
+    PermissionsIndex
   ],
 })
 export class AppModule {}

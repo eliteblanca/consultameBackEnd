@@ -13,7 +13,7 @@ export class rolesController {
   createRol(
     @Body() body: newRolDTO
   ): any {
-    this.permissionsModel.createRol(body)
+    return this.permissionsModel.createRol(body)
   }
 
   @UseGuards(AuthGuard('jwt'))

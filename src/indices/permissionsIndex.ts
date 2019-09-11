@@ -9,7 +9,7 @@ export interface permission {
   }
 
 @Injectable()
-export class UserIndex extends Esindex<permission> {
+export class PermissionsIndex extends Esindex<permission> {
     constructor(){
         super('permissions')
     }

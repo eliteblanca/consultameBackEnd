@@ -232,6 +232,19 @@ export class EsClientService extends GenericModel {
 						}
 					})
 					break;
+				case 'resources':
+					return await this.esClient.indices.create({
+						index: index,
+						include_type_name: false,
+						body: {
+							"mappings": {
+								"properties": {
+									"resource": { "type": "keyword" }
+								}
+							}
+						}
+					})
+					break;				
 				default:
 					break;
 			}
