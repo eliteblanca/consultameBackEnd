@@ -23,12 +23,10 @@ export class UsersController {
    return this.userModel.deleteUser( params.id );
  }
 
- @UseGuards(AuthGuard('jwt'))
  @Post()
  registrate(@Body() newUser:newUserDTO):Promise<any> {
    return this.userModel.createUser(newUser);
  }
-
 
  @UseGuards(AuthGuard('jwt'))
  @Put(':idUsuario')
