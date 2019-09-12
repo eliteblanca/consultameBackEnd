@@ -5,102 +5,102 @@ import { User as U } from "../entities/user";
 import { ArticlesModelService, articleDTO, articlesBulkDTO, getArticlesDTO, SingleArticleDTO } from "../services/articles-model.service";
 import { SearchModelService } from "../services/search-model.service";
 
-@Controller('api/articles')
+@Controller('api/0')
 export class ArticlesController {
 
-   constructor(private articlesModel: ArticlesModelService, private searchModel: SearchModelService) { }
+    constructor(private articlesModel: ArticlesModelService, private searchModel: SearchModelService) { }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Get()
-   async getArticles(
-      @Query() params: getArticlesDTO
-   ): Promise<any> {
-      if (params.query) {
+    @UseGuards(AuthGuard('jwt'))
+    @Get()
+    async getArticles(
+        @Query() params: getArticlesDTO
+    ): Promise<any> {
+        if (params.query) {
 
-         let { category, ...info } = params;
+            let { category, ...info } = params;
 
-         await this.searchModel.newSearch(info)
+            await this.searchModel.newSearch(info)
 
-         return this.articlesModel.getArticlesByQuery(info);
+            return this.articlesModel.getArticlesByQuery(info);
 
-      } else if (params.category) {
-         return this.articlesModel.getArticlesByCategory(params.category);
-      }
-   }
+        } else if (params.category) {
+            return this.articlesModel.getArticlesByCategory(params.category);
+        }
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Get(':id')
-   singleArticle(@Param() singleArticleDTO: SingleArticleDTO): any {
-      return this.articlesModel.getArticle(singleArticleDTO.id);
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Get(':id')
+    singleArticle(@Param() singleArticleDTO: SingleArticleDTO): any {
+        return this.articlesModel.getArticle(singleArticleDTO.id);
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Delete(':id')
-   deleteArticle(@Param() singleArticleDTO: SingleArticleDTO): any {
-      return this.articlesModel.deleteArticle(singleArticleDTO.id);
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Delete(':id')
+    deleteArticle(@Param() singleArticleDTO: SingleArticleDTO): any {
+        return this.articlesModel.deleteArticle(singleArticleDTO.id);
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Post()
-   createArticle(
-      @Body() body: articleDTO,
-      @User() user: U
-   ): any {
-      return this.articlesModel.createArticle(body, user.sub)
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Post()
+    createArticle(
+        @Body() body: articleDTO,
+        @User() user: U
+    ): any {
+        return this.articlesModel.createArticle(body, user.sub)
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Put(':id')
-   updateArticle(
-      @Body() body,
-      @User() user: U,
-      @Param('id') id: string
-   ): any {
-      return this.articlesModel.updateArticle(id, body, user.sub)
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Put(':id')
+    updateArticle(
+        @Body() body,
+        @User() user: U,
+        @Param('id') id: string
+    ): any {
+        return this.articlesModel.updateArticle(id, body, user.sub)
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Post('_migrate')
-   createArticles(
-      @Body() body: articlesBulkDTO,
-      @User() user: U
-   ): any {
-      return this.articlesModel.createArticle(body, user.sub)
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Post('_migrate')
+    createArticles(
+        @Body() body: articlesBulkDTO,
+        @User() user: U
+    ): any {
+        return this.articlesModel.createArticle(body, user.sub)
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Post(':id/likes')
-   addLike(@Param('id') idArticulo, @User() user: U): any {
-      return this.articlesModel.addLike(idArticulo, user.sub);
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Post(':id/likes')
+    addLike(@Param('id') idArticulo, @User() user: U): any {
+        return this.articlesModel.addLike(idArticulo, user.sub);
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Post(':id/disLikes')
-   addDisLike(@Param('id') idArticulo, @User() user: U): any {
-      return this.articlesModel.addDisLike(idArticulo, user.sub);
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Post(':id/disLikes')
+    addDisLike(@Param('id') idArticulo, @User() user: U): any {
+        return this.articlesModel.addDisLike(idArticulo, user.sub);
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Delete(':id/disLikes')
-   removeDisLike(@Param('id') idArticulo, @User() user: U): any {
-      return this.articlesModel.removeDisLike(idArticulo, user.sub);
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Delete(':id/disLikes')
+    removeDisLike(@Param('id') idArticulo, @User() user: U): any {
+        return this.articlesModel.removeDisLike(idArticulo, user.sub);
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Delete(':id/likes')
-   removeLike(@Param('id') idArticulo, @User() user: U): any {
-      return this.articlesModel.removeLike(idArticulo, user.sub);
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Delete(':id/likes')
+    removeLike(@Param('id') idArticulo, @User() user: U): any {
+        return this.articlesModel.removeLike(idArticulo, user.sub);
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Post(':id/favorites')
-   addFavorite(@Param('id') idArticulo, @User() user: U): any {
-      return this.articlesModel.addFavorite(idArticulo, user.sub);
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Post(':id/favorites')
+    addFavorite(@Param('id') idArticulo, @User() user: U): any {
+        return this.articlesModel.addFavorite(idArticulo, user.sub);
+    }
 
-   @UseGuards(AuthGuard('jwt'))
-   @Delete(':id/favorites')
-   removeFavorite(@Param('id') idArticulo, @User() user: U): any {
-      return this.articlesModel.removeFavorite(idArticulo, user.sub);
-   }
+    @UseGuards(AuthGuard('jwt'))
+    @Delete(':id/favorites')
+    removeFavorite(@Param('id') idArticulo, @User() user: U): any {
+        return this.articlesModel.removeFavorite(idArticulo, user.sub);
+    }
 }
