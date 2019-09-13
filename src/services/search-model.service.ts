@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
-import { SearchsIndex,search } from "../indices/searchIndex";
+import { SearchsIndex, search } from "../indices/searchIndex";
 import * as R from 'remeda';
 
 
 
 @Injectable()
-export class SearchModelService extends GenericModel{
-    
-    constructor(private searchsIndex:SearchsIndex) {
+export class SearchModelService extends GenericModel {
+
+    constructor(private searchsIndex: SearchsIndex) {
         super()
     }
-    
+
     private suggestionList: string[] = [
         'prueba 1',
         'prueba 2',
@@ -19,7 +19,7 @@ export class SearchModelService extends GenericModel{
         'prueba 4',
         'prueba 5'];
 
-    private async getByQuery(subline:string, query:string):Promise<(search & { id: string; })[]>{
+    private async getByQuery(subline: string, query: string): Promise<(search & { id: string; })[]> {
 
         return await this.searchsIndex.query({
             query: {
@@ -31,14 +31,14 @@ export class SearchModelService extends GenericModel{
                 }
             }
         })
-        
+
     }
 
-    public increaseSearchCount(id: string): Promise<any> {
-        return this.searchsIndex.updateScript(id,{ "source": "ctx._source.searches += 1"})
+    private increaseSearchCount(id: string): Promise<any> {
+        return this.searchsIndex.updateScript(id, { "source": "ctx._source.searches += 1" })
     }
 
-    public async newSearch(options: { query: string; subline: string; }):Promise<any>{
+    public async newSearch(options: { query: string; subline: string; }): Promise<any> {
         let searchs = await this.getByQuery(options.subline, options.query)
 
         if (searchs.length) {
@@ -48,7 +48,7 @@ export class SearchModelService extends GenericModel{
         }
     }
 
-    public async getSuggestions(input:string, subline:string):Promise<(search & { id: string; })[]>  {
+    public async getSuggestions(input: string, subline: string): Promise<(search & { id: string; })[]> {
 
         try {
 
@@ -56,10 +56,10 @@ export class SearchModelService extends GenericModel{
                 query: {
                     bool: {
                         must: {
-                                match: {
-                                    "query": input
-                                },
+                            match: {
+                                "query": input
                             },
+                        },
                         filter: [
                             { "term": { "subline": subline } }
                         ]
@@ -70,21 +70,21 @@ export class SearchModelService extends GenericModel{
             return await this.searchsIndex.query(query)
 
         } catch (error) {
-            console.log(error.meta.body.error)    
+            console.log(error.meta.body.error)
         }
     }
 
-    public async getAll():Promise<(search & { id: string; })[]>  {
+    public async getAll(): Promise<(search & { id: string; })[]> {
         try {
             return await this.searchsIndex.all()
         } catch (error) {
-            console.log(error.meta.body.error)    
+            console.log(error.meta.body.error)
         }
     }
 
-    public async getBySubline(subline:string):Promise<(search & { id: string; })[]>  {
+    public async getBySubline(subline: string): Promise<(search & { id: string; })[]> {
         try {
-            return await this.searchsIndex.where({subline:subline})
+            return await this.searchsIndex.where({ subline: subline })
         } catch (error) {
             console.log(error.meta.body.error)
         }

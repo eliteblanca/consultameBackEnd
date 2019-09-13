@@ -7,24 +7,6 @@ import { CategoriesIndex } from "../indices/categoriesIndex";
 import { LikeUserIndex } from "../indices/likeUserIndex";
 import { FavoriteUserIndex } from "../indices/favoritesUserIndex";
 
-export class getArticlesDTO {
-
-    @ValidateIf(o => !o.category)
-    @IsNotEmpty({ message: "si no se proporciona una categoria se debe proporcionar una query" })
-    @IsAscii({ message: "la query debe contener carecteres Ascii" })
-    @MinLength(3, { message: "has proporcionado una query demasiado corta, debe contener minimo $constraint1 caracteres" })
-    query: string;
-
-    @IsNotEmpty({ message: "debes proporcionar una sublinea en la cual buscar los articulos" })
-    @Length(20, 20, { message: "debes proporcionar un id valido" })
-    subline: string;
-
-    @ValidateIf(o => !o.query)
-    @IsNotEmpty({ message: "si no se proporciona una query se debe proporcionar una categoria" })
-    @Length(20, 20, { message: "debes proporcionar un id valido" })
-    category: string
-}
-
 export class SingleArticleDTO {
     @IsNotEmpty({ message: "debes proporcionar un id de articulo" })
     @Length(20, 20, { message: "debes proporcionar un id valido" })
@@ -184,6 +166,10 @@ export class ArticlesModelService {
         } catch (err) {
             console.log(err)
         }
+    }
+
+    public getAllArticles = async (): Promise<(Article & { id: string; })[]> => {
+        return await this.articleIndex.all()
     }
 
     public async getArticle(articleId: string): Promise<Article & { id: string; }> {

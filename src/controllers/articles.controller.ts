@@ -2,30 +2,18 @@ import { Controller, UseGuards, Post, Get, Query, Param, Body, Delete, Put } fro
 import { AuthGuard } from '@nestjs/passport';
 import { User } from "../user.decorator";
 import { User as U } from "../entities/user";
-import { ArticlesModelService, articleDTO, articlesBulkDTO, getArticlesDTO, SingleArticleDTO } from "../services/articles-model.service";
+import { ArticlesModelService, articleDTO, articlesBulkDTO, SingleArticleDTO } from "../services/articles-model.service";
 import { SearchModelService } from "../services/search-model.service";
 
-@Controller('api/0')
+@Controller('api/articles')
 export class ArticlesController {
 
     constructor(private articlesModel: ArticlesModelService, private searchModel: SearchModelService) { }
 
     @UseGuards(AuthGuard('jwt'))
     @Get()
-    async getArticles(
-        @Query() params: getArticlesDTO
-    ): Promise<any> {
-        if (params.query) {
-
-            let { category, ...info } = params;
-
-            await this.searchModel.newSearch(info)
-
-            return this.articlesModel.getArticlesByQuery(info);
-
-        } else if (params.category) {
-            return this.articlesModel.getArticlesByCategory(params.category);
-        }
+    async getArticles(): Promise<any> {
+        return this.articlesModel.getAllArticles()
     }
 
     @UseGuards(AuthGuard('jwt'))

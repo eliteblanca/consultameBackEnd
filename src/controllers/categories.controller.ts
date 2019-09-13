@@ -1,11 +1,16 @@
 import { Controller, UseGuards, Get, Query, Param, Post, Body, Delete, Put } from '@nestjs/common';
 import { CategoriesModelService, correctParams, newCategoryDTO, getCategoryParams } from "../services/categories-model.service";
 import { AuthGuard } from '@nestjs/passport';
+import { ArticlesModelService } from "../services/articles-model.service";
+
 
 @Controller('api/categories')
 export class CategoriesController {
 
-    constructor(private categoriesModel: CategoriesModelService) { }
+    constructor(
+        private categoriesModel: CategoriesModelService,
+        private articlesModel: ArticlesModelService
+    ) { }
 
     @UseGuards(AuthGuard('jwt'))
     @Post()
@@ -18,9 +23,9 @@ export class CategoriesController {
     @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
     deleteCategory(
-        @Param("id") id:string
+        @Param("id") id: string
     ): Promise<any> {
-        try {            
+        try {
             return this.categoriesModel.deleteCategory(id);
         } catch (error) {
             console.log(error)
@@ -35,4 +40,13 @@ export class CategoriesController {
     ): Promise<any> {
         return this.categoriesModel.updateCategory(id, Body);
     }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get(':id/articles')
+    getArticlesOfCategory(
+        @Param('id') idCategory: string
+    ): Promise<any> {
+        return this.articlesModel.getArticlesByCategory(idCategory);
+    }
+
 }
