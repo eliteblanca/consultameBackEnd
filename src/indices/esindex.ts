@@ -103,7 +103,7 @@ export class Esindex<T> {
             index: this.index
         })
 
-        return true
+        return { status: "deleted" }
     }
 
     public all = async (): Promise<(T & { id: string; })[]> => {
@@ -128,10 +128,10 @@ export class Esindex<T> {
             id: id,
             index: this.index,
             refresh: 'true',
-            body: { doc: partial } 
+            body: { doc: partial }
         })
 
-        return result.body.result
+        return { status: result.body.result }
     }
 
 

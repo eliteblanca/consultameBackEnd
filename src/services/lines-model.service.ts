@@ -54,7 +54,7 @@ export class LinesModelService {
         private sublinesIndex: SublinesIndex,
         private articleIndex: ArticleIndex,
         private categoriesIndex: CategoriesIndex,
-        private categoriesModel:CategoriesModelService
+        private categoriesModel: CategoriesModelService
     ) { }
 
     private populateWithSublines = async (line: line & { id: string; }): Promise<line_with_sublines> => {
@@ -101,7 +101,7 @@ export class LinesModelService {
         }
     }
 
-    public async createLine(line: newLineDTO): Promise<any> {
+    public async createLine(line: newLineDTO): Promise<line & { id: string; }> {
         let existingLines = await this.linesIndex.where({ name: line.name })
 
         if (existingLines.length == 0) {
@@ -111,31 +111,34 @@ export class LinesModelService {
         }
     }
 
+    //! ⚠️ se deben elmininar las lineas de la tabla user lines ya que genera error
     public async deleteLine(lineId: string): Promise<any> {
 
         try {
             let sublines = await this.getSublines(lineId)
 
-            let result = await async.each(sublines.map(subline=>subline.id), this.deleteSubLine )
+            let result = await async.each(sublines.map(subline => subline.id), this.deleteSubLine)
 
             await this.linesIndex.delete(lineId)
 
             return true
         } catch (error) {
-            if(error && error.meta && error.meta.body && error.meta.statusCode == 404){
+            console.log(error)
+            if (error && error.meta && error.meta.body && error.meta.statusCode == 404) {
                 throw new NotFoundException('linea no encontrada')
-            }else{
+            } else {
                 console.log(error.meta.body)
             }
         }
     }
 
-    public async deleteSubLine(sublineId: string):Promise<any>{
+    //! ⚠️ se deben elmininar las lineas de la tabla user lines ya que genera error
+    public deleteSubLine = async (sublineId: string): Promise<any> => {
         let categoriesToDelete = await this.categoriesModel.getCategories(sublineId)
-        
+
         let idsCategoriesToDelete = categoriesToDelete
-                                    .filter(category => typeof(category.group) == 'undefined' )
-                                    .map(category=>category.id)
+            .filter(category => typeof (category.group) == 'undefined')
+            .map(category => category.id)
 
         let result = await async.each(idsCategoriesToDelete, this.categoriesModel.deleteCategory);
 
@@ -173,11 +176,11 @@ export class LinesModelService {
         }
     }
 
-    public updateLine = async (id:string, body:newLineDTO):Promise<any> => {
+    public updateLine = async (id: string, body: newLineDTO): Promise<any> => {
         return await this.linesIndex.updatePartialDocument(id, body)
     }
 
-    public updateSubline = async ( iSubline:string, body:newSublineDTO ):Promise<any> => {
-        return await this.sublinesIndex.updatePartialDocument( iSubline, body )
+    public updateSubline = async (iSubline: string, body: newSublineDTO): Promise<any> => {
+        return await this.sublinesIndex.updatePartialDocument(iSubline, body)
     }
 }
