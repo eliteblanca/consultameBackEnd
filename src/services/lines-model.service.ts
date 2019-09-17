@@ -3,6 +3,8 @@ import { GenericModel } from "../services/generic-model";
 import { CategoriesModelService } from "../services/categories-model.service";
 import { LinesIndex, line } from "../indices/linesIndex";
 import { SublinesIndex, subline } from "../indices/sublinesIndex";
+import { UserSubLinesIndex, userSubLine } from "../indices/userSubLinesIndex";
+
 import { ArticleIndex, Article } from "../indices/articleIndex";
 import { CategoriesIndex } from "../indices/categoriesIndex";
 import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, MaxLength, IsIn, IsEmpty, IsOptional, Equals, IsString, IsAlphanumeric } from "class-validator";
@@ -52,9 +54,8 @@ export class LinesModelService {
     constructor(
         private linesIndex: LinesIndex,
         private sublinesIndex: SublinesIndex,
-        private articleIndex: ArticleIndex,
-        private categoriesIndex: CategoriesIndex,
-        private categoriesModel: CategoriesModelService
+        private categoriesModel: CategoriesModelService,
+        private userSubLinesIndex: UserSubLinesIndex
     ) { }
 
     private populateWithSublines = async (line: line & { id: string; }): Promise<line_with_sublines> => {
@@ -111,7 +112,6 @@ export class LinesModelService {
         }
     }
 
-    //! ⚠️ se deben elmininar las lineas de la tabla user lines ya que genera error
     public async deleteLine(lineId: string): Promise<any> {
 
         try {
@@ -134,6 +134,9 @@ export class LinesModelService {
 
     //! ⚠️ se deben elmininar las lineas de la tabla user lines ya que genera error
     public deleteSubLine = async (sublineId: string): Promise<any> => {
+
+        await this.userSubLinesIndex.deleteWhere({ subline: sublineId })
+
         let categoriesToDelete = await this.categoriesModel.getCategories(sublineId)
 
         let idsCategoriesToDelete = categoriesToDelete

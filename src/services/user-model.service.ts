@@ -89,37 +89,44 @@ export class UserModelService {
 
     public getUserSubLines = async (id_usuario: string): Promise<(line & { id: string; sublines: (subline & { id: string })[] })[]> => {
 
-        function distinct(key) {
-            return (data) => {
-                var newArray = []
+        try {
 
-                for (var i = 0; i < data.length; i++) {
-                    if (!newArray.includes(data[i][key])) {
-                        newArray.push(data[i][key])
+
+
+            function distinct(key) {
+                return (data) => {
+                    var newArray = []
+
+                    for (var i = 0; i < data.length; i++) {
+                        if (!newArray.includes(data[i][key])) {
+                            newArray.push(data[i][key])
+                        }
                     }
+                    return newArray
                 }
-                return newArray
             }
+
+            let distinctLines = distinct('line')
+
+            let userSubLines = await this.userSubLinesIndex.where({ user: id_usuario })
+
+            let sublines: (subline & { id: string })[] = await async.map(userSubLines.map(userSubLine => userSubLine.subline), this.sublinesIndex.getById)
+
+            let lineasDistintas: (line & { id: string })[] = await async.map(distinctLines(sublines), this.linesIndex.getById)
+
+            let lineasConSublineas: (line & { id: string; sublines: (subline & { id: string })[] })[]
+
+            lineasConSublineas = lineasDistintas.map(linea => ({ ...linea, sublines: [] }))
+
+            sublines.forEach(subline => {
+                let index = lineasConSublineas.findIndex(line => line.id == subline.line)
+                lineasConSublineas[index].sublines.push(subline)
+            });
+
+            return lineasConSublineas
+        } catch (error) {
+            console.log(error)
         }
-
-        let distinctLines = distinct('line')
-
-        let result = await this.userSubLinesIndex.where({ user: id_usuario })
-
-        let sublines: (subline & { id: string })[] = await async.map(result.map(userSubLine => userSubLine.subline), this.sublinesIndex.getById)
-
-        let lineasDistintas: (line & { id: string })[] = await async.map(distinctLines(sublines), this.linesIndex.getById)
-
-        let lineasConSublineas: (line & { id: string; sublines: (subline & { id: string })[] })[]
-
-        lineasConSublineas = lineasDistintas.map(linea => ({ ...linea, sublines: [] }))
-
-        sublines.forEach(subline => {
-            let index = lineasConSublineas.findIndex(line => line.id == subline.line)
-            lineasConSublineas[index].sublines.push(subline)
-        });
-
-        return lineasConSublineas
     }
 
     public async getUserByName(name: string): Promise<(user & { id: string; })[]> {
