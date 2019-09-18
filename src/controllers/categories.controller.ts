@@ -1,7 +1,7 @@
-import { Controller, UseGuards, Get, Query, Param, Post, Body, Delete, Put } from '@nestjs/common';
-import { CategoriesModelService, correctParams, newCategoryDTO, getCategoryParams } from "../services/categories-model.service";
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ArticlesModelService } from "../services/articles-model.service";
+import { CategoriesModelService, newCategoryDTO, udpateCategoryDTO } from "../services/categories-model.service";
 
 
 @Controller('api/categories')
@@ -36,7 +36,7 @@ export class CategoriesController {
     @Put(':id')
     updateCategory(
         @Param('id') id: string,
-        @Body() Body: newCategoryDTO
+        @Body() Body: udpateCategoryDTO
     ): Promise<any> {
         return this.categoriesModel.updateCategory(id, Body);
     }
