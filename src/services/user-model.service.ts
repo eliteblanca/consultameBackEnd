@@ -53,7 +53,7 @@ export class UserModelService {
 
     ) { }
 
-    public postUserSubline = async (userId: string, subline: string): Promise<string> => {
+    public postUserSubline = async (userId: string, subline: string): Promise<any> => {
 
         let existingSublines = await this.userSubLinesIndex.where({ user: userId, subline: subline })
 
@@ -82,7 +82,7 @@ export class UserModelService {
         }
 
         this.userSubLinesIndex.create({ user: userId, subline: subline })
-        return "agregado"
+        return { status:"agregado" }
     }
 
     public deleteUserSubline = async (userId: string, subline: string): Promise<any> => this.userSubLinesIndex.deleteWhere({ subline: subline, user: userId })

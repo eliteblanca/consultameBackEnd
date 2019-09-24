@@ -102,7 +102,7 @@ export class Esindex<T> {
             id: id,
             index: this.index
         })
-
+ 
         return { status: "deleted" }
     }
 
