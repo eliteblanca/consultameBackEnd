@@ -1,9 +1,9 @@
 import { Controller, UseGuards, Post, Get, Query, Param, Body, Delete, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from "../user.decorator";
-import { User as U } from "../entities/user";
-import { ArticlesModelService, articleDTO, articlesBulkDTO, SingleArticleDTO } from "../services/articles-model.service";
-import { SearchModelService } from "../services/search-model.service";
+import { User } from '../user.decorator';
+import { User as U } from '../entities/user';
+import { ArticlesModelService, articleDTO, articlesBulkDTO, SingleArticleDTO } from '../services/articles-model.service';
+import { SearchModelService } from '../services/search-model.service';
 
 @Controller('api/articles')
 export class ArticlesController {
@@ -13,7 +13,7 @@ export class ArticlesController {
     @UseGuards(AuthGuard('jwt'))
     @Get()
     async getArticles(): Promise<any> {
-        return this.articlesModel.getAllArticles()
+        return this.articlesModel.getAllArticles();
     }
 
     @UseGuards(AuthGuard('jwt'))
@@ -32,9 +32,9 @@ export class ArticlesController {
     @Post()
     createArticle(
         @Body() body: articleDTO,
-        @User() user: U
+        @User() user: U,
     ): any {
-        return this.articlesModel.createArticle(body, user.sub)
+        return this.articlesModel.createArticle(body, user.sub);
     }
 
     @UseGuards(AuthGuard('jwt'))
@@ -42,18 +42,18 @@ export class ArticlesController {
     updateArticle(
         @Body() body,
         @User() user: U,
-        @Param('id') id: string
+        @Param('id') id: string,
     ): any {
-        return this.articlesModel.updateArticle(id, body, user.sub)
+        return this.articlesModel.updateArticle(id, body, user.sub);
     }
 
     @UseGuards(AuthGuard('jwt'))
     @Post('_migrate')
     createArticles(
         @Body() body: articlesBulkDTO,
-        @User() user: U
+        @User() user: U,
     ): any {
-        return this.articlesModel.createArticle(body, user.sub)
+        return this.articlesModel.createArticle(body, user.sub);
     }
 
     @UseGuards(AuthGuard('jwt'))

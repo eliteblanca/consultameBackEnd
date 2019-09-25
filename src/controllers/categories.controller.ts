@@ -1,8 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ArticlesModelService } from "../services/articles-model.service";
-import { CategoriesModelService, newCategoryDTO, udpateCategoryDTO } from "../services/categories-model.service";
-
+import { ArticlesModelService } from '../services/articles-model.service';
+import { CategoriesModelService, newCategoryDTO, udpateCategoryDTO } from '../services/categories-model.service';
 
 @Controller('api/categories')
 export class CategoriesController {
@@ -23,7 +22,7 @@ export class CategoriesController {
     @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
     deleteCategory(
-        @Param("id") id: string
+        @Param('id') id: string
     ): Promise<any> {
         try {
             return this.categoriesModel.deleteCategory(id);
