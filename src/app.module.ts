@@ -33,6 +33,8 @@ import { UserSubLinesIndex } from './indices/userSubLinesIndex';
 import { RolesIndex } from './indices/rolesIndex';
 import { ResourcesIndex } from './indices/resourcesIndex';
 import { PermissionsIndex } from './indices/permissionsIndex';
+import { UploadController } from './controllers/upload.controller';
+import { S3BucketService } from './services/s3-bucket.service';
 
 const secretKey = "123";
 
@@ -57,7 +59,8 @@ const secretKey = "123";
     SubLinesController,
     rolesController,
     ResourcesController,
-    PermissionsController
+    PermissionsController,
+    UploadController
   ],
   providers: [    
     {
@@ -84,7 +87,8 @@ const secretKey = "123";
     UserSubLinesIndex,
     RolesIndex,
     ResourcesIndex,
-    PermissionsIndex
+    PermissionsIndex,
+    S3BucketService
   ],
 })
 export class AppModule {}

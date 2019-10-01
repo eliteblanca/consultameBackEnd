@@ -3,7 +3,7 @@ import { EsClientService } from "../services/es-client.service";
 import { validate, IsString, MinLength, ValidateNested } from 'class-validator';
 import { NotFoundException } from "@nestjs/common";
 
-const PUNTO_DE_ENLACE: string = "https://search-multiconsulta-konecta-oxehhr2nsdrsr5ak6tj7hvw3pe.us-west-1.es.amazonaws.com";
+const PUNTO_DE_ENLACE: string = "https://search-multiconsultakonecta-xnu6wcquoqrgomg6uvq45neezm.us-west-1.es.amazonaws.com";
 
 export class GenericModel {
     constructor() {

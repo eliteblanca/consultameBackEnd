@@ -20,8 +20,6 @@ export class articleDTO {
     @MinLength(3, { message: 'has proporcionado un titulo demasiado corto, debe contener minimo $constraint1 caracteres' })
     public title: string;
 
-    @IsNotEmpty({ message: 'debes proporcionar un contenido al articulo' })
-    @MinLength(3, { message: 'has proporcionado un contenido demasiado corto, debe contener minimo $constraint1 caracteres' })
     public content: string;
 
     @MinLength(3, { message: 'has proporcionado un tag demasiado corto, debe contener minimo $constraint1 caracteres', each: true })
