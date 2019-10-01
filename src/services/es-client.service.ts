@@ -21,6 +21,7 @@ export class EsClientService extends GenericModel {
                                 "properties": {
                                     "title": { "type": "text" },
                                     "content": { "type": "text" },
+                                    "obj": { "type": "keyword" },                                    
                                     "tags": { "type": "keyword" },
                                     "resume": { "type": "text" },
                                     "attached": { "type": "keyword" },

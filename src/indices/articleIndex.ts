@@ -4,6 +4,7 @@ import { Injectable } from "@nestjs/common";
 export interface Article {
     title:string;
     content:string;
+    obj:string;
     tags?:string[];
     resume?:string;
     attached?:string[];

@@ -22,6 +22,8 @@ export class articleDTO {
 
     public content: string;
 
+    public obj: string;
+
     @MinLength(3, { message: 'has proporcionado un tag demasiado corto, debe contener minimo $constraint1 caracteres', each: true })
     @MaxLength(150, { message: 'has proporcionado un tag demasiado largo, debe contener maximo $constraint1 caracteres', each: true })
     @IsAscii({ message: 'el tag solo debe contener caracteres Ascii', each: true })
@@ -56,6 +58,8 @@ export class articlesBulkDTO implements Article {
     @IsNotEmpty({ message: 'debes proporcionar un contenido al articulo' })
     @MinLength(3, { message: 'has proporcionado un contenido demasiado corto, debe contener minimo $constraint1 caracteres' })
     public content: string;
+
+    public obj: string;
 
     @MinLength(3, { message: 'has proporcionado un tag demasiado corto, debe contener minimo $constraint1 caracteres', each: true })
     @MaxLength(150, { message: 'has proporcionado un tag demasiado largo, debe contener maximo $constraint1 caracteres', each: true })
