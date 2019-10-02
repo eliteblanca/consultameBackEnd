@@ -5,13 +5,11 @@ import * as aws from 'aws-sdk';
 
 @Injectable()
 export class S3BucketService {
-    s3Client = new S3(
-        {
-            accessKeyId: 'AKIA36TUP7PLRILOAXGK',
-            secretAccessKey: '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',
-            region: 'us-west-1'
-        }
-    );
+    s3Client = new S3({
+        accessKeyId: 'AKIA36TUP7PLRILOAXGK',
+        secretAccessKey: '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',
+        region: 'us-west-1'
+    });
 
     async uploadFile(idArticle: string, file: any) {
 

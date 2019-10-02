@@ -160,7 +160,7 @@ export class ArticlesModelService {
                 }
             };
 
-            console.log(options);
+            
 
             return await this.articleIndex.query(query);
 
@@ -299,7 +299,6 @@ export class ArticlesModelService {
     public async removeDisLike(articleId: string, id_usuario: string): Promise<any> {
         let result = await this.likeUserIndex.deleteWhere({ article: articleId, user: id_usuario, type: 'dislike' });
 
-        console.log(result);
 
         if (result.deleted) {
             try {
@@ -329,7 +328,6 @@ export class ArticlesModelService {
 
         let result = await this.likeUserIndex.deleteWhere({ article: articleId, user: id_usuario, type: 'like' });
 
-        console.log(result);
 
         if (result.deleted) {
             try {
@@ -465,9 +463,6 @@ export class ArticlesModelService {
 
         let newArticle: Article = { ...articleExtas, ...article };
         try {
-
-            console.log(newArticle);
-
             return await this.articleIndex.updatePartialDocument(id, newArticle);
         } catch (error) {
             console.log(error.meta.body.error);
