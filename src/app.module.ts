@@ -34,6 +34,10 @@ import { ResourcesIndex } from './indices/resourcesIndex';
 import { PermissionsIndex } from './indices/permissionsIndex';
 import { UploadController } from './controllers/upload.controller';
 import { S3BucketService } from './services/s3-bucket.service';
+import { NewsController } from './controllers/news.controller';
+import { NewsModelService } from './services/news-model.service';
+import { NewsIndex } from "./indices/newsIndex";
+
 
 const secretKey = "123";
 
@@ -58,7 +62,8 @@ const secretKey = "123";
     rolesController,
     ResourcesController,
     PermissionsController,
-    UploadController
+    UploadController,
+    NewsController
   ],
   providers: [        
     AuthService,
@@ -70,6 +75,7 @@ const secretKey = "123";
     CategoriesModelService,
     LinesModelService,
     PermissionsModelService,
+    NewsModelService,
     ArticleIndex,
     LinesIndex,
     SublinesIndex,
@@ -82,7 +88,8 @@ const secretKey = "123";
     RolesIndex,
     ResourcesIndex,
     PermissionsIndex,
-    S3BucketService
+    S3BucketService,
+    NewsIndex,
   ],
 })
 export class AppModule {}

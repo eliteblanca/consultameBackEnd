@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { LinesModelService, newSublineDTO } from "../services/lines-model.service";
 import { ArticlesModelService } from "../services/articles-model.service";
 import { SearchModelService } from "../services/search-model.service";
+import { NewsModelService } from "../services/news-model.service";
 
 @Controller('api/sublines')
 export class SubLinesController {
@@ -12,7 +13,8 @@ export class SubLinesController {
         private linesModel: LinesModelService,
         private categoriesModel: CategoriesModelService,
         private articlesModel: ArticlesModelService,
-        private searchModel: SearchModelService
+        private searchModel: SearchModelService,
+        private newsModel:NewsModelService
     ) { }
 
     @UseGuards(AuthGuard('jwt'))
@@ -52,5 +54,13 @@ export class SubLinesController {
         } else {
             throw new BadRequestException('falta el parametro query');
         }
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get(':idSubline/news')
+    async getNews(
+        @Param('idSubline') idSubline: string
+    ): Promise<any> {
+        return this.newsModel.getNews(idSubline)
     }
 }

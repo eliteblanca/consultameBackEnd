@@ -16,7 +16,7 @@ export class Esindex<T> {
 
     private createBody = R.objOf('body')
 
-    private createRequest = x => R.addProp(R.objOf('body')(x), 'index', this.index)
+    protected createRequest = x => R.addProp(R.objOf('body')(x), 'index', this.index)
 
     public create = async (doc: T): Promise<T & { id: string; }> => {
         let result = await this.esClient.index({
@@ -39,13 +39,14 @@ export class Esindex<T> {
     }
 
     public query = async (query: object): Promise<(T & { id: string; })[]> => {
-
+        
         let queryObj: RequestParams.Search = this.createRequest(query)
-
+        
         let result = await this.esClient.search(queryObj)
 
-        return R.map((x: any) => R.addProp(x._source, 'id', x._id))
-            (result.body.hits.hits)
+        console.log(result.body.hits.hits)
+
+        return R.map((x: any) => R.addProp(x._source, 'id', x._id))(result.body.hits.hits)
     }
 
     public where = async (ops: Partial<T>): Promise<(T & { id: string; })[]> => {

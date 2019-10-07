@@ -16,7 +16,6 @@ export class SingleArticleDTO {
 export class articleDTO {
 
     @IsNotEmpty({ message: 'debes proporcionar un nombre al articulo' })
-    @IsAscii({ message: 'el titulo solo debe contener caracteres Ascii' })
     @MinLength(3, { message: 'has proporcionado un titulo demasiado corto, debe contener minimo $constraint1 caracteres' })
     public title: string;
 
@@ -26,12 +25,10 @@ export class articleDTO {
 
     @MinLength(3, { message: 'has proporcionado un tag demasiado corto, debe contener minimo $constraint1 caracteres', each: true })
     @MaxLength(150, { message: 'has proporcionado un tag demasiado largo, debe contener maximo $constraint1 caracteres', each: true })
-    @IsAscii({ message: 'el tag solo debe contener caracteres Ascii', each: true })
     @IsOptional()
     public tags?: string[];
 
     @MinLength(3, { message: 'has proporcionado un resumen demasiado corto, debe contener minimo $constraint1 caracteres' })
-    @IsAscii({ message: 'el resumen solo debe contener caracteres Ascii' })
     @IsOptional()
     public resume?: string;
 
@@ -139,7 +136,7 @@ export class ArticlesModelService {
 
     }
 
-    public async getArticlesByQuery(options: { query: string; subline: string; }): Promise<(Article & { id: string; })[]> {
+    public async getArticlesByQuery(options: { query: string; subline: string; }): Promise<(Article & { id: string, highlight:string  })[]> {
         try {
 
             let query = {
@@ -157,12 +154,20 @@ export class ArticlesModelService {
                             { 'term': { 'subline': options.subline } }
                         ]
                     }
+                },
+
+                highlight : {
+                    fields : {
+                        "content" : { "type" : "plain" }
+                    }
                 }
             };
 
-            
+            let result = await this.articleIndex.query(query);
 
-            return await this.articleIndex.query(query);
+            // console.log(result)
+
+            return result
 
         } catch (err) {
             console.log(err);
@@ -217,7 +222,7 @@ export class ArticlesModelService {
             }
         }
 
-        let articleExtas = {
+        let articleExtras = {
             likes: [],
             disLikes: [],
             favorites: [],
@@ -229,7 +234,7 @@ export class ArticlesModelService {
             modificationDate: (new Date).getTime()
         };
 
-        let newArticle: Article = { ...articleExtas, ...article };
+        let newArticle: Article = { ...articleExtras, ...article };
 
         return await this.articleIndex.create(newArticle);
     }
@@ -261,7 +266,7 @@ export class ArticlesModelService {
             return new ConflictException('ya has dado like en este articulo');
         }
 
-        return true;
+        return { status: "updated" };
 
     }
 
@@ -378,7 +383,7 @@ export class ArticlesModelService {
             return new ConflictException('ya has agregado este articulo a tus favoritos');
         }
 
-        return true;
+        return { status: 'updated' };
     }
 
     public async removeFavorite(articleId: string, id_usuario: string): Promise<any> {
