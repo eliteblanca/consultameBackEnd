@@ -5,6 +5,7 @@ import { LinesModelService, newSublineDTO } from "../services/lines-model.servic
 import { ArticlesModelService } from "../services/articles-model.service";
 import { SearchModelService } from "../services/search-model.service";
 import { NewsModelService } from "../services/news-model.service";
+import { statement } from '@babel/template';
 
 @Controller('api/sublines')
 export class SubLinesController {
@@ -59,8 +60,14 @@ export class SubLinesController {
     @UseGuards(AuthGuard('jwt'))
     @Get(':idSubline/news')
     async getNews(
-        @Param('idSubline') idSubline: string
+        @Param('idSubline') idSubline: string,
+        @Query('state') state:string
     ): Promise<any> {
-        return this.newsModel.getNews(idSubline)
+        if(state == 'archived'){
+            return this.newsModel.getDrafts(idSubline)
+        }else{    
+            return this.newsModel.getNews(idSubline)
+        }
     }
+   
 }
