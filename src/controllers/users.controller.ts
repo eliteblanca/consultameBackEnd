@@ -80,8 +80,11 @@ export class UsersController {
 
     @UseGuards(AuthGuard('jwt'))
     @Get('me/favorites')
-    getSelfFavorites(@User() user: U
+    getSelfFavorites(
+        @User() user: U,
+        @Query('from') from: string,
+        @Query('size') size: string
     ): any {
-        return this.userModel.getUserFavorites(user.sub);
+        return this.userModel.getUserFavorites(user.sub,from,size);
     }
 }

@@ -130,13 +130,24 @@ export class ArticlesModelService {
 
     //#region Public
 
-    public async getArticlesByCategory(category: string): Promise<(Article & { id: string; })[]> {
-
-        return await this.articleIndex.where({ category: category });
-
+    public async getArticlesByCategory(category: string, from:string, size:string): Promise<(Article & { id: string; })[]> {
+        return await this.articleIndex.where({ category: category },from,size, { orderby:'modificationDate', order:'desc' });
     }
 
-    public async getArticlesByQuery(options: { query: string; subline: string; }): Promise<(Article & { id: string, highlight:string  })[]> {
+    public async getArticlesByQuery(options: { query: string; subline: string; from?:string; size?:string }): Promise<(Article & { id: string, highlight:string  })[]> {
+
+        let from = '0';
+
+        if(!!options.from){
+            from = options.from
+        }
+        
+        let size = '10';
+
+        if(!!options.size){
+            size = options.size
+        }
+
         try {
 
             let query = {
@@ -155,7 +166,8 @@ export class ArticlesModelService {
                         ]
                     }
                 },
-
+                from : parseInt(from),
+                size : parseInt(size),
                 highlight : {
                     fields : {
                         "content" : { "type" : "plain" }
@@ -165,12 +177,10 @@ export class ArticlesModelService {
 
             let result = await this.articleIndex.query(query);
 
-            // console.log(result)
-
             return result
 
         } catch (err) {
-            console.log(err);
+            console.log(err.meta.body.error);
         }
     }
 

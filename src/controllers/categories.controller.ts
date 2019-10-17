@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ArticlesModelService } from '../services/articles-model.service';
 import { CategoriesModelService, newCategoryDTO, udpateCategoryDTO } from '../services/categories-model.service';
@@ -43,9 +43,10 @@ export class CategoriesController {
     @UseGuards(AuthGuard('jwt'))
     @Get(':id/articles')
     getArticlesOfCategory(
-        @Param('id') idCategory: string
+        @Param('id') idCategory: string,
+        @Query('from') from: string,
+        @Query('size') size: string
     ): Promise<any> {
-        return this.articlesModel.getArticlesByCategory(idCategory);
+        return this.articlesModel.getArticlesByCategory(idCategory, from, size);
     }
-
 }

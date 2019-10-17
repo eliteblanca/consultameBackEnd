@@ -44,27 +44,51 @@ export class Esindex<T> {
         
         let result = await this.esClient.search(queryObj)
 
-        console.log(result.body.hits.hits)
-
         return R.map((x: any) => R.addProp(x._source, 'id', x._id))(result.body.hits.hits)
     }
 
-    public where = async (ops: Partial<T>): Promise<(T & { id: string; })[]> => {
+    public where = async (ops: { [P in keyof T]?: any; }, from?:string, size?:string, order?:{ orderby:keyof T, order:'asc' | 'desc' } ): Promise<(T & { id: string; })[]> => {
 
-        let result = await this.esClient.search({
-            index: this.index,
-            body: {
-                query: {
-                    bool: {
-                        filter: R.pipe(
-                            R.toPairs(ops),
-                            R.map(pair => R.objOf(pair[1], pair[0])),
-                            R.map(obj => R.objOf(obj, 'term'))
-                        )
+        let result:ApiResponse<any, any>;        
+
+        if(!!from && !!size){
+            console.log('prueba',from ,size)
+            result = await this.esClient.search({
+                index: this.index,
+                body: {
+                    query: {
+                        bool: {
+                            filter: R.pipe(
+                                R.toPairs(ops),
+                                R.map(pair => R.objOf(pair[1], pair[0])),
+                                R.map(obj => R.objOf(obj, 'term'))
+                            )
+                        }
+                    },
+                    from : parseInt(from),
+                    size : parseInt(size),
+                    sort : [
+                        R.objOf(order.orderby.toString())({ order : order.order })
+                    ]
+                }
+            })
+
+        }else{
+            result = await this.esClient.search({
+                index: this.index,
+                body: {
+                    query: {
+                        bool: {
+                            filter: R.pipe(
+                                R.toPairs(ops),
+                                R.map(pair => R.objOf(pair[1], pair[0])),
+                                R.map(obj => R.objOf(obj, 'term'))
+                            )
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
 
         return R.map(result.body.hits.hits, (x: any) => R.addProp(x._source, 'id', x._id))
 

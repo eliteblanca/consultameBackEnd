@@ -19,7 +19,7 @@ export class NewsController {
 
     @UseGuards(AuthGuard('jwt'))
     @Post()
-    async postNews(        
+    async postNews(
         @Body() news: postNewsDTO,        
         @User() user: U
     ): Promise<any> {

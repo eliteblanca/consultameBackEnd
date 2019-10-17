@@ -1,6 +1,6 @@
 import { Esindex } from "./esindex";
 import { Injectable } from "@nestjs/common";
-import { RequestParams } from "@elastic/elasticsearch";
+import { ApiResponse } from "@elastic/elasticsearch";
 import * as R from 'remeda';
 
 export interface news {
@@ -23,5 +23,4 @@ export class NewsIndex extends Esindex<news> {
         super('news')
     }
 
-    
 }

@@ -47,11 +47,13 @@ export class SubLinesController {
     @Get(':idSubline/articles')
     async getArticlesByQuery(
         @Param('idSubline') idSubline: string,
-        @Query('query') query: string
+        @Query('query') query: string,
+        @Query('from') from: string,
+        @Query('size') size: string
     ): Promise<any> {
         if (query) {
             await this.searchModel.newSearch({ query: query, subline: idSubline })
-            return this.articlesModel.getArticlesByQuery({ subline: idSubline, query: query })
+            return this.articlesModel.getArticlesByQuery({ subline: idSubline, query: query, from:from, size:size })
         } else {
             throw new BadRequestException('falta el parametro query');
         }
@@ -61,13 +63,16 @@ export class SubLinesController {
     @Get(':idSubline/news')
     async getNews(
         @Param('idSubline') idSubline: string,
-        @Query('state') state:string
+        @Query('state') state:string,
+        @Query('from') from: string,
+        @Query('size') size: string,
+        @Query('date') date: string
     ): Promise<any> {
         if(state == 'archived'){
-            return this.newsModel.getDrafts(idSubline)
-        }else{    
-            return this.newsModel.getNews(idSubline)
+            return this.newsModel.getDrafts(idSubline, from, size)
+        }else{
+            return this.newsModel.getNews(idSubline, from, size, date)
         }
     }
-   
+
 }

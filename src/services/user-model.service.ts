@@ -7,6 +7,7 @@ import { UserIndex, user, userWithoutPassword } from "../indices/userIndex";
 import { UserSubLinesIndex, userSubLine } from "../indices/userSubLinesIndex";
 import { SublinesIndex, subline } from "../indices/sublinesIndex";
 import { LinesIndex, line } from "../indices/linesIndex";
+import { Article, ArticleIndex } from "../indices/articleIndex";
 import * as async from 'async';
 import * as R from 'remeda';
 
@@ -49,8 +50,8 @@ export class UserModelService {
         private userIndex: UserIndex,
         private userSubLinesIndex: UserSubLinesIndex,
         private sublinesIndex: SublinesIndex,
+        private articleIndex: ArticleIndex,
         private linesIndex: LinesIndex
-
     ) { }
 
     public postUserSubline = async (userId: string, subline: string): Promise<any> => {
@@ -186,9 +187,8 @@ export class UserModelService {
         return R.map(result, (dislikeUser: likeUser) => dislikeUser.article)
     }
 
-    public async getUserFavorites(userId: string): Promise<any> {
-        let result = await this.favoriteUserIndex.where({ user: userId })
-        return R.map(result, (favoriteUser: favoriteUser) => favoriteUser.article)
+    public async getUserFavorites(userId: string, from:string, size:string): Promise<(Article & { id: string; })[]> {
+        return await this.articleIndex.where({ favorites: userId }, from, size,  { orderby: 'publicationDate' , order:'desc'})
     }
 
 }
