@@ -37,6 +37,9 @@ import { S3BucketService } from './services/s3-bucket.service';
 import { NewsController } from './controllers/news.controller';
 import { NewsModelService } from './services/news-model.service';
 import { NewsIndex } from "./indices/newsIndex";
+import { CommentsIndexService } from './indices/commentsIndex.service';
+import { CommentsController } from './controllers/comments.controller';
+import { CommentsModelService } from './services/comments-model.service';
 
 
 const secretKey = "123";
@@ -63,7 +66,8 @@ const secretKey = "123";
     ResourcesController,
     PermissionsController,
     UploadController,
-    NewsController
+    NewsController,
+    CommentsController
   ],
   providers: [        
     AuthService,
@@ -90,6 +94,8 @@ const secretKey = "123";
     PermissionsIndex,
     S3BucketService,
     NewsIndex,
+    CommentsIndexService,
+    CommentsModelService,
   ],
 })
 export class AppModule {}

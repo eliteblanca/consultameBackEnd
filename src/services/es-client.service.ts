@@ -65,7 +65,6 @@ export class EsClientService extends GenericModel {
                         }
                     })
                     break;
-
                 case 'searchs':
                     return await this.esClient.indices.create({
                         index: index,
@@ -270,6 +269,27 @@ export class EsClientService extends GenericModel {
                         }
                     })
                     break;
+                case 'comments':
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body: {
+                            "mappings": {
+                                "properties": {
+                                    "article": { "type": "keyword" },
+                                    "publicationDate": { "type": "date", "format": 'epoch_millis' },
+                                    "user": { "type": "keyword" },
+                                    "username": { "type": "keyword" },
+                                    "replyTo": { "type": "keyword" },
+                                    "text": { "type": "keyword" }
+                                }
+                            }
+                        }
+                    })
+                    break;
+
+
+
                 default:
                     break;
             }

@@ -145,8 +145,9 @@ export class NewsModelService {
 
     getDrafts = async (idSubline: string, from: string, size: string): Promise<(news & { id: string; })[]> => {
         try {
-            return await this.newsIndex.where({ subline: idSubline, state: 'archived' }, from, size)
+            return await this.newsIndex.where({ subline: idSubline, state: 'archived' }, from, size, { orderby:'modificationDate', order:'desc' })
         } catch (error) {
+            console.log(error)
             console.log(error.meta.body.error)
         }
     }

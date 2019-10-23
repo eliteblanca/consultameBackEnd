@@ -49,13 +49,16 @@ export class SubLinesController {
         @Param('idSubline') idSubline: string,
         @Query('query') query: string,
         @Query('from') from: string,
-        @Query('size') size: string
+        @Query('size') size: string,
+        @Query('tag') tag: string
     ): Promise<any> {
         if (query) {
             await this.searchModel.newSearch({ query: query, subline: idSubline })
             return this.articlesModel.getArticlesByQuery({ subline: idSubline, query: query, from:from, size:size })
+        } else if(tag) {
+            return this.articlesModel.getArticlesByTag({ subline: idSubline, tag: tag, from:from, size:size })
         } else {
-            throw new BadRequestException('falta el parametro query');
+            throw new BadRequestException('falta el parametro query o tag');
         }
     }
 
@@ -69,6 +72,7 @@ export class SubLinesController {
         @Query('date') date: string
     ): Promise<any> {
         if(state == 'archived'){
+            console.log('GetDraft')
             return this.newsModel.getDrafts(idSubline, from, size)
         }else{
             return this.newsModel.getNews(idSubline, from, size, date)

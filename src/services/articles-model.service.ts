@@ -184,6 +184,11 @@ export class ArticlesModelService {
         }
     }
 
+    public async getArticlesByTag(options: { tag: string; subline: string; from?:string; size?:string }): Promise<(Article & { id: string })[]> {
+        let result = await this.articleIndex.where({ tags: options.tag, subline:options.subline }, options.from, options.size, { orderby: 'publicationDate' , order:'desc'})
+        return result
+    }
+
     public getAllArticles = async (): Promise<(Article & { id: string; })[]> => {
         return await this.articleIndex.all();
     }

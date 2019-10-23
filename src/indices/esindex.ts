@@ -51,8 +51,8 @@ export class Esindex<T> {
 
         let result:ApiResponse<any, any>;        
 
-        if(!!from && !!size){
-            console.log('prueba',from ,size)
+        if(!!from && !!size && !!order){
+
             result = await this.esClient.search({
                 index: this.index,
                 body: {
@@ -68,12 +68,31 @@ export class Esindex<T> {
                     from : parseInt(from),
                     size : parseInt(size),
                     sort : [
-                        R.objOf(order.orderby.toString())({ order : order.order })
+                        R.objOf(order.orderby.toString())({ order : order.order }) // R.objOf(key)(value) = {key : value}
                     ]
                 }
             })
-
-        }else{
+            
+        } else if(!!from && !!size && !!!order){
+            
+            result = await this.esClient.search({
+                index: this.index,
+                body: {
+                    query: {
+                        bool: {
+                            filter: R.pipe(
+                                R.toPairs(ops),
+                                R.map(pair => R.objOf(pair[1], pair[0])),
+                                R.map(obj => R.objOf(obj, 'term'))
+                            )
+                        }
+                    },
+                    from : parseInt(from),
+                    size : parseInt(size)
+                }
+            })
+            
+        } else {
             result = await this.esClient.search({
                 index: this.index,
                 body: {
@@ -144,10 +163,6 @@ export class Esindex<T> {
         await this.esClient.update(queryObj)
     }
 
-    // public  updateFullDocument(id:string, doc: T):Promise<any>{
-
-    // }
-
     public updatePartialDocument = async (id: string, partial: Partial<T>): Promise<any> => {
         let result = await this.esClient.update({
             id: id,
@@ -158,7 +173,5 @@ export class Esindex<T> {
 
         return { status: result.body.result }
     }
-
-
 
 }
