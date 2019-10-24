@@ -17,7 +17,7 @@ export class S3BucketService {
 
         let params = { 
             Bucket: 'multiconsultakonecta',
-            Key: `articleImages/${idArticle}/${file.originalname}`,
+            Key: `${idArticle}/${file.originalname}`,
             Body: file.buffer,
             ContentType: file.mimetype
         };
@@ -26,14 +26,12 @@ export class S3BucketService {
             return await this.s3Client.upload(params).promise()
         }catch(err){
             console.log(err)
-            throw new InternalServerErrorException('error al guardar la imagen');
+            throw new InternalServerErrorException('error al guardar el archivo');
         }
     }
 
     getFile(idArticle:string, fileName:string){
-        let params = { Bucket: 'multiconsultakonecta', Key: `articleImages/${idArticle}/${fileName}` };
-
+        let params = { Bucket: 'multiconsultakonecta', Key: `${idArticle}/${fileName}` };
         return this.s3Client.getObject(params).createReadStream();
-
     }
 }
