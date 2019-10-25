@@ -12,9 +12,6 @@ export class S3BucketService {
     });
 
     async uploadFile(idArticle: string, file: any) {
-
-        console.log(file)
-
         let params = { 
             Bucket: 'multiconsultakonecta',
             Key: `${idArticle}/${file.originalname}`,
@@ -34,4 +31,11 @@ export class S3BucketService {
         let params = { Bucket: 'multiconsultakonecta', Key: `${idArticle}/${fileName}` };
         return this.s3Client.getObject(params).createReadStream();
     }
+
+    deleteFile(idArticle:string, fileName:any){
+        let params = { Bucket: 'multiconsultakonecta', Key: `${idArticle}/${fileName}` };
+        return this.s3Client.deleteObject(params).promise();
+    }
+
+    
 }

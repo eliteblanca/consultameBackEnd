@@ -24,7 +24,7 @@ export class newUserDTO {
 
     @IsNotEmpty({ message: "Debes proporcionar un rol" })
     @IsIn(['admin', 'publicador', 'user'], { message: "el rol debe ser 'admin','publicador' ó 'user' " })
-    public rol: string;
+    public rol: 'admin' | 'user' | 'publicador';
 
 }
 
@@ -32,7 +32,7 @@ export class updateUserRolDTO {
 
     @IsNotEmpty({ message: "Debes proporcionar un rol" })
     @IsIn(['admin', 'publicador', 'user'], { message: "el rol debe ser 'admin','publicador' ó 'user' " })
-    public rol: string;
+    public rol: 'admin' | 'user' | 'publicador';
 
 }
 
@@ -92,8 +92,6 @@ export class UserModelService {
 
         try {
 
-
-
             function distinct(key) {
                 return (data) => {
                     var newArray = []
@@ -109,9 +107,23 @@ export class UserModelService {
 
             let distinctLines = distinct('line')
 
-            let userSubLines = await this.userSubLinesIndex.where({ user: id_usuario })
+            let user = await this.userIndex.getById(id_usuario)
 
-            let sublines: (subline & { id: string })[] = await async.map(userSubLines.map(userSubLine => userSubLine.subline), this.sublinesIndex.getById)
+            let userSubLines;
+
+            let sublines : (subline & { id: string })[];
+
+            if(user.rol != 'admin'){
+                
+                userSubLines = await this.userSubLinesIndex.where({ user: id_usuario })
+                
+                sublines = await async.map(userSubLines.map(userSubLine => userSubLine.subline), this.sublinesIndex.getById)
+
+            }else{
+
+                sublines = await this.sublinesIndex.all()
+
+            }
 
             let lineasDistintas: (line & { id: string })[] = await async.map(distinctLines(sublines), this.linesIndex.getById)
 

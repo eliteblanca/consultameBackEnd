@@ -10,9 +10,9 @@ export interface Article {
     tags?:string[];
     resume?:string;
     attached?:string[];
-    likes?:string[];//user ids
-    disLikes?:string[];//user ids
-    favorites?:string[];//user ids
+    likes?:string[];
+    disLikes?:string[];
+    favorites?:string[];
     state:string;
     publicationDate?:number;
     modificationDate?:number;

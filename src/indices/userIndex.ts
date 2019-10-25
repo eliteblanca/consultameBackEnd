@@ -4,7 +4,7 @@ import { Injectable } from "@nestjs/common";
 export interface user {
     username: string,
     password: string,
-    rol: string
+    rol: 'admin' | 'user' | 'publicador'
 }
 
 export interface userWithoutPassword {

@@ -61,8 +61,11 @@ export class ArticlesModelService {
 
     //#region Public
 
-    public async getArticlesByCategory(category: string, state:string, from:string, size:string): Promise<(Article & { id: string; })[]> {
-        return await this.articleIndex.where({ category: category, state:state },from,size, { orderby:'modificationDate', order:'desc' });
+    public async getArticlesByCategory(category: string, state:string = 'published', from:string = '0', size:string = '10'): Promise<(Article & { id: string; })[]> {
+        
+            return await this.articleIndex.where({ category: category, state:state },from,size, { orderby:'modificationDate', order:'desc' });
+            
+        
     }
 
     public async getArticlesByQuery(query: string, subline: string, state:string = 'published', from:string = '0', size:string = '10'  ): Promise<(Article & { id: string, highlight:string  })[]> {
