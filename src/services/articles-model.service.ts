@@ -36,84 +36,15 @@ export class articleDTO {
     @IsOptional()
     public attached?: string[];
 
-    @IsOptional()
-    @IsIn(['noticia', 'articulo'])
-    public role?: 'noticia' | 'articulo';
+    @IsNotEmpty({ message: 'debes proporcionar un estado al articulo' })
+    public state:string;
 
     @IsNotEmpty({ message: 'debes proporcionar una categoria' })
     @Length(20, 20, { message: 'debes proporcionar un id valido' })
     public category: string;
 
 }
-export class articlesBulkDTO implements Article {
 
-    @IsNotEmpty({ message: 'debes proporcionar un nombre al articulo' })
-    @IsAscii({ message: 'el titulo solo debe contener caracteres Ascii' })
-    @MinLength(3, { message: 'has proporcionado un titulo demasiado corto, debe contener minimo $constraint1 caracteres' })
-    public title: string;
-
-    @IsNotEmpty({ message: 'debes proporcionar un contenido al articulo' })
-    @MinLength(3, { message: 'has proporcionado un contenido demasiado corto, debe contener minimo $constraint1 caracteres' })
-    public content: string;
-
-    public obj: string;
-
-    @MinLength(3, { message: 'has proporcionado un tag demasiado corto, debe contener minimo $constraint1 caracteres', each: true })
-    @MaxLength(150, { message: 'has proporcionado un tag demasiado largo, debe contener maximo $constraint1 caracteres', each: true })
-    @IsAscii({ message: 'el tag solo debe contener caracteres Ascii', each: true })
-    @IsOptional()
-    public tags?: string[];
-
-    @MinLength(3, { message: 'has proporcionado un resumen demasiado corto, debe contener minimo $constraint1 caracteres' })
-    @IsAscii({ message: 'el resumen solo debe contener caracteres Ascii' })
-    @IsOptional()
-    public resume?: string;
-
-    @MinLength(3, { message: 'has proporcionado un vinculo demasiado corto, debe contener minimo $constraint1 caracteres', each: true })
-    @IsOptional()
-    public attached?: string[];
-
-    @IsOptional()
-    @Length(20, 20, { message: 'debes proporcionar un id valido', each: true })
-    public likes?: string[];//user ids
-
-    @IsOptional()
-    @Length(20, 20, { message: 'debes proporcionar un id valido', each: true })
-    public disLikes?: string[];//user ids
-
-    @IsOptional()
-    @Length(20, 20, { message: 'debes proporcionar un id valido', each: true })
-    public favorites?: string[];//user ids
-
-    @IsOptional()
-    @IsIn(['noticia', 'articulo'])
-    public role?: 'noticia' | 'articulo';
-
-    public publicationDate?: number;
-
-    public modificationDate?: number;
-
-    @IsOptional()
-    @Length(20, 20, { message: 'debes proporcionar un id valido' })
-    public modificationUser?: string;
-
-    @IsOptional()
-    @Length(20, 20, { message: 'debes proporcionar un id valido' })
-    public creator?: string;
-
-    @IsNotEmpty({ message: 'debes proporcionar una categoria' })
-    @Length(20, 20, { message: 'debes proporcionar un id valido' })
-    public category: string;
-
-    @IsNotEmpty({ message: 'debes proporcionar una sublinea' })
-    @Length(20, 20, { message: 'debes proporcionar un id valido' })
-    public subline: string;
-
-    @IsNotEmpty({ message: 'debes proporcionar una linea' })
-    @Length(20, 20, { message: 'debes proporcionar un id valido' })
-    public line: string;
-
-}
 @Injectable()
 export class ArticlesModelService {
 
@@ -130,39 +61,27 @@ export class ArticlesModelService {
 
     //#region Public
 
-    public async getArticlesByCategory(category: string, from:string, size:string): Promise<(Article & { id: string; })[]> {
-        return await this.articleIndex.where({ category: category },from,size, { orderby:'modificationDate', order:'desc' });
+    public async getArticlesByCategory(category: string, state:string, from:string, size:string): Promise<(Article & { id: string; })[]> {
+        return await this.articleIndex.where({ category: category, state:state },from,size, { orderby:'modificationDate', order:'desc' });
     }
 
-    public async getArticlesByQuery(options: { query: string; subline: string; from?:string; size?:string }): Promise<(Article & { id: string, highlight:string  })[]> {
-
-        let from = '0';
-
-        if(!!options.from){
-            from = options.from
-        }
-        
-        let size = '10';
-
-        if(!!options.size){
-            size = options.size
-        }
-
+    public async getArticlesByQuery(query: string, subline: string, state:string = 'published', from:string = '0', size:string = '10'  ): Promise<(Article & { id: string, highlight:string  })[]> {
+        //archived
         try {
-
-            let query = {
+            let q = {
                 query: {
                     bool: {
                         must: [
                             {
                                 multi_match: {
-                                    'query': options.query,
+                                    'query': query,
                                     'fields': ['title^3', 'content^2', 'tags']
                                 }
                             }
                         ],
                         filter: [
-                            { 'term': { 'subline': options.subline } }
+                            { 'term': { 'subline': subline } },
+                            { 'term': { 'state': state } }
                         ]
                     }
                 },
@@ -175,7 +94,7 @@ export class ArticlesModelService {
                 }
             };
 
-            let result = await this.articleIndex.query(query);
+            let result = await this.articleIndex.query(q);
 
             return result
 
@@ -185,7 +104,7 @@ export class ArticlesModelService {
     }
 
     public async getArticlesByTag(options: { tag: string; subline: string; from?:string; size?:string }): Promise<(Article & { id: string })[]> {
-        let result = await this.articleIndex.where({ tags: options.tag, subline:options.subline }, options.from, options.size, { orderby: 'publicationDate' , order:'desc'})
+        let result = await this.articleIndex.where({ tags: options.tag, subline:options.subline, state:'published' }, options.from, options.size, { orderby: 'publicationDate' , order:'desc'})
         return result
     }
 

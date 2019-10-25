@@ -28,7 +28,7 @@ export class EsClientService extends GenericModel {
                                     "likes": { "type": "keyword" },
                                     "disLikes": { "type": "keyword" },
                                     "favorites": { "type": "keyword" },
-                                    "role": { "type": "keyword" },
+                                    "state": { "type": "keyword" },
                                     "publicationDate": { "type": "date", "format": 'epoch_millis' },
                                     "modificationDate": { "type": "date", "format": 'epoch_millis' },
                                     "modificationUser": { "type": "keyword" },

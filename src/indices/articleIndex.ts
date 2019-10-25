@@ -13,7 +13,7 @@ export interface Article {
     likes?:string[];//user ids
     disLikes?:string[];//user ids
     favorites?:string[];//user ids
-    role?:"noticia"|"articulo";
+    state:string;
     publicationDate?:number;
     modificationDate?:number;
     modificationUser?:string;

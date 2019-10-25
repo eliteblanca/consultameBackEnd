@@ -50,11 +50,12 @@ export class SubLinesController {
         @Query('query') query: string,
         @Query('from') from: string,
         @Query('size') size: string,
+        @Query('state') state: string,
         @Query('tag') tag: string
     ): Promise<any> {
         if (query) {
             await this.searchModel.newSearch({ query: query, subline: idSubline })
-            return this.articlesModel.getArticlesByQuery({ subline: idSubline, query: query, from:from, size:size })
+            return this.articlesModel.getArticlesByQuery(query, idSubline, state, from, size)
         } else if(tag) {
             return this.articlesModel.getArticlesByTag({ subline: idSubline, tag: tag, from:from, size:size })
         } else {

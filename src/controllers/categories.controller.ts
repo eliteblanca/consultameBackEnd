@@ -45,8 +45,9 @@ export class CategoriesController {
     getArticlesOfCategory(
         @Param('id') idCategory: string,
         @Query('from') from: string,
-        @Query('size') size: string
+        @Query('size') size: string,
+        @Query('state') state: string
     ): Promise<any> {
-        return this.articlesModel.getArticlesByCategory(idCategory, from, size);
+        return this.articlesModel.getArticlesByCategory(idCategory, state, from, size);
     }
 }
