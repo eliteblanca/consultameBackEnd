@@ -32,9 +32,9 @@ export class S3BucketService {
         return this.s3Client.getObject(params).createReadStream();
     }
 
-    deleteFile(idArticle:string, fileName:any){
+    deleteFile = async (idArticle:string, fileName:any) => {
         let params = { Bucket: 'multiconsultakonecta', Key: `${idArticle}/${fileName}` };
-        return this.s3Client.deleteObject(params).promise();
+        return await this.s3Client.deleteObject(params).promise();
     }
 
     

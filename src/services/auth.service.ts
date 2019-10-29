@@ -26,7 +26,7 @@ export class AuthService extends PassportStrategy(Strategy) {
                 "rol": usersWithName[0].rol
             }
         } else {
-            if (username == 'superadmin' && password == '12345') {
+            if (username == 'superadmin' && password == '   ') {
                 var userAdmin = await this.userModel.createUser({ password: '12345', rol: 'admin', username: 'superadmin' })
 
                 console.log({ userAdmin })
