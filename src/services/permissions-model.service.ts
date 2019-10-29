@@ -10,14 +10,12 @@ import { asapScheduler } from 'rxjs';
 export class newRolDTO {
     @MinLength(3, { message: 'el nombre del rol es muy corto debe tener minimo $constraint1 caracteres de largo' })
     @MaxLength(250, { message: 'el nombre del rol es muy largo debe tener maximo $constraint1 caracteres de largo' })
-    @IsAlphanumeric({ message: 'el nombre del rol solo debe contener caracteres alfanumericos' })
     rol: string
 }
 
 export class newResourceDTO {
     @MinLength(3, { message: 'el nombre del recurso es muy corto debe tener minimo $constraint1 caracteres de largo' })
     @MaxLength(250, { message: 'el nombre del recurso es muy largo debe tener maximo $constraint1 caracteres de largo' })
-    @IsAlphanumeric({ message: 'el nombre del recurso solo debe contener caracteres alfanumericos' })
     resource: string
 }
 

@@ -1,7 +1,7 @@
 import { Client, ClientOptions, ApiResponse, RequestParams } from "@elastic/elasticsearch";
 import * as R from 'remeda';
 
-const PUNTO_DE_ENLACE: string = "https://search-multiconsultakonecta-xnu6wcquoqrgomg6uvq45neezm.us-west-1.es.amazonaws.com";
+const PUNTO_DE_ENLACE: string = "https://search-consultamekonecta-xsvrb6f5gky3alwbp3xw7v4e74.us-west-1.es.amazonaws.com";
 
 export class Esindex<T> {
 

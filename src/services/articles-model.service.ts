@@ -6,6 +6,8 @@ import { SublinesIndex } from '../indices/sublinesIndex';
 import { CategoriesIndex } from '../indices/categoriesIndex';
 import { LikeUserIndex } from '../indices/likeUserIndex';
 import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
+import { S3BucketService } from '../services/s3-bucket.service';
+import * as async from 'async';
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: 'debes proporcionar un id de articulo' })
@@ -55,9 +57,9 @@ export class ArticlesModelService {
         private sublinesIndex: SublinesIndex,
         private categoriesIndex: CategoriesIndex,
         private likeUserIndex: LikeUserIndex,
-        private favoriteUserIndex: FavoriteUserIndex
-    ) {
-    }
+        private favoriteUserIndex: FavoriteUserIndex,
+        private S3BucketService: S3BucketService
+    ) {  }
 
     //#region Public
 
@@ -351,15 +353,29 @@ export class ArticlesModelService {
     }
 
     public deleteArticle = async (id: string): Promise<any> => {
+
+        try {
+            var article = await this.articleIndex.getById(id)
+        } catch (error) {
+            console.log(error);
+        }
+
+        await async.each( article.attached, async (fileName) => {
+            await this.S3BucketService.deleteFile(id,fileName)
+        })
+
         try {
             await this.articleIndex.delete(id);
         } catch (error) {
             console.log(error);
         }
 
+
         await this.favoriteUserIndex.deleteWhere({ article: id });
 
         await this.likeUserIndex.deleteWhere({ article: id });
+
+
     }
 
     public updateArticle = async (id: string, article: articleDTO, modificationUser: string): Promise<any> => {
