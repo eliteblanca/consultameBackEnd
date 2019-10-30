@@ -5,12 +5,20 @@ import { join } from "path";
 import { DefaultPageFilter } from "./filters/default-page.filter";
 import { ValidationPipe } from '@nestjs/common';
 import { json } from 'body-parser';
+import * as fs from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.use(json({ limit: '50mb'  }))
 
-  const port: number = 443;
+  const httpsOptions = {
+    key: fs.readFileSync('../../../../../../../../key.pem'),
+    cert: fs.readFileSync('../../../../../../../../cert.pem'),
+  };
+
+  const app = await NestFactory.create<NestExpressApplication>(AppModule,{
+    httpsOptions,
+  });
+
+  app.use(json({ limit: '50mb'  }))
 
   app.enableCors();
 
@@ -19,7 +27,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({transform: true}));
   app.useGlobalFilters(new DefaultPageFilter())
 
-  await app.listen(port);
-  console.log(`Listen in port ${port}`)
+  await app.listen(443);
+  console.log(`Listen in port ${443}`)
 }
+
 bootstrap();
