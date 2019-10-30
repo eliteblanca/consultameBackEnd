@@ -20,6 +20,6 @@ async function bootstrap() {
   app.useGlobalFilters(new DefaultPageFilter())
 
   await app.listen(port);
-  console.log("Listen in",`http://172.20.20.24:${port}`)
+  console.log(`Listen in port ${port}`)
 }
 bootstrap();
