@@ -9,15 +9,21 @@ import * as fs from 'fs';
 
 async function bootstrap() {
 
-  const httpsOptions = {
-    key: fs.readFileSync('../../../../../../../../key.pem'),
-    cert: fs.readFileSync('../../../../../../../../cert.pem'),
-  };
+  try {   
+    
+    const httpsOptions = {
+      key: fs.readFileSync('../../../../../../../../key.pem'),
+      cert: fs.readFileSync('../../../../../../../../cert.pem'),
+    };
+    
+    var app = await NestFactory.create<NestExpressApplication>(AppModule,{
+      httpsOptions,
+    });
 
-  const app = await NestFactory.create<NestExpressApplication>(AppModule,{
-    httpsOptions,
-  });
-
+  } catch (error) {
+      var app = await NestFactory.create<NestExpressApplication>(AppModule);    
+  }
+    
   app.use(json({ limit: '50mb'  }))
 
   app.enableCors();
