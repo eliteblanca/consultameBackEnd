@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.use(json({ limit: '50mb'  }))
 
-  const port: number = 3001;
+  const port: number = 443;
 
   app.enableCors();
 
