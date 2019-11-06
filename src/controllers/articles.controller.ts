@@ -28,24 +28,24 @@ export class ArticlesController {
         return this.articlesModel.deleteArticle(singleArticleDTO.id);
     }
 
-    @UseGuards(AuthGuard('jwt'))
-    @Post()
-    createArticle(
-        @Body() body: articleDTO,
-        @User() user: U,
-    ): any {
-        return this.articlesModel.createArticle(body, user.sub);
-    }
+    // @UseGuards(AuthGuard('jwt'))
+    // @Post()
+    // createArticle(
+    //     @Body() body: articleDTO,
+    //     @User() user: U,
+    // ): any {
+    //     return this.articlesModel.createArticle(body, user.sub);
+    // }
 
-    @UseGuards(AuthGuard('jwt'))
-    @Put(':id')
-    updateArticle(
-        @Body() body,
-        @User() user: U,
-        @Param('id') id: string,
-    ): any {
-        return this.articlesModel.updateArticle(id, body, user.sub);
-    }
+    // @UseGuards(AuthGuard('jwt'))
+    // @Put(':id')
+    // updateArticle(
+    //     @Body() body,
+    //     @User() user: U,
+    //     @Param('id') id: string,
+    // ): any {
+    //     return this.articlesModel.updateArticle(id, body, user.sub);
+    // }
 
     @UseGuards(AuthGuard('jwt'))
     @Post(':id/likes')

@@ -2,7 +2,6 @@ import { forwardRef, Inject, Injectable, NotAcceptableException, NotFoundExcepti
 import { IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, Length } from 'class-validator';
 import { ArticleIndex } from "../indices/articleIndex";
 import { CategoriesIndex, category } from "../indices/categoriesIndex";
-import { SublinesIndex } from "../indices/sublinesIndex";
 import { ArticlesModelService } from "./articles-model.service";
 import * as async from 'async';
 import * as R from 'remeda';
@@ -65,7 +64,6 @@ export class udpateCategoryDTO {
 export class CategoriesModelService {
     constructor(
         private categoriesIndex: CategoriesIndex,
-        private sublinesIndex: SublinesIndex,
         private articleIndex: ArticleIndex,
         @Inject(forwardRef(() => ArticlesModelService))
         private articlesModel: ArticlesModelService
@@ -93,7 +91,7 @@ export class CategoriesModelService {
     public async createCategory(newCategory: newCategoryDTO): Promise<category & { id: string; }> {
         try {
             // --> comprueba si la linea existe
-            let subline = await this.sublinesIndex.getById(newCategory.sublinea)
+            // let subline = await this.sublinesIndex.getById(newCategory.sublinea)
         } catch (error) {
             if (error.meta.statusCode == 404) {
                 throw new NotAcceptableException('la sublinea no existe');
@@ -125,7 +123,7 @@ export class CategoriesModelService {
 
         try {
 
-            let subline = await this.sublinesIndex.getById(sublineId);
+            // let subline = await this.sublinesIndex.getById(sublineId);
 
             return await this.categoriesIndex.where({ sublinea: sublineId })
 

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from "../services/auth.service";
+import { LdapService } from "../services/auth.service";
 
 class user {
     "sub": string
@@ -13,9 +13,9 @@ class user {
 
 @Controller('api')
 export class AppController {
-    constructor(private authService: AuthService) { }
+    constructor(private authService: LdapService) { }
 
-    @UseGuards(AuthGuard('local'))
+    @UseGuards(AuthGuard('ldap'))
     @Post('authenticate')
     login(@Request() req): Promise<{ tokem: string }> {
         return this.authService.generateJwt(req.user);

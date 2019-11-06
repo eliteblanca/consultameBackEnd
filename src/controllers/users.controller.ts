@@ -1,13 +1,18 @@
 import { Controller, UseGuards, Get, Query, Param, Body, Delete, Post, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { UserModelService, deleteUserDTO, newUserDTO, updateUserRolDTO } from "../services/user-model.service";
+import { UserModelService, deleteUserDTO, updateUserRolDTO } from "../services/user-model.service";
 import { User } from "../user.decorator";
 import { User as U } from "../entities/user";
+import { PcrcModelService, postUserPcrcDTO } from "../services/pcrc-model.service";
+
 
 @Controller('api/users')
 export class UsersController {
 
-    constructor(private userModel: UserModelService) { }
+    constructor(
+        private userModel: UserModelService,
+        private pcrcModel:PcrcModelService
+    ) { }
 
     @UseGuards(AuthGuard('jwt'))
     @Get()
@@ -23,11 +28,11 @@ export class UsersController {
         return this.userModel.deleteUser(params.id);
     }
 
-    @Post()
-    @UseGuards(AuthGuard('jwt'))
-    registrate(@Body() newUser: newUserDTO): Promise<any> {
-        return this.userModel.createUser(newUser);
-    }
+    // @Post()
+    // @UseGuards(AuthGuard('jwt'))
+    // registrate(@Body() newUser: newUserDTO): Promise<any> {
+    //     return this.userModel.createUser(newUser);
+    // }
 
     @UseGuards(AuthGuard('jwt'))
     @Put(':idUsuario')
@@ -36,33 +41,7 @@ export class UsersController {
         @Param('idUsuario') idUsuario: string
     ): Promise<any> {
         return this.userModel.updateUserRol(idUsuario, newUser);
-    }
-
-    @UseGuards(AuthGuard('jwt'))
-    @Get(':idUsuario/allowedlines')
-    getUserSubLines(
-        @Param('idUsuario') id_usuario
-    ): any {
-        return this.userModel.getUserSubLines(id_usuario)
-    }
-
-    @UseGuards(AuthGuard('jwt'))
-    @Post(':idUsuario/allowedlines')
-    postUserSubline(
-        @Param('idUsuario') id_usuario,
-        @Body() body: { subline: string }
-    ): any {
-        return this.userModel.postUserSubline(id_usuario, body.subline)
-    }
-
-    @UseGuards(AuthGuard('jwt'))
-    @Delete(':idUsuario/allowedlines/:idSubline')
-    deleteUserSubline(
-        @Param('idUsuario') id_usuario,
-        @Param('idSubline') idSubline
-    ): any {
-        return this.userModel.deleteUserSubline(id_usuario, idSubline)
-    }
+    }  
 
     @UseGuards(AuthGuard('jwt'))
     @Get('me/likes')
@@ -86,5 +65,33 @@ export class UsersController {
         @Query('size') size: string
     ): any {
         return this.userModel.getUserFavorites(user.sub,from,size);
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get(':cedula/pcrc')
+    getUserPcrc(
+        @Param('cedula') cedula:string,
+        @Query('from') from: string,
+        @Query('size') size: string,
+    ): any {
+        return this.pcrcModel.getUserPcrc(cedula, from, size)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post(':cedula/pcrc')
+    postUserPcrc(
+        @Param('cedula') cedula:string,
+        @Body() body:postUserPcrcDTO
+    ): any {
+        return this.pcrcModel.postUserPcrc(cedula, body.pcrc)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Delete(':cedula/pcrc/:pcrc')
+    deleteUserPcrc(
+        @Param('cedula') cedula:string,
+        @Param('pcrc') pcrc:string
+    ): any {
+        return this.pcrcModel.deleteUserPcrc(cedula, pcrc)
     }
 }

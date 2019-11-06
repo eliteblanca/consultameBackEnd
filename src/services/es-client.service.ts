@@ -159,8 +159,6 @@ export class EsClientService extends GenericModel {
                         body: {
                             "mappings": {
                                 "properties": {
-                                    "username": { "type": "keyword" },
-                                    "password": { "type": "keyword" },
                                     "rol": { "type": "keyword" }
                                 }
                             }
@@ -213,15 +211,15 @@ export class EsClientService extends GenericModel {
                         }
                     })
                     break;
-                case 'usersublines':
+                case 'userpcrc':
                     return await this.esClient.indices.create({
                         index: index,
                         include_type_name: false,
                         body: {
                             "mappings": {
                                 "properties": {
-                                    "user": { "type": "keyword" },
-                                    "subline": { "type": "keyword" }
+                                    "cedula": { "type": "keyword" },
+                                    "pcrc": { "type": "keyword" }
                                 }
                             }
                         }

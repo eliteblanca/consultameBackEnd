@@ -21,7 +21,7 @@ async function bootstrap() {
     });
 
   } catch (error) {
-      var app = await NestFactory.create<NestExpressApplication>(AppModule);    
+      var app = await NestFactory.create<NestExpressApplication>(AppModule);
   }
     
   app.use(json({ limit: '50mb'  }))
@@ -33,8 +33,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({transform: true}));
   app.useGlobalFilters(new DefaultPageFilter())
 
-  await app.listen(443);
-  console.log(`Listen in port ${443}`)
+  await app.listen(3001);
+  console.log(`Listen in port ${3001}`)
 }
 
 bootstrap();

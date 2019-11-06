@@ -1,48 +1,64 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { promises } from 'fs';
-import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-local';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy as jwStrategy } from 'passport-jwt';
-import { User } from "../entities/user";
+import * as ldapStrategy from 'passport-ldapauth';
+import { user, UserIndex } from "../indices/userIndex";
 import { UserModelService } from "../services/user-model.service";
+import { User } from "../entities/user";
 const secretKey: string = "123";
 
 @Injectable()
-export class AuthService extends PassportStrategy(Strategy) {
-
-    constructor(private readonly jwtService: JwtService, private userModel: UserModelService) { super(); }
-
-    async validate(username: string, password: string): Promise<User> {
-
-        let usersWithName = await this.userModel.getUserByName(username);
-
-        if (usersWithName.length && usersWithName[0].password == password) {
-            return {
-                "sub": usersWithName[0].id,
-                "name": usersWithName[0].username,
-                "rol": usersWithName[0].rol
+export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
+    constructor(
+        private userModel: UserModelService,
+        private UserIndex: UserIndex,
+        private readonly jwtService: JwtService
+    ) {
+        super({
+            server: {
+                url: 'ldap://sm1dc01w12s.multienlace.com.co',
+                bindDN: 'julian.vargas.a@multienlace.com.co',
+                bindCredentials: 'Konecta2027',
+                searchFilter: '(SAMAccountName={{username}})',
+                searchBase: 'dc=multienlace,dc=com,dc=co'
             }
-        } else {
-            if (username == 'superadmin' && password == '12345') {
-                var userAdmin = await this.userModel.createUser({ password: '12345', rol: 'admin', username: 'superadmin' })
+        });
+    }
 
-                console.log({ userAdmin })
+    async validate(ldapUserInfo) {
+
+        console.log(ldapUserInfo)
+
+        try {
+
+            var user = await this.UserIndex.getById(ldapUserInfo.postOfficeBox)
+
+            return {
+                "sub": user.id,
+                "name": ldapUserInfo.name,
+                "rol": user.rol
+            }
+
+        } catch (error) {
+            if (!error.body.found) {
+
+                var user = await this.userModel.createUser({ cedula: ldapUserInfo.postOfficeBox, rol: "user" })        
 
                 return {
-                    "sub": userAdmin.id,
-                    "name": userAdmin.username,
-                    "rol": userAdmin.rol
+                    "sub": user.id,
+                    "name": ldapUserInfo.name,
+                    "rol": user.rol
                 }
             }
-            throw new UnauthorizedException();
         }
-        // {tokem:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikp1bGlhbiIsInJvbCI6ImFkbWluIiwibGluZSI6ImFsbCIsInN1YkxpbmUiOiIifQ.SkMKVjzCyzHQTvHq7MvEf_VCBldjhdHnLm6-1WBiodk"}
+
     }
 
-    async generateJwt(user): Promise<{ tokem: string }> {
+    async generateJwt(user: { sub: string, name: string, rol: user['rol'] }): Promise<{ tokem: string }> {
         return { tokem: this.jwtService.sign(user) }
     }
+
 }
 
 @Injectable()
@@ -50,7 +66,7 @@ export class JwtValidator extends PassportStrategy(jwStrategy) {
     constructor() {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: true, //change to false on production
+            ignoreExpiration: false, 
             secretOrKey: secretKey,
         });
     }

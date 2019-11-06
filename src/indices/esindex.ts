@@ -18,12 +18,22 @@ export class Esindex<T> {
 
     protected createRequest = x => R.addProp(R.objOf('body')(x), 'index', this.index)
 
-    public create = async (doc: T): Promise<T & { id: string; }> => {
-        let result = await this.esClient.index({
-            index: this.index,
-            refresh: 'true',
-            body: doc
-        })
+    public create = async (doc: T, id?:string): Promise<T & { id: string; }> => {
+        let result:ApiResponse
+        if(typeof id == 'undefined'){
+            result = await this.esClient.index({
+                index: this.index,
+                refresh: 'true',
+                body: doc
+            })
+        } else {
+            result = await this.esClient.index({
+                id:id,
+                index: this.index,
+                refresh: 'true',
+                body: doc
+            })
+        }
 
         return R.addProp(doc, 'id', result.body._id)
     }

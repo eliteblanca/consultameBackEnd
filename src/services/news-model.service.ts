@@ -1,7 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { NewsIndex, news } from "../indices/newsIndex";
 import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn, Length } from 'class-validator';
-import { SublinesIndex } from "../indices/sublinesIndex";
 
 
 export class postNewsDTO {
@@ -42,7 +41,6 @@ export class NewsModelService {
 
     constructor(
         private newsIndex: NewsIndex,
-        private sublinesIndex: SublinesIndex
     ) { }
 
     getNews = async (sublineId: string, from: string, size: string, date: string): Promise<(news & { id: string; })[]> => {
@@ -101,12 +99,7 @@ export class NewsModelService {
         }
     }
 
-    postNews = async (news: postNewsDTO, userId: string): Promise<(news & { id: string; })> => {
-        try {
-            let subline = await this.sublinesIndex.getById(news.subline)
-        } catch (err) {
-            throw new BadRequestException('la sublinea no existe')
-        }
+    postNews = async (news: postNewsDTO, userId: string): Promise<(news & { id: string; })> => {       
 
         let newsExtras = {
             publicationDate: Date.now(),
