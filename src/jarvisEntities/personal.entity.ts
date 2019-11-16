@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { Pcrc } from "./pcrc.entity";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from "typeorm";  
+import { datosPersonales } from "./datosGenerales.entity";
 
 @Entity('dp_distribucion_personal')
 export class Personal {
@@ -14,7 +14,7 @@ export class Personal {
     codigo_sap: number;
 
     @Column({ type: "date" })
-    fecha_actual: string; // date
+    fecha_actual: string;
     
     @Column()
     pcrc: string;
@@ -38,15 +38,16 @@ export class Personal {
     unidad_organizativa: string;
     
     @Column({ type: "datetime" })
-    fecha_modificacion: string; // date time
+    fecha_modificacion: string;
 
     @Column({ type: "datetime" })
-    fecha_conex_ultimo_pcrc: string; // date time
+    fecha_conex_ultimo_pcrc: string;
 
     @Column()
     id_dp_plazas: number;
 
-    @Column()
+    @OneToOne(type => datosPersonales)
+    @JoinColumn({ referencedColumnName:'id_dp_datos_generales', name:'id_dp_datos_generales' })
     id_dp_datos_generales: number;
 
 }

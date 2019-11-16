@@ -28,12 +28,6 @@ export class UsersController {
         return this.userModel.deleteUser(params.id);
     }
 
-    // @Post()
-    // @UseGuards(AuthGuard('jwt'))
-    // registrate(@Body() newUser: newUserDTO): Promise<any> {
-    //     return this.userModel.createUser(newUser);
-    // }
-
     @UseGuards(AuthGuard('jwt'))
     @Put(':idUsuario')
     actualizarUsuario(

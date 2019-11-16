@@ -31,7 +31,6 @@ import { RolesIndex } from './indices/rolesIndex';
 import { ResourcesIndex } from './indices/resourcesIndex';
 import { PermissionsIndex } from './indices/permissionsIndex';
 import { NewsIndex } from "./indices/newsIndex";
-import { UserPcrcIndex } from "./indices/userPcrcIndex";
 
 import { S3BucketService } from './services/s3-bucket.service';
 import { NewsController } from './controllers/news.controller';
@@ -42,6 +41,7 @@ import { CommentsController } from './controllers/comments.controller';
 import { Pcrc } from "./jarvisEntities/pcrc.entity";
 import { Clientes } from "./jarvisEntities/clientes.entity";
 import { Personal } from "./jarvisEntities/personal.entity";
+import { datosPersonales } from "./jarvisEntities/datosGenerales.entity";
 import { PcrcController } from './controllers/pcrc.controller';
 import { PcrcModelService } from "./services/pcrc-model.service";
 
@@ -66,7 +66,8 @@ const secretKey = "123";
       entities: [
         Pcrc,
         Clientes,
-        Personal
+        Personal,
+        datosPersonales
       ],
       synchronize: false,
     }),
@@ -109,8 +110,7 @@ const secretKey = "123";
     NewsIndex,
     CommentsIndexService,
     CommentsModelService,
-    PcrcModelService,
-    UserPcrcIndex,
+    PcrcModelService
   ],
 })
 export class AppModule {}

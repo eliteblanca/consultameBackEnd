@@ -6,6 +6,9 @@ import * as ldapStrategy from 'passport-ldapauth';
 import { user, UserIndex } from "../indices/userIndex";
 import { UserModelService } from "../services/user-model.service";
 import { User } from "../entities/user";
+import { PcrcModelService } from "../services/pcrc-model.service";
+import * as R from 'remeda';
+
 const secretKey: string = "123";
 
 @Injectable()
@@ -13,13 +16,14 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
     constructor(
         private userModel: UserModelService,
         private UserIndex: UserIndex,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private pcrcModel: PcrcModelService
     ) {
         super({
             server: {
                 url: 'ldap://sm1dc01w12s.multienlace.com.co',
                 bindDN: 'julian.vargas.a@multienlace.com.co',
-                bindCredentials: 'Konecta2027',
+                bindCredentials: 'Konecta2028',
                 searchFilter: '(SAMAccountName={{username}})',
                 searchBase: 'dc=multienlace,dc=com,dc=co'
             }
@@ -27,9 +31,6 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
     }
 
     async validate(ldapUserInfo) {
-
-        console.log(ldapUserInfo)
-
         try {
 
             var user = await this.UserIndex.getById(ldapUserInfo.postOfficeBox)
@@ -41,9 +42,17 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
             }
 
         } catch (error) {
-            if (!error.body.found) {
 
-                var user = await this.userModel.createUser({ cedula: ldapUserInfo.postOfficeBox, rol: "user" })        
+            console.log(error)
+
+            if (!error.meta.body.found) {
+
+                var user = await this.userModel.createUser({
+                        cedula: ldapUserInfo.postOfficeBox,
+                        rol: "user",
+                        nombre: ldapUserInfo.name,
+                        pcrc: []
+                    })
 
                 return {
                     "sub": user.id,
@@ -52,7 +61,6 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
                 }
             }
         }
-
     }
 
     async generateJwt(user: { sub: string, name: string, rol: user['rol'] }): Promise<{ tokem: string }> {

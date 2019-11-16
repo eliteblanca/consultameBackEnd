@@ -2,7 +2,10 @@ import { Esindex } from "./esindex";
 import { Injectable } from "@nestjs/common";
 
 export interface user {
-    rol: 'admin' | 'user' | 'publicador'
+    cedula:string;
+    nombre:string;
+    rol: 'admin' | 'user' | 'publicador';
+    pcrc:string[];
 }
 
 @Injectable()

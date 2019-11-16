@@ -2,7 +2,7 @@ import { Esindex } from "./esindex";
 import { Injectable } from "@nestjs/common";
 
 export class category {
-    sublinea: string;
+    pcrc: string;
     name: string;
     position: number;
     icon: string;

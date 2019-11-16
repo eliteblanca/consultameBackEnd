@@ -1,11 +1,10 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsByteLength, IsBase64, ValidateNested, MaxLength, IsIn, IsEmpty } from "class-validator";
-import { LikeUserIndex, likeUser } from "../indices/likeUserIndex";
-import { FavoriteUserIndex, favoriteUser } from "../indices/favoritesUserIndex";
-import { UserIndex, user } from "../indices/userIndex";
-import { Article, ArticleIndex } from "../indices/articleIndex";
-import * as async from 'async';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { IsByteLength, IsIn, IsNotEmpty } from "class-validator";
 import * as R from 'remeda';
+import { Article, ArticleIndex } from "../indices/articleIndex";
+import { FavoriteUserIndex } from "../indices/favoritesUserIndex";
+import { likeUser, LikeUserIndex } from "../indices/likeUserIndex";
+import { user, UserIndex } from "../indices/userIndex";
 
 export class updateUserRolDTO {
 
@@ -20,6 +19,7 @@ export class deleteUserDTO {
     public id: string
 }
 
+
 @Injectable()
 export class UserModelService {
 
@@ -30,7 +30,7 @@ export class UserModelService {
         private articleIndex: ArticleIndex,
     ) { }
 
-    public async createUser(newUser:{cedula:string, rol:user["rol"]}): Promise<user & { id: string; }> {
+    public async createUser(newUser:user): Promise<user & { id: string; }> {
         try{
 
             let existingUser = await this.userIndex.getById(newUser.cedula);
@@ -41,7 +41,7 @@ export class UserModelService {
 
         } catch (error) {
             if(!error.body.found) {
-                return this.userIndex.create({ rol: newUser.rol }, newUser.cedula)
+                return this.userIndex.create(newUser, newUser.cedula)
             }
         }
     }
@@ -84,5 +84,4 @@ export class UserModelService {
     public async getUserFavorites(userId: string, from:string, size:string): Promise<(Article & { id: string; })[]> {
         return await this.articleIndex.where({ favorites: userId }, from, size,  { orderby: 'publicationDate' , order:'desc'})
     }
-
 }

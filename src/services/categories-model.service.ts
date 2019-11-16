@@ -6,18 +6,6 @@ import { ArticlesModelService } from "./articles-model.service";
 import * as async from 'async';
 import * as R from 'remeda';
 
-type categories = {
-    name: string,
-    order: number,
-    desplegado: boolean,
-    subcategories?: categories
-}[];
-
-export class correctParams {
-    @Length(20, 20, { message: "debes proporcionar un id valido" })
-    sublineId: string;
-}
-
 export class getCategoryParams {
     @Length(20, 20, { message: "debes proporcionar un id valido" })
     idCategory: string;
@@ -41,9 +29,8 @@ export class newCategoryDTO {
     @Length(20, 20, { message: "debes proporcionar un id valido" })
     public group: string;
 
-    @IsNotEmpty({ message: "Debes proporcionar una sublinea en la que agregar la categoria" })
-    @Length(20, 20, { message: "debes proporcionar un id valido para la sublinea" })
-    public sublinea: string
+    @IsNotEmpty({ message: "Debes proporcionar un pcrc en el que agregar la categoria" })
+    public pcrc: string
 }
 
 export class udpateCategoryDTO {
@@ -94,7 +81,7 @@ export class CategoriesModelService {
             // let subline = await this.sublinesIndex.getById(newCategory.sublinea)
         } catch (error) {
             if (error.meta.statusCode == 404) {
-                throw new NotAcceptableException('la sublinea no existe');
+                throw new NotAcceptableException('el pcrc no existe');
             } else {
                 console.log(error)
             }
@@ -119,17 +106,17 @@ export class CategoriesModelService {
 
     }
 
-    public async getCategories(sublineId: string): Promise<(category & { id: string; })[]> {
+    public async getCategories(pcrcId: string): Promise<(category & { id: string; })[]> {
 
         try {
 
             // let subline = await this.sublinesIndex.getById(sublineId);
 
-            return await this.categoriesIndex.where({ sublinea: sublineId })
+            return await this.categoriesIndex.where({ pcrc: pcrcId })
 
         } catch (error) {
             if (error && error.meta && error.meta.body && error.meta.statusCode == 404) {
-                throw new NotFoundException('sublinea no encontrada')
+                throw new NotFoundException('pcrc no encontrado')
             } else {
                 console.log(error)
             }

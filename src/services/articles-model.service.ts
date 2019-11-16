@@ -6,6 +6,7 @@ import { CategoriesIndex } from '../indices/categoriesIndex';
 import { LikeUserIndex } from '../indices/likeUserIndex';
 import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
 import { S3BucketService } from '../services/s3-bucket.service';
+import { PcrcModelService } from "../services/pcrc-model.service";
 import * as async from 'async';
 
 export class SingleArticleDTO {
@@ -56,7 +57,8 @@ export class ArticlesModelService {
         private categoriesIndex: CategoriesIndex,
         private likeUserIndex: LikeUserIndex,
         private favoriteUserIndex: FavoriteUserIndex,
-        private S3BucketService: S3BucketService
+        private S3BucketService: S3BucketService,
+        private pcrcModel: PcrcModelService
     ) {  }
 
     //#region Public
@@ -107,7 +109,7 @@ export class ArticlesModelService {
     }
 
     public async getArticlesByTag(options: { tag: string; subline: string; from?:string; size?:string }): Promise<(Article & { id: string })[]> {
-        let result = await this.articleIndex.where({ tags: options.tag, subline:options.subline, state:'published' }, options.from, options.size, { orderby: 'publicationDate' , order:'desc'})
+        let result = await this.articleIndex.where({ tags: options.tag, pcrc:options.subline, state:'published' }, options.from, options.size, { orderby: 'publicationDate' , order:'desc'})
         return result
     }
 
@@ -125,56 +127,55 @@ export class ArticlesModelService {
         }
     }
 
-    // public async createArticle(article: articleDTO, creator: string): Promise<Article & { id: string }> {
+    public async createArticle(article: articleDTO, creator: string): Promise<Article & { id: string }> {
 
-    //     let subline: string = null;
-    //     let line: string = null;
-    //     try {
-    //         var category = await this.categoriesIndex.getById(article.category);
-    //     } catch (error) {
-    //         if (error.meta.statusCode == 404) {
-    //             throw new NotFoundException('categoria no encontrada');
-    //         }
-    //     }
+        let pcrc: string = null;
+        let cliente: { id: number; cliente: string; };
+        try {
+            var category = await this.categoriesIndex.getById(article.category);
+        } catch (error) {
+            if (error.meta.statusCode == 404) {
+                throw new NotFoundException('categoria no encontrada');
+            }
+        }
 
-    //     try {
-    //         var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
+        try {
+            var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
+        } catch (error) {
+            console.log(error);
+        }
 
-    //     if (isLeaft) {
-    //         subline = category.sublinea;
-    //     } else {
-    //         throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias');
-    //     }
+        if (!isLeaft) {
+            throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias');
+        }
 
-    //     try {
-    //         let sublineAux = await this.sublinesIndex.getById(subline);
-    //         line = sublineAux.line;
-    //     } catch (error) {
-    //         throw error;
-    //         if (error.meta.statusCode == 404) {
-    //             throw new NotFoundException('error al guardar el articulo');
-    //         }
-    //     }
+        pcrc = category.pcrc;
+        
+        try {
+            cliente = await this.pcrcModel.getClienteOfPcrc(pcrc);
+        } catch (error) {
+            throw error;
+            if (error.meta.statusCode == 404) {
+                throw new NotFoundException('error al guardar el articulo');
+            }
+        }
 
-    //     let articleExtras = {
-    //         likes: [],
-    //         disLikes: [],
-    //         favorites: [],
-    //         subline: subline,
-    //         line: line,
-    //         creator: creator,
-    //         modificationUser: creator,
-    //         publicationDate: (new Date).getTime(),
-    //         modificationDate: (new Date).getTime()
-    //     };
+        let articleExtras = {
+            likes: [],
+            disLikes: [],
+            favorites: [],
+            pcrc: pcrc,
+            cliente: cliente.id.toString(),
+            creator: creator,
+            modificationUser: creator,
+            publicationDate: (new Date).getTime(),
+            modificationDate: (new Date).getTime()
+        };
 
-    //     let newArticle: Article = { ...articleExtras, ...article };
+        let newArticle: Article = { ...articleExtras, ...article };
 
-    //     return await this.articleIndex.create(newArticle);
-    // }
+        return await this.articleIndex.create(newArticle);
+    }
 
     public async addLike(articleId: string, id_usuario: string): Promise<any> {
 
@@ -376,54 +377,53 @@ export class ArticlesModelService {
 
     }
 
-    // public updateArticle = async (id: string, article: articleDTO, modificationUser: string): Promise<any> => {
+    public updateArticle = async (id: string, article: articleDTO, modificationUser: string): Promise<any> => {
 
-    //     let subline: string = null;
-    //     let line: string = null;
-    //     try {
-    //         var category = await this.categoriesIndex.getById(article.category);
-    //     } catch (error) {
-    //         if (error.meta.statusCode == 404) {
-    //             throw new NotFoundException('categoria no encontrada');
-    //         }
-    //     }
+        let pcrc: string = null;
+        let cliente: { id: number; cliente: string; };
+        try {
+            var category = await this.categoriesIndex.getById(article.category);
+        } catch (error) {
+            if (error.meta.statusCode == 404) {
+                throw new NotFoundException('categoria no encontrada');
+            }
+        }
 
-    //     try {
-    //         var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
+        try {
+            var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
+        } catch (error) {
+            console.log(error);
+        }
 
-    //     if (isLeaft) {
-    //         subline = category.sublinea;
-    //     } else {
-    //         throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias');
-    //     }
+        if (isLeaft) {
+            pcrc = category.pcrc;
+        } else {
+            throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias');
+        }
 
-    //     try {
-    //         let sublineAux = await this.sublinesIndex.getById(subline);
-    //         line = sublineAux.line;
-    //     } catch (error) {
-    //         throw error;
-    //         if (error.meta.statusCode == 404) {
-    //             throw new NotFoundException('error al guardar el articulo');
-    //         }
-    //     }
+        try {            
+            cliente = await this.pcrcModel.getClienteOfPcrc(pcrc);
+        } catch (error) {
+            throw error;
+            if (error.meta.statusCode == 404) {
+                throw new NotFoundException('error al guardar el articulo');
+            }
+        }
 
-    //     let articleExtas = {
-    //         subline: subline,
-    //         line: line,
-    //         modificationUser: modificationUser,
-    //         modificationDate: (new Date).getTime()
-    //     };
+        let articleExtas = {
+            pcrc: pcrc,
+            cliente: cliente.id.toString(),
+            modificationUser: modificationUser,
+            modificationDate: (new Date).getTime()
+        };
 
-    //     let newArticle: Article = { ...articleExtas, ...article };
-    //     try {
-    //         return await this.articleIndex.updatePartialDocument(id, newArticle);
-    //     } catch (error) {
-    //         console.log(error.meta.body.error);
-    //     }
-    // }
+        let newArticle: Article = { ...articleExtas, ...article };
+        try {
+            return await this.articleIndex.updatePartialDocument(id, newArticle);
+        } catch (error) {
+            console.log(error.meta.body.error);
+        }
+    }
 
     //#endregion Public
 

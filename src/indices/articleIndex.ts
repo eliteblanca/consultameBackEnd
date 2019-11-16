@@ -19,8 +19,8 @@ export interface Article {
     modificationUser?:string;
     creator?:string;
     category:string;
-    subline:string;
-    line:string;
+    pcrc:string;
+    cliente:string;
 }
 
 @Injectable()

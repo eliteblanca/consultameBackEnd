@@ -159,7 +159,10 @@ export class EsClientService extends GenericModel {
                         body: {
                             "mappings": {
                                 "properties": {
-                                    "rol": { "type": "keyword" }
+                                    "cedula": { "type": "keyword" },
+                                    "nombre": { "type": "keyword" },
+                                    "rol": { "type": "keyword" },
+                                    "pcrc": { "type": "keyword" }
                                 }
                             }
                         }
