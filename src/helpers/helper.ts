@@ -10,10 +10,6 @@ class helper{
             await callback(array[index], index, array);
         }
 
-        
-
-
-        
     }
 }
 
