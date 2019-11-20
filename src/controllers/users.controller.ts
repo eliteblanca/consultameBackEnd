@@ -64,11 +64,9 @@ export class UsersController {
     @UseGuards(AuthGuard('jwt'))
     @Get(':cedula/pcrc')
     getUserPcrc(
-        @Param('cedula') cedula:string,
-        @Query('from') from: string,
-        @Query('size') size: string,
+        @Param('cedula') cedula:string
     ): any {
-        return this.pcrcModel.getUserPcrc(cedula, from, size)
+        return this.pcrcModel.getUserPcrc(cedula)
     }
 
     @UseGuards(AuthGuard('jwt'))
