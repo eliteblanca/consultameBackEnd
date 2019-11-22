@@ -70,7 +70,7 @@ export class ArticlesModelService {
         
     }
 
-    public async getArticlesByQuery(query: string, subline: string, state:string = 'published', from:string = '0', size:string = '10'  ): Promise<(Article & { id: string, highlight:string  })[]> {
+    public async getArticlesByQuery(query: string, pcrcId: string, state:string = 'published', from:string = '0', size:string = '10'  ): Promise<(Article & { id: string, highlight:string  })[]> {
         //archived
         try {
             let q = {
@@ -85,7 +85,7 @@ export class ArticlesModelService {
                             }
                         ],
                         filter: [
-                            { 'term': { 'subline': subline } },
+                            { 'term': { 'pcrc': pcrcId } },
                             { 'term': { 'state': state } }
                         ]
                     }
