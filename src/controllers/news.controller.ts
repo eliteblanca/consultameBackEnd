@@ -20,7 +20,7 @@ export class NewsController {
     @UseGuards(AuthGuard('jwt'))
     @Post()
     async postNews(
-        @Body() news: postNewsDTO,        
+        @Body() news: postNewsDTO,
         @User() user: U
     ): Promise<any> {
         return this.newsModel.postNews(news,user.sub)
