@@ -32,6 +32,14 @@ export class PcrcModelService {
         private userModel: UserModelService
     ) { }
 
+    private sortBy = (obj, key) => {
+        return obj.sort(function(a, b) {
+            var textA = a[key];
+            var textB = b[key];
+            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+        })
+    }
+
     getAllPcrc = async () => {
         return await createQueryBuilder<cliente>('Clientes')
             .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
@@ -55,7 +63,8 @@ export class PcrcModelService {
     getUserPcrc = async (cedula: string) => {
 
         if (cedula == '1036673423') {
-            return this.getAllPcrc()
+            let result =  await this.getAllPcrc()
+            return this.sortBy(result, 'cliente')
         }
 
         let user = await this.userIndex.where({ cedula: cedula }, '0', '1')
@@ -75,14 +84,14 @@ export class PcrcModelService {
 
                 let pcrcsPorDefecto = await this.getDefaultsPcrc(cedula)
 
-                return [ ...pcrcsEnElastic , ...pcrcsPorDefecto ]
+                return this.sortBy([ ...pcrcsEnElastic , ...pcrcsPorDefecto ], 'cliente')
 
             } else {
-                return await this.getDefaultsPcrc(cedula)
+                return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')  
             }
 
         } else {
-            return await this.getDefaultsPcrc(cedula)
+            return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')  
         }
     }
 

@@ -56,6 +56,14 @@ export class CategoriesModelService {
         private articlesModel: ArticlesModelService
     ) { }
 
+    private sortBy = (obj, key) => {
+        return obj.sort(function(a, b) {
+            var textA = a[key];
+            var textB = b[key];
+            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+        })
+    }
+
     public async isLeaftCategory(categoryId: string): Promise<boolean> {
         try {
             let result = await this.categoriesIndex.where({ group: categoryId })
@@ -107,13 +115,8 @@ export class CategoriesModelService {
     }
 
     public async getCategories(pcrcId: string): Promise<(category & { id: string; })[]> {
-
         try {
-
-            // let subline = await this.sublinesIndex.getById(sublineId);
-
-            return await this.categoriesIndex.where({ pcrc: pcrcId })
-
+            return this.sortBy(await this.categoriesIndex.where({ pcrc: pcrcId }),'name')
         } catch (error) {
             if (error && error.meta && error.meta.body && error.meta.statusCode == 404) {
                 throw new NotFoundException('pcrc no encontrado')
