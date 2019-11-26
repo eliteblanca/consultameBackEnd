@@ -1,4 +1,5 @@
-import { Client, ClientOptions, ApiResponse, RequestParams } from "@elastic/elasticsearch";
+import { ApiResponse, Client, RequestParams } from "@elastic/elasticsearch";
+import * as fs from 'fs';
 import * as R from 'remeda';
 
 const PUNTO_DE_ENLACE: string = "https://search-consultamekonecta-xsvrb6f5gky3alwbp3xw7v4e74.us-west-1.es.amazonaws.com";
@@ -8,7 +9,11 @@ export class Esindex<T> {
     constructor(protected index: string) {
         this.esClient = new Client({
             node: PUNTO_DE_ENLACE,
-            requestTimeout: 3000
+            requestTimeout: 3000,
+            ssl: {
+                ca: fs.readFileSync('../../../../../../../../cert.pem'),
+                rejectUnauthorized: true
+            }
         })
     }
 
