@@ -2,6 +2,7 @@ import { Client, ClientOptions, ApiResponse } from "@elastic/elasticsearch";
 import { EsClientService } from "../services/es-client.service";
 import { validate, IsString, MinLength, ValidateNested } from 'class-validator';
 import { NotFoundException } from "@nestjs/common";
+import * as fs from 'fs';
 
 const PUNTO_DE_ENLACE: string = "https://search-consultamekonecta-xsvrb6f5gky3alwbp3xw7v4e74.us-west-1.es.amazonaws.com";
 
@@ -9,7 +10,11 @@ export class GenericModel {
     constructor() {
         this.esClient = new Client({
             node: PUNTO_DE_ENLACE,
-            requestTimeout: 3000
+            requestTimeout: 3000,
+            ssl: {
+                ca: fs.readFileSync('../../../../../../../../cert.pem'),
+                rejectUnauthorized: true
+            }
         })
     }
 
