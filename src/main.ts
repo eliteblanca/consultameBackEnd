@@ -33,7 +33,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({transform: true}));
   app.useGlobalFilters(new DefaultPageFilter())
 
-  await app.listen(3001);
+  await app.listen(443);
   console.log(`Listen in port ${3001}`)
 }
 
