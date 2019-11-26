@@ -1,3 +1,8 @@
+import * as fs from 'fs';
+import * as dotenv from 'dotenv';
+dotenv.config() //! no cambiar esta linea de orden
+
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -5,10 +10,9 @@ import { join } from "path";
 import { DefaultPageFilter } from "./filters/default-page.filter";
 import { ValidationPipe } from '@nestjs/common';
 import { json } from 'body-parser';
-import * as fs from 'fs';
 
 async function bootstrap() {
-  
+
   try {   
     
     const httpsOptions = {
@@ -23,7 +27,7 @@ async function bootstrap() {
   } catch (error) {
       var app = await NestFactory.create<NestExpressApplication>(AppModule);
   }
-    
+
   app.use(json({ limit: '50mb'  }))
 
   app.enableCors();
@@ -31,10 +35,14 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
 
   app.useGlobalPipes(new ValidationPipe({transform: true}));
+
   app.useGlobalFilters(new DefaultPageFilter())
 
-  await app.listen(443);
-  console.log(`Listen in port ${3001}`)
+  
+
+  await app.listen(process.env.PORT);
+
+  console.log(`Listen in port ${process.env.PORT}`)
 }
 
 bootstrap();

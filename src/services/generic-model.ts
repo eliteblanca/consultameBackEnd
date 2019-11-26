@@ -1,21 +1,29 @@
-import { Client, ClientOptions, ApiResponse } from "@elastic/elasticsearch";
-import { EsClientService } from "../services/es-client.service";
-import { validate, IsString, MinLength, ValidateNested } from 'class-validator';
-import { NotFoundException } from "@nestjs/common";
+import { Client } from "@elastic/elasticsearch";
 import * as fs from 'fs';
 
 const PUNTO_DE_ENLACE: string = "https://search-consultamekonecta-xsvrb6f5gky3alwbp3xw7v4e74.us-west-1.es.amazonaws.com";
 
 export class GenericModel {
     constructor() {
-        this.esClient = new Client({
-            node: PUNTO_DE_ENLACE,
-            requestTimeout: 3000,
-            ssl: {
-                ca: fs.readFileSync('../../../../../../../../cert.pem'),
-                rejectUnauthorized: true
-            }
-        })
+
+        if (process.env.NODE_ENV == 'development') {
+            this.esClient = new Client({
+                node: PUNTO_DE_ENLACE,
+                requestTimeout: 3000
+            })
+            
+        } else {
+                this.esClient = new Client({
+                    node: PUNTO_DE_ENLACE,
+                    requestTimeout: 3000,
+                    ssl: {
+                        ca: fs.readFileSync('../../../../../../../../cert.pem'),
+                        rejectUnauthorized: true
+                    }
+                })
+        }
+
+
     }
 
     protected readonly esClient: Client;
@@ -43,7 +51,7 @@ export class GenericModel {
             return { status: "200", mesage: "eliminado con exito" }
 
         } catch (error) {
-            console.log(error.meta.body.error)            
+            console.log(error.meta.body.error)
         }
     }
 

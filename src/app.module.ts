@@ -2,7 +2,6 @@ import { MorganModule, MorganInterceptor } from 'nest-morgan';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { AppController } from './controllers/app.controller';
 import { JwtValidator, LdapService } from './services/auth.service';
 import { ArticlesController } from './controllers/articles.controller';
@@ -20,7 +19,6 @@ import { CategoriesController } from './controllers/categories.controller';
 import { ResourcesController } from './controllers/resources.controller';
 import { PermissionsController } from './controllers/permissions.controller';
 import { UploadController } from './controllers/upload.controller';
-
 import { ArticleIndex } from './indices/articleIndex';
 import { CategoriesIndex } from "./indices/categoriesIndex";
 import { SearchsIndex } from './indices/searchIndex';
@@ -31,7 +29,6 @@ import { RolesIndex } from './indices/rolesIndex';
 import { ResourcesIndex } from './indices/resourcesIndex';
 import { PermissionsIndex } from './indices/permissionsIndex';
 import { NewsIndex } from "./indices/newsIndex";
-
 import { S3BucketService } from './services/s3-bucket.service';
 import { NewsController } from './controllers/news.controller';
 import { NewsModelService } from './services/news-model.service';
@@ -44,6 +41,7 @@ import { Personal } from "./jarvisEntities/personal.entity";
 import { datosPersonales } from "./jarvisEntities/datosGenerales.entity";
 import { PcrcController } from './controllers/pcrc.controller';
 import { PcrcModelService } from "./services/pcrc-model.service";
+import { ConfigService } from './services/config.service';
 
 
 const secretKey = "123";
@@ -60,8 +58,8 @@ const secretKey = "123";
       type: 'mysql',
       host: '172.102.180.196',
       port: 3306,
-      username: 'EXP_APLICA',
-      password: 'ExpAplica2020*',
+      username: process.env.JARVIS_USER,
+      password: process.env.JARVIS_PASS,
       database: 'jarvis',
       entities: [
         Pcrc,
@@ -110,7 +108,7 @@ const secretKey = "123";
     NewsIndex,
     CommentsIndexService,
     CommentsModelService,
-    PcrcModelService
+    PcrcModelService,    
   ],
 })
-export class AppModule {}
+export class AppModule {  }

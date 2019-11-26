@@ -7,14 +7,23 @@ const PUNTO_DE_ENLACE: string = "https://search-consultamekonecta-xsvrb6f5gky3al
 export class Esindex<T> {
 
     constructor(protected index: string) {
-        this.esClient = new Client({
-            node: PUNTO_DE_ENLACE,
-            requestTimeout: 3000,
-            ssl: {
-                ca: fs.readFileSync('../../../../../../../../cert.pem'),
-                rejectUnauthorized: true
-            }
-        })
+
+        if (process.env.NODE_ENV == 'development') {
+            this.esClient = new Client({
+                node: PUNTO_DE_ENLACE,
+                requestTimeout: 3000
+            })
+        } else {
+            this.esClient = new Client({
+                node: PUNTO_DE_ENLACE,
+                requestTimeout: 3000,
+                ssl: {
+                    ca: fs.readFileSync('../../../../../../../../cert.pem'),
+                    rejectUnauthorized: true
+                }
+            })
+
+        }
     }
 
     protected readonly esClient: Client;
@@ -23,9 +32,9 @@ export class Esindex<T> {
 
     protected createRequest = x => R.addProp(R.objOf('body')(x), 'index', this.index)
 
-    public create = async (doc: T, id?:string): Promise<T & { id: string; }> => {
-        let result:ApiResponse
-        if(typeof id == 'undefined'){
+    public create = async (doc: T, id?: string): Promise<T & { id: string; }> => {
+        let result: ApiResponse
+        if (typeof id == 'undefined') {
             result = await this.esClient.index({
                 index: this.index,
                 refresh: 'true',
@@ -33,7 +42,7 @@ export class Esindex<T> {
             })
         } else {
             result = await this.esClient.index({
-                id:id,
+                id: id,
                 index: this.index,
                 refresh: 'true',
                 body: doc
@@ -54,19 +63,19 @@ export class Esindex<T> {
     }
 
     public query = async (query: object): Promise<(T & { id: string; })[]> => {
-        
+
         let queryObj: RequestParams.Search = this.createRequest(query)
-        
+
         let result = await this.esClient.search(queryObj)
 
         return R.map((x: any) => R.addProp(x._source, 'id', x._id))(result.body.hits.hits)
     }
 
-    public where = async (ops: { [P in keyof T]?: any; }, from?:string, size?:string, order?:{ orderby:keyof T, order:'asc' | 'desc' } ): Promise<(T & { id: string; })[]> => {
+    public where = async (ops: { [P in keyof T]?: any; }, from?: string, size?: string, order?: { orderby: keyof T, order: 'asc' | 'desc' }): Promise<(T & { id: string; })[]> => {
 
-        let result:ApiResponse<any, any>;        
+        let result: ApiResponse<any, any>;
 
-        if(!!from && !!size && !!order){
+        if (!!from && !!size && !!order) {
 
             result = await this.esClient.search({
                 index: this.index,
@@ -80,16 +89,16 @@ export class Esindex<T> {
                             )
                         }
                     },
-                    from : parseInt(from),
-                    size : parseInt(size),
-                    sort : [
-                        R.objOf(order.orderby.toString())({ order : order.order }) // R.objOf(key)(value) = {key : value}
+                    from: parseInt(from),
+                    size: parseInt(size),
+                    sort: [
+                        R.objOf(order.orderby.toString())({ order: order.order }) // R.objOf(key)(value) = {key : value}
                     ]
                 }
             })
-            
-        } else if(!!from && !!size && !!!order){
-            
+
+        } else if (!!from && !!size && !!!order) {
+
             result = await this.esClient.search({
                 index: this.index,
                 body: {
@@ -102,11 +111,11 @@ export class Esindex<T> {
                             )
                         }
                     },
-                    from : parseInt(from),
-                    size : parseInt(size)
+                    from: parseInt(from),
+                    size: parseInt(size)
                 }
             })
-            
+
         } else {
             result = await this.esClient.search({
                 index: this.index,
@@ -161,7 +170,7 @@ export class Esindex<T> {
             id: id,
             index: this.index
         })
- 
+
         return { status: "deleted" }
     }
 
