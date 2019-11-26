@@ -60,8 +60,8 @@ const secretKey = "123";
       type: 'mysql',
       host: '172.102.180.196',
       port: 3306,
-      username: 'EXP_CONSULTA',
-      password: '4XP3RI3NCIA2019_*',
+      username: 'EXP_APLICA',
+      password: 'ExpAplica2020*',
       database: 'jarvis',
       entities: [
         Pcrc,
