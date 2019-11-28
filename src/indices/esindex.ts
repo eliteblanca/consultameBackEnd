@@ -19,7 +19,7 @@ export class Esindex<T> {
                 requestTimeout: 3000,
                 ssl: {
                     ca: fs.readFileSync('../../../../../../../../cert.pem'),
-                    rejectUnauthorized: true
+                    rejectUnauthorized: false
                 }
             })
 
