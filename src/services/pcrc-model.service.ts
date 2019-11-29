@@ -99,7 +99,7 @@ export class PcrcModelService {
         return await createQueryBuilder<cliente>('Clientes')
         .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
         .innerJoin(qb =>
-            qb.select(['Personal.pcrc as pcrc'])
+            qb.select(['Personal.cod_pcrc as cod_pcrc'])
                 .from(Personal, 'Personal')
                 .innerJoin(qb =>
                     qb.select(['max(Personal.fecha_actual) as fecha', 'Personal.documento as documento'])
@@ -110,7 +110,7 @@ export class PcrcModelService {
                 )
                 .where('Personal.documento = :documento', { documento: cedula })
             , 'accesos'
-            , 'accesos.pcrc = pcrc.cod_pcrc'
+            , 'accesos.cod_pcrc = pcrc.cod_pcrc'
         )
         .where('pcrc.estado = 1')
         .andWhere('Clientes.estado = 1')
@@ -224,7 +224,7 @@ export class PcrcModelService {
                     .groupBy('distri.documento')
                 , 'fechas'
                 , 'Personal.fecha_actual = fechas.fecha and fechas.documento = Personal.documento'
-            ).innerJoinAndSelect('Pcrc', 'pcrc', 'pcrc.cod_pcrc = Personal.pcrc and pcrc.estado = 1 and pcrc.id_dp_pcrc = :idPcrc', { idPcrc: idPcrc })
+            ).innerJoinAndSelect('Pcrc', 'pcrc', 'pcrc.cod_pcrc = Personal.cod_pcrc and pcrc.estado = 1 and pcrc.id_dp_pcrc = :idPcrc', { idPcrc: idPcrc })
             .innerJoinAndSelect('Personal.id_dp_datos_generales', 'datos')
             .select(['Personal.documento as documento','datos.nombre_completo as nombre'])
             .getRawMany()
@@ -270,4 +270,6 @@ export class PcrcModelService {
 
         return newJarvisUsers.concat(extraUsers).sort()
     }
+
+ 
 }

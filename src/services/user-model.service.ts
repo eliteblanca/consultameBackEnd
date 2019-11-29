@@ -1,10 +1,13 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { IsByteLength, IsIn, IsNotEmpty } from "class-validator";
 import * as R from 'remeda';
+import { createQueryBuilder } from 'typeorm';
 import { Article, ArticleIndex } from "../indices/articleIndex";
 import { FavoriteUserIndex } from "../indices/favoritesUserIndex";
 import { likeUser, LikeUserIndex } from "../indices/likeUserIndex";
 import { user, UserIndex } from "../indices/userIndex";
+import { Personal } from "../jarvisEntities/personal.entity";
+import { datosPersonales } from "../jarvisEntities/datosGenerales.entity";
 
 export class updateUserRolDTO {
 
@@ -27,11 +30,11 @@ export class UserModelService {
         private likeUserIndex: LikeUserIndex,
         private favoriteUserIndex: FavoriteUserIndex,
         private userIndex: UserIndex,
-        private articleIndex: ArticleIndex,
+        private articleIndex: ArticleIndex
     ) { }
 
-    public async createUser(newUser:user): Promise<user & { id: string; }> {
-        try{
+    public async createUser(newUser: user): Promise<user & { id: string; }> {
+        try {
 
             let existingUser = await this.userIndex.getById(newUser.cedula);
 
@@ -40,14 +43,48 @@ export class UserModelService {
             }
 
         } catch (error) {
-            if(!error.body.found) {
+            if (!error.body.found) {
                 return this.userIndex.create(newUser, newUser.cedula)
             }
         }
     }
 
+    public getJarvisUser = async (cedula: string) => {
+        return await createQueryBuilder(datosPersonales)
+            .where('documento = :doc', { doc: cedula })
+            .getOne()
+    }
+
     public updateUserRol = async (id_usuario: string, newUserRol: updateUserRolDTO): Promise<any> => {
-        return this.userIndex.updatePartialDocument(id_usuario, newUserRol)
+
+        try {
+            
+            let existingUser = await this.userIndex.getById(id_usuario);
+            
+            console.log('usuario existia')
+
+            return this.userIndex.updatePartialDocument(id_usuario, newUserRol)
+
+        } catch (error) {
+
+            let jarvisUser = await this.getJarvisUser(id_usuario)
+
+            let newUser = await this.userIndex.create({
+                cedula: id_usuario,
+                nombre: jarvisUser.nombre_completo,
+                pcrc: [],
+                rol: newUserRol.rol
+            }
+                , id_usuario)
+
+            
+            console.log('usuario no existia')
+
+            return { status: 'actualizado' }
+
+        }
+
+
     }
 
     public async getAllUsers(): Promise<(user & { id: string; })[]> {
@@ -81,7 +118,7 @@ export class UserModelService {
         return R.map(result, (dislikeUser: likeUser) => dislikeUser.article)
     }
 
-    public async getUserFavorites(userId: string, from:string, size:string): Promise<(Article & { id: string; })[]> {
-        return await this.articleIndex.where({ favorites: userId }, from, size,  { orderby: 'publicationDate' , order:'desc'})
+    public async getUserFavorites(userId: string, from: string, size: string): Promise<(Article & { id: string; })[]> {
+        return await this.articleIndex.where({ favorites: userId }, from, size, { orderby: 'publicationDate', order: 'desc' })
     }
 }

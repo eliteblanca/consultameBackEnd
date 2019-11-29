@@ -17,13 +17,13 @@ export class Personal {
     fecha_actual: string;
     
     @Column()
-    pcrc: string;
+    cod_pcrc: string;
 
     @Column()
-    ceco_op: number;
+    id_dp_centros_costos: number;
 
     @Column()
-    ceco_area: number;
+    id_dp_centros_costos_adm: number;
 
     @Column()
     documento_jefe: string;
@@ -36,18 +36,23 @@ export class Personal {
 
     @Column()
     unidad_organizativa: string;
-    
-    @Column({ type: "datetime" })
-    fecha_modificacion: string;
 
     @Column({ type: "datetime" })
     fecha_conex_ultimo_pcrc: string;
 
     @Column()
-    id_dp_plazas: number;
+    id_dp_cargos: number;
+
+    @Column()
+    id_dp_estados: number;
 
     @OneToOne(type => datosPersonales)
     @JoinColumn({ referencedColumnName:'id_dp_datos_generales', name:'id_dp_datos_generales' })
     id_dp_datos_generales: number;
 
+    @Column()
+    documento_modificacion: string;
+        
+    @Column({ type: "datetime" })
+    fecha_modificacion: string;
 }
