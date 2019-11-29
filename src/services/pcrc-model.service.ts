@@ -120,17 +120,35 @@ export class PcrcModelService {
 
     postUserPcrc = async (cedula: string, idPcrc: string) => {
 
-        let accesoTodos = await this.userIndex.where({ cedula, pcrc: 'todos' })
+        let accesoTodos = await this.userIndex.where({ cedula: cedula, pcrc: 'todos' })
 
         if (!!accesoTodos.length) {
             throw new ConflictException('el usuario ya tiene acceso a este pcrc')
         } else if (idPcrc == 'todos') {
 
-            await this.deleteUserPcrc(cedula, 'todos')
+            let user = await this.userIndex.where({cedula:cedula})
 
-            await this.userIndex.updatePartialDocument(cedula, { pcrc: [idPcrc] })
+            if(user.length>0){
 
-            return { status: 'created' }
+                await this.deleteUserPcrc(cedula, 'todos')
+    
+                await this.userIndex.updatePartialDocument(cedula, { pcrc: [idPcrc] })
+    
+                return { status: 'created' }
+
+            } else {
+
+                let jarvisInfo = await this.userModel.getJarvisUser(cedula);
+
+                let newUser = await this.userModel.createUser({
+                    cedula:cedula,
+                    nombre:jarvisInfo.nombre_completo,
+                    pcrc: ['todos'],
+                    rol: 'user'
+                })
+
+                return { status: 'created' }
+            }
 
         } else {
 

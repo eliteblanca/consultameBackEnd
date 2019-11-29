@@ -22,7 +22,6 @@ export class Esindex<T> {
                     rejectUnauthorized: false
                 }
             })
-
         }
     }
 
