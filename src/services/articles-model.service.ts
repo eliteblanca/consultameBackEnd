@@ -8,6 +8,7 @@ import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
 import { S3BucketService } from '../services/s3-bucket.service';
 import { PcrcModelService } from "../services/pcrc-model.service";
 import * as async from 'async';
+import { file } from '@babel/types';
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: 'debes proporcionar un id de articulo' })
@@ -51,23 +52,20 @@ export class articleDTO {
 export class ArticlesModelService {
 
     constructor(
-        @Inject(forwardRef(() => CategoriesModelService))
+        @Inject(forwardRef(() => CategoriesModelService))        
         private categoriesModel: CategoriesModelService,
         private articleIndex: ArticleIndex,
         private categoriesIndex: CategoriesIndex,
         private likeUserIndex: LikeUserIndex,
-        private favoriteUserIndex: FavoriteUserIndex,
+        private favoriteUserIndex: FavoriteUserIndex,        
         private S3BucketService: S3BucketService,
         private pcrcModel: PcrcModelService
     ) {  }
 
     //#region Public
 
-    public async getArticlesByCategory(category: string, state:string = 'published', from:string = '0', size:string = '10'): Promise<(Article & { id: string; })[]> {
-        
-            return await this.articleIndex.where({ category: category, state:state },from,size, { orderby:'modificationDate', order:'desc' });
-            
-        
+    public async getArticlesByCategory(category: string, state:string = 'published', from:string = '0', size:string = '10'): Promise<(Article & { id: string; })[]> {        
+        return await this.articleIndex.where({ category: category, state:state },from,size, { orderby:'modificationDate', order:'desc' });
     }
 
     public async getArticlesByQuery(query: string, pcrcId: string, state:string = 'published', from:string = '0', size:string = '10'  ): Promise<(Article & { id: string, highlight:string  })[]> {
@@ -199,7 +197,7 @@ export class ArticlesModelService {
                 }
             };
 
-            this.articleIndex.updateScript(articleId, updateQuery);
+            await this.articleIndex.updateScript(articleId, updateQuery);
         } else {
             return new ConflictException('ya has dado like en este articulo');
         }
@@ -230,7 +228,7 @@ export class ArticlesModelService {
                 }
             };
 
-            this.articleIndex.updateScript(articleId, updateQuery);
+            await this.articleIndex.updateScript(articleId, updateQuery);
         } else {
             return new ConflictException('ya has dado like en este articulo');
         }
@@ -296,12 +294,7 @@ export class ArticlesModelService {
         }
     }
 
-    public async addFavorite(articleId: string, id_usuario: string): Promise<any> {
-
-        try {
-        } catch (error) {
-            throw new NotAcceptableException('el articulo no existe');
-        }
+    public async addFavorite(articleId: string, id_usuario: string): Promise<any> {        
 
         let existingFavorites = await this.favoriteUserIndex.where({ article: articleId, user: id_usuario });
 
@@ -316,7 +309,7 @@ export class ArticlesModelService {
                 }
             };
 
-            this.articleIndex.updateScript(articleId, updateQuery);
+            await this.articleIndex.updateScript(articleId, updateQuery);
         } else {
             return new ConflictException('ya has agregado este articulo a tus favoritos');
         }
@@ -423,6 +416,44 @@ export class ArticlesModelService {
         } catch (error) {
             console.log(error.meta.body.error);
         }
+    }
+
+    public deleteArticleFile = async (articleId:string, filename:string):Promise<any> => {
+        try {
+            var article = await this.getArticle(articleId);
+        } catch (error) {
+            throw new NotAcceptableException('el articulo no existe');
+        }
+
+        let index = article.attached.findIndex(fileName => fileName == filename)
+
+        if (index >= 0) {
+            let updateQuery = {
+                'source': 'ctx._source.attached.remove(' + index + ')',
+                'lang': 'painless'
+            };
+
+            try {
+                await this.articleIndex.updateScript(articleId, updateQuery);
+            } catch (error) {
+                console.log(error.meta.body.error);
+            }
+        }
+    }
+
+    public async addArticleFile(articleId:string, filename:string): Promise<any> {
+
+        let updateQuery = {
+            'source': 'ctx._source.attached.add(params.file)',
+            'lang': 'painless',
+            'params': {
+                'file': filename
+            }
+        };
+
+        await this.articleIndex.updateScript(articleId, updateQuery);
+
+        return { status: 'updated' };
     }
 
     //#endregion Public

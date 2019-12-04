@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as compression from 'compression';
 import * as dotenv from 'dotenv';
 dotenv.config() //! no cambiar esta linea de orden
 
@@ -13,13 +14,13 @@ import { json } from 'body-parser';
 
 async function bootstrap() {
 
-  try {   
-    
+  try {
+
     const httpsOptions = {
       key: fs.readFileSync('../../../../../../../../key.pem'),
       cert: fs.readFileSync('../../../../../../../../cert.pem'),
     };
-    
+
     var app = await NestFactory.create<NestExpressApplication>(AppModule,{
       httpsOptions,
     });
@@ -27,6 +28,8 @@ async function bootstrap() {
   } catch (error) {
       var app = await NestFactory.create<NestExpressApplication>(AppModule);
   }
+
+  app.use(compression());
 
   app.use(json({ limit: '50mb'  }))
 
