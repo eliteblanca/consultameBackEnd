@@ -93,7 +93,14 @@ export class NewsModelService {
 
     getSingleNews = async (newsId: string): Promise<(news & { id: string; })> => {
         try {
+
+            let result = await this.newsIndex.updateScript(newsId,{
+                'source' : 'ctx._source.views += 1',
+                'lang': 'painless'
+            });
+
             return await this.newsIndex.getById(newsId)
+
         } catch (error) {
             console.log(error)
         }
@@ -107,14 +114,15 @@ export class NewsModelService {
             modificationUser: userId,
             creator: userId,
             commentsList: '',
-            attached: []
+            attached: [],
+            views:0
         };
 
         return await this.newsIndex.create({ ...newsExtras, ...news })
 
     }
 
-    updateNews = async (idArticulo: string, news: updateNewsDTO, idUsuario: string): Promise<any> => {
+    updateNews = async (idArticulo: string, news: Partial<updateNewsDTO>, idUsuario: string): Promise<any> => {
         let newsExtras = {
             modificationDate: Date.now(),
             modificationUser: idUsuario

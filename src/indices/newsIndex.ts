@@ -15,6 +15,7 @@ export interface news {
     commentsList:string;
     state:string;
     subline:string;
+    views:number;
 }
 
 @Injectable()

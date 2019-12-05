@@ -60,7 +60,7 @@ export class PcrcController {
     ): Promise<any> {
         if (query) {
             await this.searchModel.newSearch({ query: query, subline: idPcrc })
-            return this.articlesModel.getArticlesByQuery(query, idPcrc, state, from, size)
+            return this.articlesModel.getArticlesByQuery(query, { pcrc:idPcrc }, state, from, size)
         } else if (tag) {
             return this.articlesModel.getArticlesByTag({ subline: idPcrc, tag: tag, from: from, size: size })
         } else {

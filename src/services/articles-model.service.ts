@@ -48,6 +48,8 @@ export class articleDTO {
 
 }
 
+type group = { category:string } | { pcrc:string } | { cliente:string } ;
+
 @Injectable()
 export class ArticlesModelService {
 
@@ -68,9 +70,10 @@ export class ArticlesModelService {
         return await this.articleIndex.where({ category: category, state:state },from,size, { orderby:'modificationDate', order:'desc' });
     }
 
-    public async getArticlesByQuery(query: string, pcrcId: string, state:string = 'published', from:string = '0', size:string = '10'  ): Promise<(Article & { id: string, highlight:string  })[]> {
-        //archived
+    public async getArticlesByQuery(query: string, group:group, state:string = 'published', from:string = '0', size:string = '10'  ): Promise<(Article & { id: string, highlight:string  })[]> {                        
+
         try {
+            
             let q = {
                 query: {
                     bool: {
@@ -78,12 +81,12 @@ export class ArticlesModelService {
                             {
                                 multi_match: {
                                     'query': query,
-                                    'fields': ['title^3', 'content^2', 'tags']
+                                    'fields': [ 'title^3', 'content^2', 'tags' ]
                                 }
                             }
                         ],
                         filter: [
-                            { 'term': { 'pcrc': pcrcId } },
+                            { 'term': group },
                             { 'term': { 'state': state } }
                         ]
                     }
@@ -117,7 +120,14 @@ export class ArticlesModelService {
 
     public async getArticle(articleId: string): Promise<Article & { id: string; }> {
         try {
+
+            let result = await this.articleIndex.updateScript(articleId,{
+                'source' : 'ctx._source.views += 1',
+                'lang': 'painless'
+            });
+
             return await this.articleIndex.getById(articleId);
+
         } catch (error) {
             if (error.meta.statusCode == 404) {
                 throw new NotFoundException('articulo no encontrado');
@@ -167,7 +177,8 @@ export class ArticlesModelService {
             creator: creator,
             modificationUser: creator,
             publicationDate: (new Date).getTime(),
-            modificationDate: (new Date).getTime()
+            modificationDate: (new Date).getTime(),
+            views:0
         };
 
         let newArticle: Article = { ...articleExtras, ...article };
@@ -370,47 +381,60 @@ export class ArticlesModelService {
 
     }
 
-    public updateArticle = async (id: string, article: articleDTO, modificationUser: string): Promise<any> => {
+    public updateArticle = async (id: string, article: Partial<articleDTO>, modificationUser: string): Promise<any> => {
 
         let pcrc: string = null;
         let cliente: { id: number; cliente: string; };
-        try {
-            var category = await this.categoriesIndex.getById(article.category);
-        } catch (error) {
-            if (error.meta.statusCode == 404) {
-                throw new NotFoundException('categoria no encontrada');
+        let articleExtas:Partial<Article>;
+
+        if(!!article.category){
+            try {
+                var category = await this.categoriesIndex.getById(article.category);
+            } catch (error) {
+                if (error.meta.statusCode == 404) {
+                    throw new NotFoundException('categoria no encontrada');
+                }
             }
-        }
+    
+            try {
+                var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
+            } catch (error) {
+                console.log(error);
+            }
+    
+            if (isLeaft) {
+                pcrc = category.pcrc;
+            } else {
+                throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias');
+            }
+    
+            try {            
+                cliente = await this.pcrcModel.getClienteOfPcrc(pcrc);
+            } catch (error) {
+                throw error;
+                if (error.meta.statusCode == 404) {
+                    throw new NotFoundException('error al guardar el articulo');
+                }
+            }
+    
+            articleExtas = {
+                pcrc: pcrc,
+                cliente: cliente.id.toString(),
+                modificationUser: modificationUser,
+                modificationDate: (new Date).getTime()
+            };
 
-        try {
-            var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
-        } catch (error) {
-            console.log(error);
-        }
-
-        if (isLeaft) {
-            pcrc = category.pcrc;
         } else {
-            throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias');
+
+            articleExtas = {
+                modificationUser: modificationUser,
+                modificationDate: (new Date).getTime()
+            };
+
         }
 
-        try {            
-            cliente = await this.pcrcModel.getClienteOfPcrc(pcrc);
-        } catch (error) {
-            throw error;
-            if (error.meta.statusCode == 404) {
-                throw new NotFoundException('error al guardar el articulo');
-            }
-        }
+        let newArticle: Partial<Article> = { ...articleExtas, ...article };
 
-        let articleExtas = {
-            pcrc: pcrc,
-            cliente: cliente.id.toString(),
-            modificationUser: modificationUser,
-            modificationDate: (new Date).getTime()
-        };
-
-        let newArticle: Article = { ...articleExtas, ...article };
         try {
             return await this.articleIndex.updatePartialDocument(id, newArticle);
         } catch (error) {

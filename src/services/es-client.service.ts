@@ -34,9 +34,10 @@ export class EsClientService extends GenericModel {
                                     "modificationUser": { "type": "keyword" },
                                     "creator": { "type": "keyword" },
                                     "commentsList": { "type": "keyword" },
-                                    "line": { "type": "keyword" },
-                                    "subline": { "type": "keyword" },
-                                    "category": { "type": "keyword" }
+                                    "cliente": { "type": "keyword" },
+                                    "pcrc": { "type": "keyword" },
+                                    "category": { "type": "keyword" },
+                                    "views": { "type": "integer" }
                                 }
                             }
                         }
@@ -59,7 +60,8 @@ export class EsClientService extends GenericModel {
                                     "creator": { "type": "keyword" },
                                     "commentsList": { "type": "keyword" },
                                     "subline": { "type": "keyword" },
-                                    "state": { "type": "keyword" }
+                                    "state": { "type": "keyword" },
+                                    "views": { "type": "integer" }
                                 }
                             }
                         }

@@ -21,6 +21,7 @@ export interface Article {
     category:string;
     pcrc:string;
     cliente:string;
+    views:number;
 }
 
 @Injectable()
@@ -30,7 +31,7 @@ export class ArticleIndex extends Esindex<Article> {
     }
      
     public query = async (query: object): Promise<(Article & { id: string, highlight:string  })[]> => {
-        
+
         let queryObj: RequestParams.Search = this.createRequest(query)
         
         let result = await this.esClient.search(queryObj)
