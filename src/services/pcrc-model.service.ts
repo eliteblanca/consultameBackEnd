@@ -60,7 +60,7 @@ export class PcrcModelService {
         return result
     }
 
-    getUserPcrc = async (cedula: string) => {
+    getUserPcrc = async (cedula: string):Promise<cliente[]> => {
 
         if (cedula == '1036673423') {
             let result =  await this.getAllPcrc()
@@ -118,32 +118,40 @@ export class PcrcModelService {
         .getMany()
     } 
 
-    postUserPcrc = async (cedula: string, idPcrc: string) => {
+    postUserPcrc = async (cedula: string, idPcrc: string, cedulaUsuarioAdmin:string) => {
 
-        let accesoTodos = await this.userIndex.where({ cedula: cedula, pcrc: 'todos' })
-
-        if (!!accesoTodos.length) {
-            throw new ConflictException('el usuario ya tiene acceso a este pcrc')
-        } else if (idPcrc == 'todos') {
+         if (idPcrc == 'todos') {
 
             let user = await this.userIndex.where({cedula:cedula})
 
-            if(user.length>0){
-
-                await this.deleteUserPcrc(cedula, 'todos')
+            if(user.length > 0){
     
-                await this.userIndex.updatePartialDocument(cedula, { pcrc: [idPcrc] })
+                let adminPcrc = await this.getUserPcrc(cedulaUsuarioAdmin)
+
+                let UserPcrc = await this.getUserPcrc(cedula)
+
+                let UserPcrcIds =  R.flatten(UserPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+
+                let admiPpcrcIds =  R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+
+                let duplicateQuit = [...new Set(UserPcrcIds.concat(admiPpcrcIds))]// quitar duplicadps
+
+                await this.userIndex.updatePartialDocument(cedula, { pcrc: duplicateQuit })
     
                 return { status: 'created' }
 
             } else {
 
-                let jarvisInfo = await this.userModel.getJarvisUser(cedula);
+                let jarvisInfo = await this.userModel.getJarvisUser(cedula)
+
+                let adminPcrc = await this.getUserPcrc(cedulaUsuarioAdmin)
+
+                let admiPpcrcIds =  R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
 
                 let newUser = await this.userModel.createUser({
                     cedula:cedula,
                     nombre:jarvisInfo.nombre_completo,
-                    pcrc: ['todos'],
+                    pcrc: admiPpcrcIds,
                     rol: 'user'
                 })
 
@@ -207,10 +215,23 @@ export class PcrcModelService {
         }
     }
 
-    deleteUserPcrc = async (cedula: string, pcrc: string) => {
+    deleteUserPcrc = async (cedula: string, pcrc: string, cedulaUsuarioAdmin:string) => {
 
         if (pcrc == 'todos') {
-            await this.userIndex.updatePartialDocument(cedula, { pcrc: [] })
+
+    
+            let adminPcrc = await this.getUserPcrc(cedulaUsuarioAdmin)
+
+            let UserPcrc = await this.getUserPcrc(cedula)
+
+            let UserPcrcIds =  R.flatten(UserPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+
+            let admiPpcrcIds =  R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+
+            let difference = UserPcrcIds.filter(x => !admiPpcrcIds.includes(x)) 
+
+            await this.userIndex.updatePartialDocument(cedula, { pcrc: difference })
+
         } else {
 
             let user = await this.userIndex.getById(cedula)
@@ -286,7 +307,16 @@ export class PcrcModelService {
             }
         });
 
-        return newJarvisUsers.concat(extraUsers).sort()
+        return newJarvisUsers.concat(extraUsers).sort((a, b) =>  {
+            if (a.nombre > b.nombre) {
+              return 1;
+            }
+            if (a.nombre < b.nombre) {
+              return -1;
+            }
+            // a must be equal to b
+            return 0;
+          })
     }
 
  

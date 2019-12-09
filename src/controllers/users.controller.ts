@@ -46,7 +46,8 @@ export class UsersController {
 
     @UseGuards(AuthGuard('jwt'))
     @Get('me/dislikes')
-    getSelfdisLikes(@User() user: U
+    getSelfdisLikes(
+        @User() user: U
     ): any {
         return this.userModel.getUserDisLikes(user.sub);
     }
@@ -73,17 +74,19 @@ export class UsersController {
     @Post(':cedula/pcrc')
     postUserPcrc(
         @Param('cedula') cedula:string,
-        @Body() body:postUserPcrcDTO
+        @Body() body:postUserPcrcDTO,
+        @User() user: U
     ): any {
-        return this.pcrcModel.postUserPcrc(cedula, body.pcrc)
+        return this.pcrcModel.postUserPcrc(cedula, body.pcrc, user.sub)
     }
 
     @UseGuards(AuthGuard('jwt'))
     @Delete(':cedula/pcrc/:pcrc')
     deleteUserPcrc(
         @Param('cedula') cedula:string,
-        @Param('pcrc') pcrc:string
+        @Param('pcrc') pcrc:string,        
+        @User() user: U
     ): any {
-        return this.pcrcModel.deleteUserPcrc(cedula, pcrc)
+        return this.pcrcModel.deleteUserPcrc(cedula, pcrc, user.sub)
     }
 }

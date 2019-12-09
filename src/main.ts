@@ -3,7 +3,6 @@ import * as compression from 'compression';
 import * as dotenv from 'dotenv';
 dotenv.config() //! no cambiar esta linea de orden
 
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -22,7 +21,7 @@ async function bootstrap() {
     };
 
     var app = await NestFactory.create<NestExpressApplication>(AppModule,{
-      httpsOptions,
+      httpsOptions
     });
 
   } catch (error) {

@@ -9,13 +9,13 @@ export class GenericModel {
         if (process.env.NODE_ENV == 'development') {
             this.esClient = new Client({
                 node: PUNTO_DE_ENLACE,
-                requestTimeout: 3000
+                requestTimeout: 10000
             })
             
         } else {
                 this.esClient = new Client({
                     node: PUNTO_DE_ENLACE,
-                    requestTimeout: 3000,
+                    requestTimeout: 10000,
                     ssl: {
                         ca: fs.readFileSync('../../../../../../../../cert.pem'),
                         rejectUnauthorized: false

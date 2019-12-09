@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MorganModule, MorganInterceptor } from 'nest-morgan';
+
 import { AppController } from './controllers/app.controller';
 import { ArticlesController } from './controllers/articles.controller';
 import { CategoriesController } from './controllers/categories.controller';
@@ -40,6 +42,8 @@ import { PermissionsModelService } from './services/permissions-model.service';
 import { S3BucketService } from './services/s3-bucket.service';
 import { SearchModelService } from './services/search-model.service';
 import { UserModelService } from './services/user-model.service';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+
 
 const secretKey = "123";
 
@@ -66,6 +70,7 @@ const secretKey = "123";
       ],
       synchronize: false,
     }),
+    MorganModule.forRoot()
   ],
   controllers: [
     AppController,
@@ -105,7 +110,11 @@ const secretKey = "123";
     NewsIndex,
     CommentsIndexService,
     CommentsModelService,
-    PcrcModelService,    
+    PcrcModelService, 
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MorganInterceptor('combined'),
+    }   
   ],
 })
 export class AppModule {  }
