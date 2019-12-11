@@ -113,7 +113,7 @@ const secretKey = "123";
     PcrcModelService, 
     {
       provide: APP_INTERCEPTOR,
-      useClass: MorganInterceptor('combined'),
+      useClass: MorganInterceptor('tiny'),
     }   
   ],
 })

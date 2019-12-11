@@ -23,8 +23,6 @@ export class CommentsModelService {
 
     getComments = async (articleId: string, from:string = '0' , size:string = '10' ): Promise<comment[]> => {
 
-        console.log(articleId)
-
         try {
             let query = {
                 query: {
@@ -91,8 +89,6 @@ export class CommentsModelService {
             username:username,
             article: articleId
         }
-
-        console.log(commnetExtras)
 
         return await this.commentsIndex.create({ ...newComment, ...commnetExtras })
     }

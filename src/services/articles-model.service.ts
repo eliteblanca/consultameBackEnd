@@ -480,6 +480,10 @@ export class ArticlesModelService {
         return { status: 'updated' };
     }
 
+    public async prueba(): Promise<any>{
+        return await this.articleIndex.getById('julian')
+    }
+
     //#endregion Public
 
 }

@@ -52,13 +52,21 @@ export class Esindex<T> {
     }
 
     public getById = async (id: string): Promise<T & { id: string; }> => {
-        let result = await this.esClient.get({
-            id: id,
-            index: this.index,
-            type: '_doc'
-        })
 
-        return R.addProp(result.body._source, 'id', result.body._id);
+        try {
+            
+            let result = await this.esClient.get({
+                id: id,
+                index: this.index,
+                type: '_doc'
+            })
+            
+            return R.addProp(result.body._source, 'id', result.body._id);
+            
+        } catch(err) {
+            console.log(err)
+        }
+
     }
 
     public query = async (query: object): Promise<(T & { id: string; })[]> => {

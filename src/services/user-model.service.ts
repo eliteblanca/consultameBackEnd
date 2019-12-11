@@ -3,7 +3,6 @@ import { IsByteLength, IsIn, IsNotEmpty } from "class-validator";
 import * as R from 'remeda';
 import { createQueryBuilder } from 'typeorm';
 import { Article, ArticleIndex } from "../indices/articleIndex";
-import { FavoriteUserIndex } from "../indices/favoritesUserIndex";
 import { likeUser, LikeUserIndex } from "../indices/likeUserIndex";
 import { user, UserIndex } from "../indices/userIndex";
 import { Personal } from "../jarvisEntities/personal.entity";
@@ -28,7 +27,6 @@ export class UserModelService {
 
     constructor(
         private likeUserIndex: LikeUserIndex,
-        private favoriteUserIndex: FavoriteUserIndex,
         private userIndex: UserIndex,
         private articleIndex: ArticleIndex
     ) { }
@@ -60,8 +58,6 @@ export class UserModelService {
         try {
             
             let existingUser = await this.userIndex.getById(id_usuario);
-            
-            console.log('usuario existia')
 
             return this.userIndex.updatePartialDocument(id_usuario, newUserRol)
 
@@ -70,15 +66,14 @@ export class UserModelService {
             let jarvisUser = await this.getJarvisUser(id_usuario)
 
             let newUser = await this.userIndex.create({
-                cedula: id_usuario,
-                nombre: jarvisUser.nombre_completo,
-                pcrc: [],
-                rol: newUserRol.rol
-            }
-                , id_usuario)
+                    cedula: id_usuario,
+                    nombre: jarvisUser.nombre_completo,
+                    pcrc: [],
+                    rol: newUserRol.rol
+                },
+                id_usuario)
 
             
-            console.log('usuario no existia')
 
             return { status: 'actualizado' }
 
@@ -120,5 +115,39 @@ export class UserModelService {
 
     public async getUserFavorites(userId: string, from: string, size: string): Promise<(Article & { id: string; })[]> {
         return await this.articleIndex.where({ favorites: userId }, from, size, { orderby: 'publicationDate', order: 'desc' })
+    }
+
+    public searchUsers = async (query:string) => {
+        let jarvisUsers:{documento:string, nombre:string}[] = await createQueryBuilder(datosPersonales,'datos')
+            .select(['datos.documento as documento','datos.nombre_completo as nombre'])
+            .where("datos.documento LIKE :query",{ query:'%' + query + '%' })
+            .orWhere("datos.nombre_completo LIKE :query",{ query:'%' + query + '%' })
+            .getRawMany()
+
+        let existingUsers = await this.userIndex.query({
+            query: {
+                "terms": {
+                    "cedula": jarvisUsers.map(result => result.documento)
+                }
+            }
+        });
+
+        let newJarvisUsers = jarvisUsers.map(user => {
+            let existingUser = existingUsers.find(existingUser => existingUser.cedula == user.documento)
+0
+            if(existingUser){
+                let {id , ...userSinId} = existingUser;
+                return userSinId
+            } else {
+                return {
+                        cedula:user.documento,
+                        nombre:user.nombre,
+                        rol: "user",
+                        pcrc:[],
+                    }
+            }
+        })
+
+        return newJarvisUsers
     }
 }

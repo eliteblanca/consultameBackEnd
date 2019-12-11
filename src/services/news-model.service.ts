@@ -15,7 +15,7 @@ export class postNewsDTO {
     obj: string;
 
     @IsNotEmpty({ message: "debes proporcionar un estado a la noticia" })
-    state: string;
+    state: news['state'];
 
     @IsNotEmpty({ message: "debes asignar la noticia a una sublinea" })
     subline: string;
@@ -33,7 +33,7 @@ export class updateNewsDTO {
     obj: string;
 
     @IsNotEmpty({ message: "debes proporcionar un estado a la noticia" })
-    state: string;
+    state: news['state'];
 }
 
 @Injectable()
@@ -43,16 +43,14 @@ export class NewsModelService {
         private newsIndex: NewsIndex,
     ) { }
 
-    getNews = async (sublineId: string, from: string, size: string, date: string): Promise<(news & { id: string; })[]> => {
+    getNews = async (sublineId: string, from = '0', size = '20', date = (new Date).getTime().toString(), query?: string): Promise<(news & { id: string; })[]> => {
         try {
-            let query: any;
 
-            if (!!from && !!size) {
-                if (!!!date) {
-                    date = (new Date).getTime().toString()
-                }
+            let esQuery: any;
 
-                query = {
+
+            if (typeof query == 'undefined') {
+                esQuery = {
                     query: {
                         bool: {
                             filter: [
@@ -70,22 +68,35 @@ export class NewsModelService {
                 }
 
             } else {
-                query = {
+
+                esQuery = {
                     query: {
                         bool: {
+                            must: [
+                                {
+                                    multi_match: {
+                                        'query': query,
+                                        'fields': [ 'title^3', 'content^2']
+                                    }
+                                }
+                            ],
                             filter: [
                                 { term: { subline: sublineId } },
-                                { term: { state: 'published' } }
+                                { term: { state: 'published' } },
+                                { range: { publicationDate: { lt: date } } }
                             ]
                         }
                     },
+                    from: parseInt(from),
+                    size: parseInt(size),
                     sort: [
                         { publicationDate: { order: "desc" } }
                     ],
                 }
             }
 
-            return await this.newsIndex.query(query)
+            return await this.newsIndex.query(esQuery)
+
         } catch (error) {
             console.log(error.meta.body.error)
         }
@@ -94,8 +105,8 @@ export class NewsModelService {
     getSingleNews = async (newsId: string): Promise<(news & { id: string; })> => {
         try {
 
-            let result = await this.newsIndex.updateScript(newsId,{
-                'source' : 'ctx._source.views += 1',
+            let result = await this.newsIndex.updateScript(newsId, {
+                'source': 'ctx._source.views += 1',
                 'lang': 'painless'
             });
 
@@ -106,7 +117,7 @@ export class NewsModelService {
         }
     }
 
-    postNews = async (news: postNewsDTO, userId: string): Promise<(news & { id: string; })> => {       
+    postNews = async (news: postNewsDTO, userId: string): Promise<(news & { id: string; })> => {
 
         let newsExtras = {
             publicationDate: Date.now(),
@@ -115,7 +126,7 @@ export class NewsModelService {
             creator: userId,
             commentsList: '',
             attached: [],
-            views:0
+            views: 0
         };
 
         return await this.newsIndex.create({ ...newsExtras, ...news })
@@ -144,11 +155,58 @@ export class NewsModelService {
         }
     }
 
-    getDrafts = async (idSubline: string, from: string, size: string): Promise<(news & { id: string; })[]> => {
+    getDrafts = async (idSubline: string, from = '0', size = '20', query?:string): Promise<(news & { id: string; })[]> => {
         try {
-            return await this.newsIndex.where({ subline: idSubline, state: 'archived' }, from, size, { orderby:'modificationDate', order:'desc' })
+
+            let esQuery: any;
+
+            if (typeof query == 'undefined') {
+                esQuery = {
+                    query: {
+                        bool: {
+                            filter: [
+                                { term: { subline: idSubline } },
+                                { term: { state: 'archived' } }
+                            ]
+                        }
+                    },
+                    from: parseInt(from),
+                    size: parseInt(size),
+                    sort: [
+                        { publicationDate: { order: "desc" } }
+                    ],
+                }
+
+            } else {
+
+                esQuery = {
+                    query: {
+                        bool: {
+                            must: [
+                                {
+                                    multi_match: {
+                                        'query': query,
+                                        'fields': [ 'title^3', 'content^2']
+                                    }
+                                }
+                            ],
+                            filter: [
+                                { term: { subline: idSubline } },
+                                { term: { state: 'archived' } }
+                            ]
+                        }
+                    },
+                    from: parseInt(from),
+                    size: parseInt(size),
+                    sort: [
+                        { publicationDate: { order: "desc" } }
+                    ],
+                }
+            }
+
+            return await this.newsIndex.query(esQuery)
+
         } catch (error) {
-            console.log(error)
             console.log(error.meta.body.error)
         }
     }

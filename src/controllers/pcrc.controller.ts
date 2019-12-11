@@ -71,17 +71,18 @@ export class PcrcController {
     @UseGuards(AuthGuard('jwt'))
     @Get(':idPcrc/news')
     async getNews(
-        @Param('idPcrc') idPcrc: string,
+        @Param('idPcrc') idPcrc: string,        
+        @Query('query') query: string,
         @Query('state') state: string,
         @Query('from') from: string,
         @Query('size') size: string,
         @Query('date') date: string
     ): Promise<any> {
+
         if (state == 'archived') {
-            console.log('GetDraft')
-            return this.newsModel.getDrafts(idPcrc, from, size)
+            return this.newsModel.getDrafts(idPcrc, from, size, query)
         } else {
-            return this.newsModel.getNews(idPcrc, from, size, date)
+            return this.newsModel.getNews(idPcrc, from, size, date, query)
         }
     }
 

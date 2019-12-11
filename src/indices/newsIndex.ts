@@ -13,7 +13,7 @@ export interface news {
     modificationUser:string;
     creator:string;
     commentsList:string;
-    state:string;
+    state:'published' | 'archived';
     subline:string;
     views:number;
 }

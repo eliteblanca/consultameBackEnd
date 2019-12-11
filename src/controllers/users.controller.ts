@@ -16,8 +16,14 @@ export class UsersController {
 
     @UseGuards(AuthGuard('jwt'))
     @Get()
-    getUsers(): any {
-        return this.userModel.getAllUsers();
+    getUsers(
+        @Query('query') query:string
+    ): any {
+        if(!!query) {
+            return this.userModel.searchUsers(query);
+        } else {
+            return this.userModel.getAllUsers();
+        }
     }
 
     @UseGuards(AuthGuard('jwt'))

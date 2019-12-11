@@ -198,8 +198,6 @@ export class PcrcModelService {
                                 .where('datosPersonales.documento = :cedula',{ cedula: cedula })
                                 .getOne()
 
-                                // console.log(sql)
-
                             return this.userModel.createUser({
                                 cedula: cedula,
                                 nombre: datosPersonales['nombre_completo'],

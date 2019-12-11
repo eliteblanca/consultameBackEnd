@@ -17,6 +17,12 @@ export class ArticlesController {
     }
 
     @UseGuards(AuthGuard('jwt'))
+    @Get('prueba')
+    async getPrueba(): Promise<any> {
+        return this.articlesModel.prueba();
+    }
+
+    @UseGuards(AuthGuard('jwt'))
     @Get(':id')
     singleArticle(@Param() singleArticleDTO: SingleArticleDTO): any {
         return this.articlesModel.getArticle(singleArticleDTO.id);
