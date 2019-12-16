@@ -6,15 +6,12 @@ export class DefaultPageFilter<T> implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
-    let url:string = ctx.getRequest().url;    
-    
-    if(url.startsWith('/api')){      
-      let responseObj = {
-        status : exception.getStatus(),
-        message: exception.message.message
-      }
-      response.status(responseObj.status).json(responseObj);
-    }else{
+    let url:string = ctx.getRequest().url;
+
+    if(url.startsWith('/api')){
+      console.log(exception)
+      return exception;
+    } else {
       response.sendFile(join(__dirname, '../..', 'public/index.html'));
     }
   }

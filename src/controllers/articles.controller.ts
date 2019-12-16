@@ -16,10 +16,16 @@ export class ArticlesController {
         return this.articlesModel.getAllArticles();
     }
 
-    @UseGuards(AuthGuard('jwt'))
     @Get('prueba')
     async getPrueba(): Promise<any> {
-        return this.articlesModel.prueba();
+        try {
+            
+            return this.articlesModel.prueba();
+
+        } catch (error) {
+            throw error;
+            
+        }
     }
 
     @UseGuards(AuthGuard('jwt'))

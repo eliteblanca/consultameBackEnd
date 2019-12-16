@@ -33,7 +33,7 @@ export class PcrcModelService {
     ) { }
 
     private sortBy = (obj, key) => {
-        return obj.sort(function(a, b) {
+        return obj.sort(function (a, b) {
             var textA = a[key];
             var textB = b[key];
             return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
@@ -60,10 +60,10 @@ export class PcrcModelService {
         return result
     }
 
-    getUserPcrc = async (cedula: string):Promise<cliente[]> => {
+    getUserPcrc = async (cedula: string): Promise<cliente[]> => {
 
         if (cedula == '1036673423') {
-            let result =  await this.getAllPcrc()
+            let result = await this.getAllPcrc()
             return this.sortBy(result, 'cliente')
         }
 
@@ -84,60 +84,60 @@ export class PcrcModelService {
 
                 let pcrcsPorDefecto = await this.getDefaultsPcrc(cedula)
 
-                return this.sortBy([ ...pcrcsEnElastic , ...pcrcsPorDefecto ], 'cliente')
+                return this.sortBy([...pcrcsEnElastic, ...pcrcsPorDefecto], 'cliente')
 
             } else {
-                return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')  
+                return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')
             }
 
         } else {
-            return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')  
+            return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')
         }
     }
 
     private getDefaultsPcrc = async (cedula: string) => {
         return await createQueryBuilder<cliente>('Clientes')
-        .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
-        .innerJoin(qb =>
-            qb.select(['Personal.cod_pcrc as cod_pcrc'])
-                .from(Personal, 'Personal')
-                .innerJoin(qb =>
-                    qb.select(['max(Personal.fecha_actual) as fecha', 'Personal.documento as documento'])
-                        .from(Personal, 'Personal')
-                        .groupBy('Personal.documento')
-                    , 'fechas'
-                    , 'Personal.fecha_actual = fechas.fecha and fechas.documento = Personal.documento'
-                )
-                .where('Personal.documento = :documento', { documento: cedula })
-            , 'accesos'
-            , 'accesos.cod_pcrc = pcrc.cod_pcrc'
-        )
-        .where('pcrc.estado = 1')
-        .andWhere('Clientes.estado = 1')
-        .select(['Clientes.id_dp_clientes', 'Clientes.cliente', 'pcrc.id_dp_pcrc', 'pcrc.cod_pcrc', 'pcrc.pcrc'])
-        .getMany()
-    } 
+            .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
+            .innerJoin(qb =>
+                qb.select(['Personal.cod_pcrc as cod_pcrc'])
+                    .from(Personal, 'Personal')
+                    .innerJoin(qb =>
+                        qb.select(['max(Personal.fecha_actual) as fecha', 'Personal.documento as documento'])
+                            .from(Personal, 'Personal')
+                            .groupBy('Personal.documento')
+                        , 'fechas'
+                        , 'Personal.fecha_actual = fechas.fecha and fechas.documento = Personal.documento'
+                    )
+                    .where('Personal.documento = :documento', { documento: cedula })
+                , 'accesos'
+                , 'accesos.cod_pcrc = pcrc.cod_pcrc'
+            )
+            .where('pcrc.estado = 1')
+            .andWhere('Clientes.estado = 1')
+            .select(['Clientes.id_dp_clientes', 'Clientes.cliente', 'pcrc.id_dp_pcrc', 'pcrc.cod_pcrc', 'pcrc.pcrc'])
+            .getMany()
+    }
 
-    postUserPcrc = async (cedula: string, idPcrc: string, cedulaUsuarioAdmin:string) => {
+    postUserPcrc = async (cedula: string, idPcrc: string, cedulaUsuarioAdmin: string) => {
 
-         if (idPcrc == 'todos') {
+        if (idPcrc == 'todos') {
 
-            let user = await this.userIndex.where({cedula:cedula})
+            let user = await this.userIndex.where({ cedula: cedula })
 
-            if(user.length > 0){
-    
+            if (user.length > 0) {
+
                 let adminPcrc = await this.getUserPcrc(cedulaUsuarioAdmin)
 
                 let UserPcrc = await this.getUserPcrc(cedula)
 
-                let UserPcrcIds =  R.flatten(UserPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+                let UserPcrcIds = R.flatten(UserPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
 
-                let admiPpcrcIds =  R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+                let admiPpcrcIds = R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
 
                 let duplicateQuit = [...new Set(UserPcrcIds.concat(admiPpcrcIds))]// quitar duplicadps
 
                 await this.userIndex.updatePartialDocument(cedula, { pcrc: duplicateQuit })
-    
+
                 return { status: 'created' }
 
             } else {
@@ -146,11 +146,11 @@ export class PcrcModelService {
 
                 let adminPcrc = await this.getUserPcrc(cedulaUsuarioAdmin)
 
-                let admiPpcrcIds =  R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+                let admiPpcrcIds = R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
 
                 let newUser = await this.userModel.createUser({
-                    cedula:cedula,
-                    nombre:jarvisInfo.nombre_completo,
+                    cedula: cedula,
+                    nombre: jarvisInfo.nombre_completo,
                     pcrc: admiPpcrcIds,
                     rol: 'user'
                 })
@@ -177,8 +177,10 @@ export class PcrcModelService {
                     throw new NotAcceptableException('el pcrc no existe')
                 } else {
 
-                    try {
-                        let usuarioExiste = await this.userIndex.getById(cedula)
+
+                    let usuarioExiste = await this.userIndex.getById(cedula)
+
+                    if (!!usuarioExiste) {
 
                         let updateQuery = {
                             'source': 'ctx._source.pcrc.add(params.pcrc)',
@@ -190,21 +192,19 @@ export class PcrcModelService {
 
                         this.userIndex.updateScript(cedula, updateQuery);
 
-                    } catch (error) {
+                    } else {
 
-                        if (!error.meta.body.found) {
+                        let datosPersonales = await createQueryBuilder("datosPersonales")
+                            .where('datosPersonales.documento = :cedula', { cedula: cedula })
+                            .getOne()
 
-                            let datosPersonales = await createQueryBuilder("datosPersonales")
-                                .where('datosPersonales.documento = :cedula',{ cedula: cedula })
-                                .getOne()
-
-                            return this.userModel.createUser({
-                                cedula: cedula,
-                                nombre: datosPersonales['nombre_completo'],
-                                pcrc: [idPcrc],
-                                rol: 'user'
-                            })
-                        }
+                        return this.userModel.createUser({
+                            cedula: cedula,
+                            nombre: datosPersonales['nombre_completo'],
+                            pcrc: [idPcrc],
+                            rol: 'user'
+                        })
+                        
                     }
                 }
 
@@ -213,20 +213,20 @@ export class PcrcModelService {
         }
     }
 
-    deleteUserPcrc = async (cedula: string, pcrc: string, cedulaUsuarioAdmin:string) => {
+    deleteUserPcrc = async (cedula: string, pcrc: string, cedulaUsuarioAdmin: string) => {
 
         if (pcrc == 'todos') {
 
-    
+
             let adminPcrc = await this.getUserPcrc(cedulaUsuarioAdmin)
 
             let UserPcrc = await this.getUserPcrc(cedula)
 
-            let UserPcrcIds =  R.flatten(UserPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+            let UserPcrcIds = R.flatten(UserPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
 
-            let admiPpcrcIds =  R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+            let admiPpcrcIds = R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
 
-            let difference = UserPcrcIds.filter(x => !admiPpcrcIds.includes(x)) 
+            let difference = UserPcrcIds.filter(x => !admiPpcrcIds.includes(x))
 
             await this.userIndex.updatePartialDocument(cedula, { pcrc: difference })
 
@@ -254,7 +254,7 @@ export class PcrcModelService {
 
     getPcrcUsers = async (idPcrc: string) => {
 
-        let jarvisUsers: { documento: string, nombre:string }[] = await createQueryBuilder(Personal)
+        let jarvisUsers: { documento: string, nombre: string }[] = await createQueryBuilder(Personal)
             .innerJoin(qb =>
                 qb.select(['max(distri.fecha_actual) as fecha', 'distri.documento as documento'])
                     .from(Personal, 'distri')
@@ -263,7 +263,7 @@ export class PcrcModelService {
                 , 'Personal.fecha_actual = fechas.fecha and fechas.documento = Personal.documento'
             ).innerJoinAndSelect('Pcrc', 'pcrc', 'pcrc.cod_pcrc = Personal.cod_pcrc and pcrc.estado = 1 and pcrc.id_dp_pcrc = :idPcrc', { idPcrc: idPcrc })
             .innerJoinAndSelect('Personal.id_dp_datos_generales', 'datos')
-            .select(['Personal.documento as documento','datos.nombre_completo as nombre'])
+            .select(['Personal.documento as documento', 'datos.nombre_completo as nombre'])
             .getRawMany()
 
         let existingUsers = await this.userIndex.query({
@@ -277,27 +277,27 @@ export class PcrcModelService {
         let newJarvisUsers = jarvisUsers.map(user => {
             let existingUser = existingUsers.find(existingUser => existingUser.cedula == user.documento)
 
-            if(existingUser){
-               return existingUser
+            if (existingUser) {
+                return existingUser
             } else {
                 return {
-                        cedula:user.documento,
-                        nombre:user.nombre,
-                        rol: 'user',
-                        pcrc:[idPcrc],
-                    }
-                
+                    cedula: user.documento,
+                    nombre: user.nombre,
+                    rol: 'user',
+                    pcrc: [idPcrc],
+                }
+
             }
 
         })
 
         let extraUsers = await this.userIndex.query({
             query: {
-                bool: {                    
+                bool: {
                     must: [
                         {
                             terms: {
-                                pcrc: [idPcrc,'todos']
+                                pcrc: [idPcrc, 'todos']
                             }
                         }
                     ]
@@ -305,17 +305,17 @@ export class PcrcModelService {
             }
         });
 
-        return newJarvisUsers.concat(extraUsers).sort((a, b) =>  {
+        return newJarvisUsers.concat(extraUsers).sort((a, b) => {
             if (a.nombre > b.nombre) {
-              return 1;
+                return 1;
             }
             if (a.nombre < b.nombre) {
-              return -1;
+                return -1;
             }
             // a must be equal to b
             return 0;
-          })
+        })
     }
 
- 
+
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, NotAcceptableException, ConflictException, forwardRef, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, NotAcceptableException, ConflictException, forwardRef, Inject, HttpException } from '@nestjs/common';
 import { CategoriesModelService } from '../services/categories-model.service';
 import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn, Length } from 'class-validator';
 import { ArticleIndex, Article } from '../indices/articleIndex';
@@ -63,8 +63,7 @@ export class ArticlesModelService {
         private S3BucketService: S3BucketService,
         private pcrcModel: PcrcModelService
     ) {  }
-
-    //#region Public
+  
 
     public async getArticlesByCategory(category: string, state:string = 'published', from:string = '0', size:string = '10'): Promise<(Article & { id: string; })[]> {        
         return await this.articleIndex.where({ category: category, state:state },from,size, { orderby:'modificationDate', order:'desc' });
@@ -110,7 +109,7 @@ export class ArticlesModelService {
     }
 
     public async getArticlesByTag(options: { tag: string; subline: string; from?:string; size?:string }): Promise<(Article & { id: string })[]> {
-        let result = await this.articleIndex.where({ tags: options.tag, pcrc:options.subline, state:'published' }, options.from, options.size, { orderby: 'publicationDate' , order:'desc'})
+        let result = await this.articleIndex.where({ tags:  options.tag , pcrc:options.subline, state:'published' }, options.from, options.size, { orderby: 'publicationDate' , order:'desc'})
         return result
     }
 
@@ -119,32 +118,37 @@ export class ArticlesModelService {
     }
 
     public async getArticle(articleId: string): Promise<Article & { id: string; }> {
-        try {
+
+        let article = await this.articleIndex.getById(articleId);
+        
+        if(article){
 
             let result = await this.articleIndex.updateScript(articleId,{
                 'source' : 'ctx._source.views += 1',
                 'lang': 'painless'
             });
 
-            return await this.articleIndex.getById(articleId);
+           return article
 
-        } catch (error) {
-            if (error.meta.statusCode == 404) {
-                throw new NotFoundException('articulo no encontrado');
-            }
+        } else {
+            throw new HttpException({
+                "message": "articulo no encontrado"
+            }, 404)
         }
+
     }
 
     public async createArticle(article: articleDTO, creator: string): Promise<Article & { id: string }> {
 
         let pcrc: string = null;
         let cliente: { id: number; cliente: string; };
-        try {
-            var category = await this.categoriesIndex.getById(article.category);
-        } catch (error) {
-            if (error.meta.statusCode == 404) {
-                throw new NotFoundException('categoria no encontrada');
-            }
+        
+        var category = await this.categoriesIndex.getById(article.category);
+        
+        if(!!!category){
+            throw new HttpException({
+                "message": `la categoria '${article.category}' no existe`
+            }, 400)
         }
 
         try {
@@ -356,12 +360,14 @@ export class ArticlesModelService {
     }
 
     public deleteArticle = async (id: string): Promise<any> => {
+        
+        var article = await this.articleIndex.getById(id)
 
-        try {
-            var article = await this.articleIndex.getById(id)
-        } catch (error) {
-            console.log(error);
-        }
+        if(!!!article){
+            throw new HttpException({
+                "message": `articulo no encontrado`
+            }, 404)
+        }        
 
         await async.each( article.attached, async (fileName) => {
             await this.S3BucketService.deleteFile(id,fileName)
@@ -373,11 +379,9 @@ export class ArticlesModelService {
             console.log(error);
         }
 
-
         await this.favoriteUserIndex.deleteWhere({ article: id });
 
         await this.likeUserIndex.deleteWhere({ article: id });
-
 
     }
 
@@ -388,12 +392,13 @@ export class ArticlesModelService {
         let articleExtas:Partial<Article>;
 
         if(!!article.category){
-            try {
-                var category = await this.categoriesIndex.getById(article.category);
-            } catch (error) {
-                if (error.meta.statusCode == 404) {
-                    throw new NotFoundException('categoria no encontrada');
-                }
+            
+            var category = await this.categoriesIndex.getById(article.category);
+            
+            if(!!!category){
+                throw new HttpException({
+                    "message": `la categoria '${article.category}' no existe`
+                }, 400)
             }
     
             try {
@@ -481,9 +486,7 @@ export class ArticlesModelService {
     }
 
     public async prueba(): Promise<any>{
-        return await this.articleIndex.getById('julian')
+        return await this.articleIndex.updatePartialDocument('asdsad',{})
     }
-
-    //#endregion Public
 
 }

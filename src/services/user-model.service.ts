@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, HttpException } from '@nestjs/common';
 import { IsByteLength, IsIn, IsNotEmpty } from "class-validator";
 import * as R from 'remeda';
 import { createQueryBuilder } from 'typeorm';
@@ -7,6 +7,7 @@ import { likeUser, LikeUserIndex } from "../indices/likeUserIndex";
 import { user, UserIndex } from "../indices/userIndex";
 import { Personal } from "../jarvisEntities/personal.entity";
 import { datosPersonales } from "../jarvisEntities/datosGenerales.entity";
+import { tsImportEqualsDeclaration } from '@babel/types';
 
 export class updateUserRolDTO {
 
@@ -25,6 +26,7 @@ export class deleteUserDTO {
 @Injectable()
 export class UserModelService {
 
+
     constructor(
         private likeUserIndex: LikeUserIndex,
         private userIndex: UserIndex,
@@ -32,18 +34,14 @@ export class UserModelService {
     ) { }
 
     public async createUser(newUser: user): Promise<user & { id: string; }> {
-        try {
+        let existingUser = await this.userIndex.getById(newUser.cedula);
 
-            let existingUser = await this.userIndex.getById(newUser.cedula);
-
-            if (!!existingUser) {
-                throw new ConflictException('ya existe un usuario con esta cedula');
-            }
-
-        } catch (error) {
-            if (!error.body.found) {
-                return this.userIndex.create(newUser, newUser.cedula)
-            }
+        if (!!existingUser) {
+            throw new HttpException({
+                "message": `ya existe un usuario con esta cedula`
+            }, 400)
+        } else {
+            return this.userIndex.create(newUser, newUser.cedula)
         }
     }
 
@@ -55,31 +53,27 @@ export class UserModelService {
 
     public updateUserRol = async (id_usuario: string, newUserRol: updateUserRolDTO): Promise<any> => {
 
-        try {
-            
-            let existingUser = await this.userIndex.getById(id_usuario);
+        let existingUser = await this.userIndex.getById(id_usuario);
+
+        if (!!existingUser) {
 
             return this.userIndex.updatePartialDocument(id_usuario, newUserRol)
 
-        } catch (error) {
+        } else {
 
             let jarvisUser = await this.getJarvisUser(id_usuario)
 
             let newUser = await this.userIndex.create({
-                    cedula: id_usuario,
-                    nombre: jarvisUser.nombre_completo,
-                    pcrc: [],
-                    rol: newUserRol.rol
-                },
+                cedula: id_usuario,
+                nombre: jarvisUser.nombre_completo,
+                pcrc: [],
+                rol: newUserRol.rol
+            },
                 id_usuario)
-
-            
 
             return { status: 'actualizado' }
 
         }
-
-
     }
 
     public async getAllUsers(): Promise<(user & { id: string; })[]> {
@@ -114,14 +108,14 @@ export class UserModelService {
     }
 
     public async getUserFavorites(userId: string, from: string, size: string): Promise<(Article & { id: string; })[]> {
-        return await this.articleIndex.where({ favorites: userId }, from, size, { orderby: 'publicationDate', order: 'desc' })
+        return await this.articleIndex.where({ favorites:  userId  }, from, size, { orderby: 'publicationDate', order: 'desc' })
     }
 
-    public searchUsers = async (query:string) => {
-        let jarvisUsers:{documento:string, nombre:string}[] = await createQueryBuilder(datosPersonales,'datos')
-            .select(['datos.documento as documento','datos.nombre_completo as nombre'])
-            .where("datos.documento LIKE :query",{ query:'%' + query + '%' })
-            .orWhere("datos.nombre_completo LIKE :query",{ query:'%' + query + '%' })
+    public searchUsers = async (query: string) => {
+        let jarvisUsers: { documento: string, nombre: string }[] = await createQueryBuilder(datosPersonales, 'datos')
+            .select(['datos.documento as documento', 'datos.nombre_completo as nombre'])
+            .where("datos.documento LIKE :query", { query: '%' + query + '%' })
+            .orWhere("datos.nombre_completo LIKE :query", { query: '%' + query + '%' })
             .getRawMany()
 
         let existingUsers = await this.userIndex.query({
@@ -134,20 +128,24 @@ export class UserModelService {
 
         let newJarvisUsers = jarvisUsers.map(user => {
             let existingUser = existingUsers.find(existingUser => existingUser.cedula == user.documento)
-0
-            if(existingUser){
-                let {id , ...userSinId} = existingUser;
+            0
+            if (existingUser) {
+                let { id, ...userSinId } = existingUser;
                 return userSinId
             } else {
                 return {
-                        cedula:user.documento,
-                        nombre:user.nombre,
-                        rol: "user",
-                        pcrc:[],
-                    }
+                    cedula: user.documento,
+                    nombre: user.nombre,
+                    rol: "user",
+                    pcrc: [],
+                }
             }
         })
 
         return newJarvisUsers
+    }
+
+    async getUser(idUsuario: string) {
+        return await this.searchUsers(idUsuario)
     }
 }

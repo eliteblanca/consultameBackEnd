@@ -23,7 +23,7 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
             server: {
                 url: 'ldap://sm1dc01w12s.multienlace.com.co',
                 bindDN: 'julian.vargas.a@multienlace.com.co',
-                bindCredentials: 'Konecta2028',
+                bindCredentials: 'Konecta2029',
                 searchFilter: '(SAMAccountName={{username}})',
                 searchBase: 'dc=multienlace,dc=com,dc=co'
             }
@@ -31,9 +31,10 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
     }
 
     async validate(ldapUserInfo) {
-        try {
 
-            var user = await this.UserIndex.getById(ldapUserInfo.postOfficeBox)
+        var user = await this.UserIndex.getById(ldapUserInfo.postOfficeBox)
+
+        if (!!user) {
 
             return {
                 "sub": user.id,
@@ -41,31 +42,27 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
                 "rol": user.rol
             }
 
-        } catch (error) {
+        } else {
 
-            console.log(error)
+            var user = await this.userModel.createUser({
+                cedula: ldapUserInfo.postOfficeBox,
+                rol: "user",
+                nombre: ldapUserInfo.name,
+                pcrc: []
+            })
 
-            if (!error.meta.body.found) {
-
-                var user = await this.userModel.createUser({
-                        cedula: ldapUserInfo.postOfficeBox,
-                        rol: "user",
-                        nombre: ldapUserInfo.name,
-                        pcrc: []
-                    })
-
-                return {
-                    "sub": user.id,
-                    "name": ldapUserInfo.name,
-                    "rol": user.rol
-                }
+            return {
+                "sub": user.id,
+                "name": ldapUserInfo.name,
+                "rol": user.rol
             }
+
         }
     }
 
     async generateJwt(user: { sub: string, name: string, rol: user['rol'] }): Promise<{ tokem: string }> {
-        if(user.sub == '1036673423'){
-            let newUser = {...user};
+        if (user.sub == '1036673423') {
+            let newUser = { ...user };
             newUser.rol = 'admin';
 
             return { tokem: this.jwtService.sign(newUser) }
@@ -81,7 +78,7 @@ export class JwtValidator extends PassportStrategy(jwStrategy) {
     constructor() {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: false, 
+            ignoreExpiration: false,
             secretOrKey: secretKey,
         });
     }

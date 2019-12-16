@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, HttpException } from '@nestjs/common';
 import { CommentsIndexService, comment } from "../indices/commentsIndex.service";
 import { Article, ArticleIndex } from "../indices/articleIndex";
 import { IsOptional, Length } from 'class-validator';
@@ -58,23 +58,28 @@ export class CommentsModelService {
         if( newComment.replyTo ){
 
             let replyComment:comment;
+
             let article:Article;
 
-            try{
-                article = await this.articleIndex.getById(articleId) 
-            } catch (error){
-                throw new ConflictException('el articulo no existe');
+            article = await this.articleIndex.getById(articleId) 
+
+            if(!!!article){
+                throw new HttpException({
+                    "message": `articulo no encontrado`
+                }, 404)
+
             }
 
-            try {
-                replyComment = await this.commentsIndex.getById(newComment.replyTo)
-            } catch (error) {
-                if(error.meta && error.meta.body && !error.meta.body.found){
-                    throw new ConflictException('el comentario a responder no existe');
-                }
+            
+            replyComment = await this.commentsIndex.getById(newComment.replyTo)
+
+            if(!!!replyComment){
+                throw new HttpException({
+                    "message": `el comentario a responder no existe`
+                }, 404)
             }
 
-            if(replyComment.replyTo){
+            if( replyComment.replyTo){
                 throw new ConflictException('no puedes responder a una respuesta de un commentario');
             }
 

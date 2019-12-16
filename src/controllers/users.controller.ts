@@ -27,6 +27,14 @@ export class UsersController {
     }
 
     @UseGuards(AuthGuard('jwt'))
+    @Get(':idUsuario')
+    getSingleUser(
+        @Param('idUsuario') idUsuario:string
+    ): any {
+        return this.userModel.getUser(idUsuario)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
     deleteUser(
         @Param() params: deleteUserDTO

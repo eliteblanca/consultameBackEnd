@@ -71,14 +71,14 @@ export class PermissionsModelService {
     }
     //! ⚠️ agregar validacion al eliminar un id que no existe
     public deleteRol = async (id: string): Promise<any> => {
-        let rol = await this.rolesIndex.getById(id)
-        let users = await this.userIndex.where({ rol: rol.id })
+        // let rol = await this.rolesIndex.getById(id)
+        // let users = await this.userIndex.where({ rol: rol.id })
 
-        if (users.length) {
-            throw new ConflictException('no se puede eliminar un rol que tenga usuarios asignados')
-        }
+        // if (users.length) {
+        //     throw new ConflictException('no se puede eliminar un rol que tenga usuarios asignados')
+        // }
 
-        return await this.rolesIndex.delete(id)
+        // return await this.rolesIndex.delete(id)
     }
 
     public createResource = async (newResource: newResourceDTO): Promise<(resource & { id: string; })> => {

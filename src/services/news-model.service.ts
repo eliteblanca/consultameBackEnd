@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpException } from '@nestjs/common';
 import { NewsIndex, news } from "../indices/newsIndex";
 import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn, Length } from 'class-validator';
 
@@ -102,19 +102,23 @@ export class NewsModelService {
         }
     }
 
-    getSingleNews = async (newsId: string): Promise<(news & { id: string; })> => {
-        try {
+    getSingleNews = async (newsId: string): Promise<(news & { id: string; })> => {        
 
+        let news = await this.newsIndex.getById(newsId)
+
+        if(!!news){
             let result = await this.newsIndex.updateScript(newsId, {
                 'source': 'ctx._source.views += 1',
                 'lang': 'painless'
             });
 
-            return await this.newsIndex.getById(newsId)
+            return news
 
-        } catch (error) {
-            console.log(error)
-        }
+        } else {
+            throw new HttpException({
+                "message": `Noticia no encontrada`
+            }, 404)
+        }        
     }
 
     postNews = async (news: postNewsDTO, userId: string): Promise<(news & { id: string; })> => {
