@@ -63,16 +63,19 @@ export class UserModelService {
 
             let jarvisUser = await this.getJarvisUser(id_usuario)
 
-            let newUser = await this.userIndex.create({
-                cedula: id_usuario,
-                nombre: jarvisUser.nombre_completo,
-                pcrc: [],
-                rol: newUserRol.rol
-            },
-                id_usuario)
+            if(!!jarvisUser){
+                let newUser = await this.userIndex.create({
+                    cedula: id_usuario,
+                    nombre: jarvisUser.nombre_completo,
+                    pcrc: [],
+                    rol: newUserRol.rol
+                },
+                    id_usuario)
+            } else {
+                throw new NotFoundException('usuario no encontrado')
+            }
 
             return { status: 'actualizado' }
-
         }
     }
 

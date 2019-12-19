@@ -486,7 +486,9 @@ export class ArticlesModelService {
     }
 
     public async prueba(): Promise<any>{
-        return await this.articleIndex.updatePartialDocument('asdsad',{})
+        return await this.articleIndex.aggsWhere({ cliente:'cliente' }, { field:"views", op:"sum" })
     }
+
+
 
 }

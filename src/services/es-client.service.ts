@@ -72,22 +72,6 @@ export class EsClientService extends GenericModel {
                         index: index,
                         include_type_name: false,
                         body: {
-                            // "mappings" : {
-                            //     "properties" : {
-                            //         "subline"  : { "type": "keyword" },
-                            //         "query"    : { 
-                            //             "type": "search_as_you_type",
-                            //             "fields": {
-                            //                 "raw": {
-                            //                     "type": "keyword"
-                            //                 }
-                            //             }
-                            //         },
-
-
-                            //         "searches" : { "type": "integer" }
-                            //     }
-                            // }
                             mappings: {
                                 properties: {
                                     query: {
@@ -290,7 +274,27 @@ export class EsClientService extends GenericModel {
                         }
                     })
                     break;
-
+                    case 'articlesViews':
+                        return await this.esClient.indices.create({
+                            index: index,
+                            include_type_name: false,
+                            body: {
+                                "mappings": {
+                                    "properties": {
+                                        "articleId": { "type": "keyword" },
+                                        "userId": { "type": "keyword" },                                        
+                                        "publicationDate": { "type": "date", "format": 'epoch_millis' },
+                                        "modificationDate": { "type": "date", "format": 'epoch_millis' },
+                                        "modificationUser": { "type": "keyword" },
+                                        "creator": { "type": "keyword" },
+                                        "cliente": { "type": "keyword" },
+                                        "pcrc": { "type": "keyword" },
+                                        "category": { "type": "keyword" }                                        
+                                    }
+                                }
+                            }
+                        })
+                        break;
 
 
                 default:

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MorganModule, MorganInterceptor } from 'nest-morgan';
-
 import { AppController } from './controllers/app.controller';
 import { ArticlesController } from './controllers/articles.controller';
 import { CategoriesController } from './controllers/categories.controller';
@@ -27,6 +26,7 @@ import { ResourcesIndex } from './indices/resourcesIndex';
 import { RolesIndex } from './indices/rolesIndex';
 import { SearchsIndex } from './indices/searchIndex';
 import { UserIndex } from './indices/userIndex';
+import { ArticlesViewsIndex } from "./indices/articlesViewsIndex";
 import { Clientes } from "./jarvisEntities/clientes.entity";
 import { datosPersonales } from "./jarvisEntities/datosGenerales.entity";
 import { Pcrc } from "./jarvisEntities/pcrc.entity";
@@ -43,6 +43,9 @@ import { S3BucketService } from './services/s3-bucket.service';
 import { SearchModelService } from './services/search-model.service';
 import { UserModelService } from './services/user-model.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ReportsController } from './controllers/reports.controller';
+import { ReportsModelService } from './services/reports-model.service';
+
 
 
 const secretKey = "123";
@@ -85,7 +88,8 @@ const secretKey = "123";
     UploadController,
     NewsController,
     CommentsController,
-    PcrcController
+    PcrcController,
+    ReportsController
   ],
   providers: [  
     JwtValidator,    
@@ -106,6 +110,7 @@ const secretKey = "123";
     RolesIndex,
     ResourcesIndex,
     PermissionsIndex,
+    ArticlesViewsIndex,
     S3BucketService,
     NewsIndex,
     CommentsIndexService,
@@ -114,7 +119,7 @@ const secretKey = "123";
     {
       provide: APP_INTERCEPTOR,
       useClass: MorganInterceptor('tiny'),
-    }   
+    }, ReportsModelService   
   ],
 })
 export class AppModule {  }
