@@ -59,7 +59,7 @@ export class UserModelService {
             
             let existingUser = await this.userIndex.getById(id_usuario);
 
-            return this.userIndex.updatePartialDocument(id_usuario, newUserRol)
+            return await this.userIndex.updatePartialDocument(id_usuario, newUserRol)
 
         } catch (error) {
 
