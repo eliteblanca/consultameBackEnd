@@ -57,7 +57,7 @@ export class UserModelService {
 
         if (!!existingUser) {
 
-            return this.userIndex.updatePartialDocument(id_usuario, newUserRol)
+            return await this.userIndex.updatePartialDocument(id_usuario, newUserRol)
 
         } else {
 
