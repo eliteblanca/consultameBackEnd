@@ -7,8 +7,8 @@ import { LikeUserIndex } from '../indices/likeUserIndex';
 import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
 import { S3BucketService } from '../services/s3-bucket.service';
 import { PcrcModelService } from "../services/pcrc-model.service";
+import { ArticleViewsModelService } from "../services/articleViews-model.service";
 import * as async from 'async';
-import { file } from '@babel/types';
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: 'debes proporcionar un id de articulo' })
@@ -40,7 +40,7 @@ export class articleDTO {
     public attached?: string[];
 
     @IsNotEmpty({ message: 'debes proporcionar un estado al articulo' })
-    public state:string;
+    public state: string;
 
     @IsNotEmpty({ message: 'debes proporcionar una categoria' })
     @Length(20, 20, { message: 'debes proporcionar un id valido' })
@@ -48,31 +48,31 @@ export class articleDTO {
 
 }
 
-type group = { category:string } | { pcrc:string } | { cliente:string } ;
+type group = { category: string } | { pcrc: string } | { cliente: string };
 
 @Injectable()
 export class ArticlesModelService {
 
     constructor(
-        @Inject(forwardRef(() => CategoriesModelService))        
+        @Inject(forwardRef(() => CategoriesModelService))
         private categoriesModel: CategoriesModelService,
         private articleIndex: ArticleIndex,
         private categoriesIndex: CategoriesIndex,
         private likeUserIndex: LikeUserIndex,
-        private favoriteUserIndex: FavoriteUserIndex,        
+        private favoriteUserIndex: FavoriteUserIndex,
         private S3BucketService: S3BucketService,
-        private pcrcModel: PcrcModelService
-    ) {  }
-  
+        private pcrcModel: PcrcModelService,
+        private ArticleViewsModel: ArticleViewsModelService
+    ) { }
 
-    public async getArticlesByCategory(category: string, state:string = 'published', from:string = '0', size:string = '10'): Promise<(Article & { id: string; })[]> {        
-        return await this.articleIndex.where({ category: category, state:state },from,size, { orderby:'modificationDate', order:'desc' });
+    public async getArticlesByCategory(category: string, state: string = 'published', from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> {
+        return await this.articleIndex.where({ category: category, state: state }, from, size, { orderby: 'modificationDate', order: 'desc' });
     }
 
-    public async getArticlesByQuery(query: string, group:group, state:string = 'published', from:string = '0', size:string = '10'  ): Promise<(Article & { id: string, highlight:string  })[]> {                        
+    public async getArticlesByQuery(query: string, group: group, state: string = 'published', from: string = '0', size: string = '10'): Promise<(Article & { id: string, highlight: string })[]> {
 
         try {
-            
+
             let q = {
                 query: {
                     bool: {
@@ -80,7 +80,7 @@ export class ArticlesModelService {
                             {
                                 multi_match: {
                                     'query': query,
-                                    'fields': [ 'title^3', 'content^2', 'tags' ]
+                                    'fields': ['title^3', 'content^2', 'tags']
                                 }
                             }
                         ],
@@ -90,11 +90,11 @@ export class ArticlesModelService {
                         ]
                     }
                 },
-                from : parseInt(from),
-                size : parseInt(size),
-                highlight : {
-                    fields : {
-                        "content" : { "type" : "plain" }
+                from: parseInt(from),
+                size: parseInt(size),
+                highlight: {
+                    fields: {
+                        "content": { "type": "plain" }
                     }
                 }
             };
@@ -108,8 +108,8 @@ export class ArticlesModelService {
         }
     }
 
-    public async getArticlesByTag(options: { tag: string; subline: string; from?:string; size?:string }): Promise<(Article & { id: string })[]> {
-        let result = await this.articleIndex.where({ tags:  options.tag , pcrc:options.subline, state:'published' }, options.from, options.size, { orderby: 'publicationDate' , order:'desc'})
+    public async getArticlesByTag(options: { tag: string; subline: string; from?: string; size?: string }): Promise<(Article & { id: string })[]> {
+        let result = await this.articleIndex.where({ tags: options.tag, pcrc: options.subline, state: 'published' }, options.from, options.size, { orderby: 'publicationDate', order: 'desc' })
         return result
     }
 
@@ -117,18 +117,20 @@ export class ArticlesModelService {
         return await this.articleIndex.all();
     }
 
-    public async getArticle(articleId: string): Promise<Article & { id: string; }> {
+    public async getArticle(articleId: string, userId: string): Promise<Article & { id: string; }> {
 
         let article = await this.articleIndex.getById(articleId);
-        
-        if(article){
 
-            let result = await this.articleIndex.updateScript(articleId,{
-                'source' : 'ctx._source.views += 1',
+        if (article) {
+
+            let result = await this.articleIndex.updateScript(articleId, {
+                'source': 'ctx._source.views += 1',
                 'lang': 'painless'
             });
 
-           return article
+            await this.ArticleViewsModel.createView(article, userId)
+
+            return article
 
         } else {
             throw new HttpException({
@@ -142,10 +144,10 @@ export class ArticlesModelService {
 
         let pcrc: string = null;
         let cliente: { id: number; cliente: string; };
-        
+
         var category = await this.categoriesIndex.getById(article.category);
-        
-        if(!!!category){
+
+        if (!!!category) {
             throw new HttpException({
                 "message": `la categoria '${article.category}' no existe`
             }, 400)
@@ -162,7 +164,7 @@ export class ArticlesModelService {
         }
 
         pcrc = category.pcrc;
-        
+
         try {
             cliente = await this.pcrcModel.getClienteOfPcrc(pcrc);
         } catch (error) {
@@ -182,7 +184,7 @@ export class ArticlesModelService {
             modificationUser: creator,
             publicationDate: (new Date).getTime(),
             modificationDate: (new Date).getTime(),
-            views:0
+            views: 0
         };
 
         let newArticle: Article = { ...articleExtras, ...article };
@@ -257,9 +259,10 @@ export class ArticlesModelService {
 
 
         if (result.deleted) {
-            try {
-                var article = await this.getArticle(articleId);
-            } catch (error) {
+
+            let article = await this.articleIndex.getById(articleId);
+
+            if (!!!article) {
                 throw new NotAcceptableException('el articulo no existe');
             }
 
@@ -286,9 +289,9 @@ export class ArticlesModelService {
 
 
         if (result.deleted) {
-            try {
-                var article = await this.getArticle(articleId);
-            } catch (error) {
+            let article = await this.articleIndex.getById(articleId);
+
+            if (!!!article) {
                 throw new NotAcceptableException('el articulo no existe');
             }
 
@@ -309,7 +312,7 @@ export class ArticlesModelService {
         }
     }
 
-    public async addFavorite(articleId: string, id_usuario: string): Promise<any> {        
+    public async addFavorite(articleId: string, id_usuario: string): Promise<any> {
 
         let existingFavorites = await this.favoriteUserIndex.where({ article: articleId, user: id_usuario });
 
@@ -337,9 +340,9 @@ export class ArticlesModelService {
         let result = await this.favoriteUserIndex.deleteWhere({ article: articleId, user: id_usuario });
 
         if (result.deleted) {
-            try {
-                var article = await this.getArticle(articleId);
-            } catch (error) {
+            let article = await this.articleIndex.getById(articleId);
+
+            if (!!!article) {
                 throw new NotAcceptableException('el articulo no existe');
             }
 
@@ -360,17 +363,17 @@ export class ArticlesModelService {
     }
 
     public deleteArticle = async (id: string): Promise<any> => {
-        
+
         var article = await this.articleIndex.getById(id)
 
-        if(!!!article){
+        if (!!!article) {
             throw new HttpException({
                 "message": `articulo no encontrado`
             }, 404)
-        }        
+        }
 
-        await async.each( article.attached, async (fileName) => {
-            await this.S3BucketService.deleteFile(id,fileName)
+        await async.each(article.attached, async (fileName) => {
+            await this.S3BucketService.deleteFile(id, fileName)
         })
 
         try {
@@ -389,31 +392,31 @@ export class ArticlesModelService {
 
         let pcrc: string = null;
         let cliente: { id: number; cliente: string; };
-        let articleExtas:Partial<Article>;
+        let articleExtas: Partial<Article>;
 
-        if(!!article.category){
-            
+        if (!!article.category) {
+
             var category = await this.categoriesIndex.getById(article.category);
-            
-            if(!!!category){
+
+            if (!!!category) {
                 throw new HttpException({
                     "message": `la categoria '${article.category}' no existe`
                 }, 400)
             }
-    
+
             try {
                 var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
             } catch (error) {
                 console.log(error);
             }
-    
+
             if (isLeaft) {
                 pcrc = category.pcrc;
             } else {
                 throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias');
             }
-    
-            try {            
+
+            try {
                 cliente = await this.pcrcModel.getClienteOfPcrc(pcrc);
             } catch (error) {
                 throw error;
@@ -421,7 +424,7 @@ export class ArticlesModelService {
                     throw new NotFoundException('error al guardar el articulo');
                 }
             }
-    
+
             articleExtas = {
                 pcrc: pcrc,
                 cliente: cliente.id.toString(),
@@ -447,10 +450,10 @@ export class ArticlesModelService {
         }
     }
 
-    public deleteArticleFile = async (articleId:string, filename:string):Promise<any> => {
-        try {
-            var article = await this.getArticle(articleId);
-        } catch (error) {
+    public deleteArticleFile = async (articleId: string, filename: string): Promise<any> => {
+        let article = await this.articleIndex.getById(articleId);
+
+        if (!!!article) {
             throw new NotAcceptableException('el articulo no existe');
         }
 
@@ -470,7 +473,7 @@ export class ArticlesModelService {
         }
     }
 
-    public async addArticleFile(articleId:string, filename:string): Promise<any> {
+    public async addArticleFile(articleId: string, filename: string): Promise<any> {
 
         let updateQuery = {
             'source': 'ctx._source.attached.add(params.file)',
@@ -485,8 +488,8 @@ export class ArticlesModelService {
         return { status: 'updated' };
     }
 
-    public async prueba(): Promise<any>{
-        return await this.articleIndex.aggsWhere({ cliente:'cliente' }, { field:"views", op:"sum" })
+    public async prueba(): Promise<any> {
+        return await this.articleIndex.aggsWhere({ cliente: 'cliente' }, { field: "views", op: "sum" })
     }
 
 

@@ -274,7 +274,7 @@ export class EsClientService extends GenericModel {
                         }
                     })
                     break;
-                    case 'articlesViews':
+                    case 'articlesviews':
                         return await this.esClient.indices.create({
                             index: index,
                             include_type_name: false,
@@ -282,14 +282,19 @@ export class EsClientService extends GenericModel {
                                 "mappings": {
                                     "properties": {
                                         "articleId": { "type": "keyword" },
-                                        "userId": { "type": "keyword" },                                        
+                                        "userId": { "type": "keyword" },
                                         "publicationDate": { "type": "date", "format": 'epoch_millis' },
                                         "modificationDate": { "type": "date", "format": 'epoch_millis' },
                                         "modificationUser": { "type": "keyword" },
                                         "creator": { "type": "keyword" },
                                         "cliente": { "type": "keyword" },
                                         "pcrc": { "type": "keyword" },
-                                        "category": { "type": "keyword" }                                        
+                                        "category": { "type": "keyword" },
+                                        "viewDate": { "type": "date", "format": 'epoch_millis' },
+                                        "director": { "type": "keyword" },
+                                        "gerente": { "type": "keyword" },
+                                        "coordinador": { "type": "keyword" },
+                                        "lider": { "type": "keyword" }
                                     }
                                 }
                             }

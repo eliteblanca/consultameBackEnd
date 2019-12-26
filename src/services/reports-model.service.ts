@@ -2,35 +2,21 @@ import { Injectable, HttpException } from '@nestjs/common';
 import { ArticleIndex, Article } from "../indices/articleIndex";
 import { IsNotEmpty, Length } from 'class-validator';
 import * as R from 'remeda';
+import { ArticlesViewsIndex, articleView } from "../indices/articlesViewsIndex";
 
 enum FiltersToFieldEnum {
     categoria = 'category',
     pcrc = 'pcrc',
-    cliente = 'cliente'
-};
-
-enum DataToFieldEnum {
-    views = 'views',
-    // Lectures, = 
-    favs = 'favorites',
-    likes = 'likes',
-    dislikes = 'disLikes'
+    cliente = 'cliente',
+    articulo = 'articleId',
+    director = 'director',
+    coordinador = 'coordinador',
+    gerente = 'gerente',
+    lider = 'lider'
 };
 
 @Injectable()
-export class ReportsModelService {
-
-    private aceptedFilterField = [
-        'categoria',
-        'pcrc',
-        'cliente',
-
-        'articulo',
-        'director',
-        'coordinador',
-        'gerente',
-        'lider'
-    ]
+export class ReportsModelService {  
 
     private aceptedData = [
         'views',
@@ -46,24 +32,37 @@ export class ReportsModelService {
         'lines'
     ]    
 
-    constructor(private articleIndex:ArticleIndex){  }
+    private esFilters = [
+        'categoria',
+        'pcrc',
+        'cliente'
+    ]
 
-    getReport(fromdate: string, todate: string, filterfield: string, filtervalue: string, data: string): any {
-        if( this.aceptedFilterField.includes(filterfield) && this.aceptedData.includes(data) ){
-            
-            if(!!FiltersToFieldEnum[filterfield] && !!DataToFieldEnum[data]){
-                return this.articleIndex.aggsWhere( R.objOf(filtervalue, FiltersToFieldEnum[filterfield]), { op:"sum",field:DataToFieldEnum[data] })
-            } else {
+    constructor(
+        private articlesViewsIndex:ArticlesViewsIndex
+    ){  }
 
-            }
-
+    async getReport(fromdate: string, todate: string, filterfield: string, filtervalue: string, data: string) {
+        if( !!FiltersToFieldEnum[filterfield] && this.aceptedData.includes(data) ){
+          if( data == 'views' ){
+            return await this.getViewsBy(filterfield, filtervalue)
+          }
         } else {
             let errorCode = 12;
-            
+
             throw new HttpException({
                 "error": `error code: ${errorCode}`,
                 "message": "not_soported"
             }, 400)
         }
     }
+
+    async getViewsBy(filterfield:string, filtervalue:string){
+        if( !!FiltersToFieldEnum[filterfield] ){
+            // return await this.articlesViewsIndex.aggsWhere(R.objOf(filtervalue, FiltersToFieldEnum[filterfield]), { field:"articleId", op:" " })
+        } else {
+
+        }
+    }
+
 }

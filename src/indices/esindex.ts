@@ -89,6 +89,9 @@ export class Esindex<T> {
 
                 } else {
                     errorCode += '04'
+
+                    console.log(error)
+
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,
                         "message": "response_error"
@@ -1365,7 +1368,7 @@ export class Esindex<T> {
         }
 
     }
-    //10
+    //11
     public aggsWhere = async (ops: { [P in keyof T]?: any; }, aggs:{ op: aggsType, field : keyof T }): Promise< number > => {
         try {     
 
@@ -1428,6 +1431,9 @@ export class Esindex<T> {
                     }, 500)
 
                 } else {
+
+                    console.log(error.body.error)
+
                     errorCode += '05'
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,

@@ -30,8 +30,11 @@ export class ArticlesController {
 
     @UseGuards(AuthGuard('jwt'))
     @Get(':id')
-    singleArticle(@Param() singleArticleDTO: SingleArticleDTO): any {
-        return this.articlesModel.getArticle(singleArticleDTO.id);
+    singleArticle(
+        @Param() singleArticleDTO: SingleArticleDTO,
+        @User() user: U
+    ): any {
+        return this.articlesModel.getArticle(singleArticleDTO.id, user.sub);
     }
 
     @UseGuards(AuthGuard('jwt'))
