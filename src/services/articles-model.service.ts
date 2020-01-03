@@ -196,15 +196,12 @@ export class ArticlesModelService {
 
         await this.removeDisLike(articleId, id_usuario);
 
-        try {
-        } catch (error) {
-            throw new NotAcceptableException('el articulo no existe');
-        }
+                
 
         let existinglikes = await this.likeUserIndex.where({ type: 'like', article: articleId, user: id_usuario });
 
         if (!existinglikes.length) {
-            this.likeUserIndex.create({ article: articleId, type: 'like', user: id_usuario });
+            await this.likeUserIndex.create({ article: articleId, type: 'like', user: id_usuario });
 
             let updateQuery = {
                 'source': 'ctx._source.likes.add(params.user)',
@@ -235,7 +232,7 @@ export class ArticlesModelService {
         let existingDislikes = await this.likeUserIndex.where({ type: 'dislike', article: articleId, user: id_usuario });
 
         if (!existingDislikes.length) {
-            this.likeUserIndex.create({ article: articleId, type: 'dislike', user: id_usuario });
+            await this.likeUserIndex.create({ article: articleId, type: 'dislike', user: id_usuario });
 
             let updateQuery = {
                 'source': 'ctx._source.disLikes.add(params.user)',
@@ -259,11 +256,12 @@ export class ArticlesModelService {
 
 
         if (result.deleted) {
+            var article = await this.articleIndex.getById(articleId)
 
-            let article = await this.articleIndex.getById(articleId);
-
-            if (!!!article) {
-                throw new NotAcceptableException('el articulo no existe');
+            if(!!!article){
+                throw new HttpException({
+                    "message": `articulo no encontrado`
+                }, 404)
             }
 
             let index = article.disLikes.findIndex(userId => userId == id_usuario);
@@ -289,10 +287,12 @@ export class ArticlesModelService {
 
 
         if (result.deleted) {
-            let article = await this.articleIndex.getById(articleId);
+            var article = await this.articleIndex.getById(articleId)
 
-            if (!!!article) {
-                throw new NotAcceptableException('el articulo no existe');
+            if(!!!article){
+                throw new HttpException({
+                    "message": `articulo no encontrado`
+                }, 404)
             }
 
             let index = article.likes.findIndex(userId => userId == id_usuario);
@@ -317,7 +317,7 @@ export class ArticlesModelService {
         let existingFavorites = await this.favoriteUserIndex.where({ article: articleId, user: id_usuario });
 
         if (!existingFavorites.length) {
-            this.favoriteUserIndex.create({ article: articleId, user: id_usuario });
+            await this.favoriteUserIndex.create({ article: articleId, user: id_usuario });
 
             let updateQuery = {
                 'source': 'ctx._source.favorites.add(params.user)',
@@ -340,10 +340,12 @@ export class ArticlesModelService {
         let result = await this.favoriteUserIndex.deleteWhere({ article: articleId, user: id_usuario });
 
         if (result.deleted) {
-            let article = await this.articleIndex.getById(articleId);
+            var article = await this.articleIndex.getById(articleId)
 
-            if (!!!article) {
-                throw new NotAcceptableException('el articulo no existe');
+            if(!!!article){
+                throw new HttpException({
+                    "message": `articulo no encontrado`
+                }, 404)
             }
 
             let index = article.favorites.findIndex(userId => userId == id_usuario);
@@ -450,11 +452,13 @@ export class ArticlesModelService {
         }
     }
 
-    public deleteArticleFile = async (articleId: string, filename: string): Promise<any> => {
-        let article = await this.articleIndex.getById(articleId);
+    public deleteArticleFile = async (articleId:string, filename:string):Promise<any> => {
+        var article = await this.articleIndex.getById(articleId)
 
-        if (!!!article) {
-            throw new NotAcceptableException('el articulo no existe');
+        if(!!!article){
+            throw new HttpException({
+                "message": `articulo no encontrado`
+            }, 404)
         }
 
         let index = article.attached.findIndex(fileName => fileName == filename)

@@ -9,9 +9,6 @@ import { CommentsController } from './controllers/comments.controller';
 import { EsClientController } from './controllers/es-client.controller';
 import { NewsController } from './controllers/news.controller';
 import { PcrcController } from './controllers/pcrc.controller';
-import { PermissionsController } from './controllers/permissions.controller';
-import { ResourcesController } from './controllers/resources.controller';
-import { rolesController } from './controllers/roles.controller';
 import { searchController } from './controllers/search.controller';
 import { UploadController } from './controllers/upload.controller';
 import { UsersController } from './controllers/users.controller';
@@ -38,7 +35,6 @@ import { CommentsModelService } from './services/comments-model.service';
 import { EsClientService } from './services/es-client.service';
 import { NewsModelService } from './services/news-model.service';
 import { PcrcModelService } from "./services/pcrc-model.service";
-import { PermissionsModelService } from './services/permissions-model.service';
 import { S3BucketService } from './services/s3-bucket.service';
 import { SearchModelService } from './services/search-model.service';
 import { UserModelService } from './services/user-model.service';
@@ -82,9 +78,6 @@ const secretKey = "123";
     UsersController,
     EsClientController,
     CategoriesController,
-    rolesController,
-    ResourcesController,
-    PermissionsController,
     UploadController,
     NewsController,
     CommentsController,
@@ -99,7 +92,6 @@ const secretKey = "123";
     SearchModelService,
     UserModelService,
     CategoriesModelService,
-    PermissionsModelService,
     NewsModelService,
     ArticleViewsModelService,
     CargosModelService,

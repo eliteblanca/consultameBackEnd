@@ -72,7 +72,7 @@ export class PcrcModelService {
         if (!!user.length) {
 
             if (user[0].pcrc.includes('todos')) {
-                return this.getAllPcrc()
+                return await this.getAllPcrc()
             } else if (user[0].pcrc.length) {
                 let pcrcsEnElastic = await createQueryBuilder<cliente>('Clientes')
                     .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
@@ -190,7 +190,7 @@ export class PcrcModelService {
                             }
                         };
 
-                        this.userIndex.updateScript(cedula, updateQuery);
+                        await this.userIndex.updateScript(cedula, updateQuery);
 
                     } else {
 
@@ -198,7 +198,7 @@ export class PcrcModelService {
                             .where('datosPersonales.documento = :cedula', { cedula: cedula })
                             .getOne()
 
-                        return this.userModel.createUser({
+                        return await this.userModel.createUser({
                             cedula: cedula,
                             nombre: datosPersonales['nombre_completo'],
                             pcrc: [idPcrc],
