@@ -23,11 +23,12 @@ import { ResourcesIndex } from './indices/resourcesIndex';
 import { RolesIndex } from './indices/rolesIndex';
 import { SearchsIndex } from './indices/searchIndex';
 import { UserIndex } from './indices/userIndex';
-import { ArticlesViewsIndex } from "./indices/articlesViewsIndex";
+import { ArticlesEventsIndex } from "./indices/articlesEventsIndex";
 import { Clientes } from "./jarvisEntities/clientes.entity";
 import { datosPersonales } from "./jarvisEntities/datosGenerales.entity";
 import { Pcrc } from "./jarvisEntities/pcrc.entity";
 import { Personal } from "./jarvisEntities/personal.entity";
+import { CentrosCostos } from "./jarvisEntities/centrosCostos.entity";
 import { ArticlesModelService } from './services/articles-model.service';
 import { JwtValidator, LdapService } from './services/auth.service';
 import { CategoriesModelService } from './services/categories-model.service';
@@ -40,9 +41,15 @@ import { SearchModelService } from './services/search-model.service';
 import { UserModelService } from './services/user-model.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ReportsController } from './controllers/reports.controller';
-import { ReportsModelService } from './services/reports-model.service';
-import { ArticleViewsModelService } from "./services/articleViews-model.service";
+import { ArticleEventsModelService } from "./services/articleEvents-model.service";
 import { CargosModelService } from "./services/cargos-model.service";
+import { ReportsModelService } from './services/reports-model.service';
+import { ClientesController } from './controllers/clientes.controller';
+import { DirectoresController } from './controllers/directores.controller';
+import { GerentesController } from './controllers/gerentes.controller';
+import { CoordinadoresController } from './controllers/coordinadores.controller';
+
+
 
 const secretKey = "123";
 
@@ -65,7 +72,8 @@ const secretKey = "123";
         Pcrc,
         Clientes,
         Personal,
-        datosPersonales
+        datosPersonales,
+        CentrosCostos
       ],
       synchronize: false,
     }),
@@ -82,7 +90,11 @@ const secretKey = "123";
     NewsController,
     CommentsController,
     PcrcController,
-    ReportsController
+    ReportsController,
+    ClientesController,
+    DirectoresController,
+    GerentesController,
+    CoordinadoresController
   ],
   providers: [  
     JwtValidator,    
@@ -93,7 +105,7 @@ const secretKey = "123";
     UserModelService,
     CategoriesModelService,
     NewsModelService,
-    ArticleViewsModelService,
+    ArticleEventsModelService,
     CargosModelService,
     CommentsModelService,
     PcrcModelService, 
@@ -106,15 +118,15 @@ const secretKey = "123";
     RolesIndex,
     ResourcesIndex,
     PermissionsIndex,
-    ArticlesViewsIndex,
+    ArticlesEventsIndex,
     S3BucketService,
     NewsIndex,
-    CommentsIndexService,
-    
+    CommentsIndexService,    
     {
       provide: APP_INTERCEPTOR,
       useClass: MorganInterceptor('tiny'),
-    }, ReportsModelService   
+    },
+    ReportsModelService
   ],
 })
 export class AppModule {  }

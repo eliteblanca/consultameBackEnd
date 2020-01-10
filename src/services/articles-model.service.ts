@@ -7,7 +7,8 @@ import { LikeUserIndex } from '../indices/likeUserIndex';
 import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
 import { S3BucketService } from '../services/s3-bucket.service';
 import { PcrcModelService } from "../services/pcrc-model.service";
-import { ArticleViewsModelService } from "../services/articleViews-model.service";
+import { ArticleEventsModelService } from "./articleEvents-model.service";
+import { CargosModelService } from "../services/cargos-model.service";
 import * as async from 'async';
 
 export class SingleArticleDTO {
@@ -62,7 +63,8 @@ export class ArticlesModelService {
         private favoriteUserIndex: FavoriteUserIndex,
         private S3BucketService: S3BucketService,
         private pcrcModel: PcrcModelService,
-        private ArticleViewsModel: ArticleViewsModelService
+        private ArticleViewsModel: ArticleEventsModelService,
+        private cargosModel:CargosModelService
     ) { }
 
     public async getArticlesByCategory(category: string, state: string = 'published', from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> {
@@ -128,7 +130,7 @@ export class ArticlesModelService {
                 'lang': 'painless'
             });
 
-            await this.ArticleViewsModel.createView(article, userId)
+            await this.ArticleViewsModel.createEvent(article, userId, 'view')
 
             return article
 
@@ -194,9 +196,7 @@ export class ArticlesModelService {
 
     public async addLike(articleId: string, id_usuario: string): Promise<any> {
 
-        await this.removeDisLike(articleId, id_usuario);
-
-                
+        await this.removeDisLike(articleId, id_usuario);                
 
         let existinglikes = await this.likeUserIndex.where({ type: 'like', article: articleId, user: id_usuario });
 
@@ -212,6 +212,9 @@ export class ArticlesModelService {
             };
 
             await this.articleIndex.updateScript(articleId, updateQuery);
+
+            await this.ArticleViewsModel.createEvent(articleId, id_usuario, 'like')
+
         } else {
             return new ConflictException('ya has dado like en este articulo');
         }
@@ -223,11 +226,6 @@ export class ArticlesModelService {
     public async addDisLike(articleId: string, id_usuario: string): Promise<any> {
 
         await this.removeLike(articleId, id_usuario);
-
-        try {
-        } catch (error) {
-            throw new NotAcceptableException('el articulo no existe');
-        }
 
         let existingDislikes = await this.likeUserIndex.where({ type: 'dislike', article: articleId, user: id_usuario });
 
@@ -243,6 +241,9 @@ export class ArticlesModelService {
             };
 
             await this.articleIndex.updateScript(articleId, updateQuery);
+
+            await this.ArticleViewsModel.createEvent(articleId, id_usuario, 'dislike')
+
         } else {
             return new ConflictException('ya has dado like en este articulo');
         }
@@ -328,6 +329,9 @@ export class ArticlesModelService {
             };
 
             await this.articleIndex.updateScript(articleId, updateQuery);
+            
+            await this.ArticleViewsModel.createEvent(articleId, id_usuario, 'fav');
+
         } else {
             return new ConflictException('ya has agregado este articulo a tus favoritos');
         }
@@ -493,9 +497,7 @@ export class ArticlesModelService {
     }
 
     public async prueba(): Promise<any> {
-        return await this.articleIndex.aggsWhere({ cliente: 'cliente' }, { field: "views", op: "sum" })
+        // return await this.cargosModel.getClientDirectors('110')
     }
-
-
 
 }

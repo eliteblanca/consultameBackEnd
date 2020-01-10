@@ -48,7 +48,6 @@ export class NewsModelService {
 
             let esQuery: any;
 
-
             if (typeof query == 'undefined') {
                 esQuery = {
                     query: {

@@ -7,7 +7,7 @@ export class EsClientController {
 
     constructor(private esClientService: EsClientService) { }
 
-    @UseGuards(AuthGuard('jwt'))
+    // @UseGuards(AuthGuard('jwt'))
     @Post('index')
     createIndex(
         @Body() body: { index: string }

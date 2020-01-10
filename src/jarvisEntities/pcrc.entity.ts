@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from "typeorm";
 import { Clientes } from "./clientes.entity";
 import { Personal } from "./personal.entity";
+import { CentrosCostos } from "./centrosCostos.entity";
 
 @Entity('dp_pcrc')
 export class Pcrc {
@@ -23,7 +24,8 @@ export class Pcrc {
     @Column()
     id_pcrc: number;
 
-    @Column()
+    @ManyToOne(type => CentrosCostos, centro => centro.pcrcs)
+    @JoinColumn({name:'id_dp_centros_costos'})
     id_dp_centros_costos: number;
 
     @ManyToOne(type => Clientes, cliente => cliente.pcrcs)

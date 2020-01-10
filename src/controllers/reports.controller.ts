@@ -1,26 +1,32 @@
-import { Controller, UseGuards, Get, Param, Query } from '@nestjs/common';
+import { Controller, UseGuards, Get, Param, Query, HttpException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ReportsModelService } from "../services/reports-model.service";
 import { CargosModelService } from "../services/cargos-model.service";
+import { ArticleEventsModelService } from "../services/articleEvents-model.service";
+import { isEvent } from "../indices/articlesEventsIndex";
 
 @Controller('api/reports')
 export class ReportsController {
 
     constructor(
-        private ReportsModel:ReportsModelService,
+        private articleEventsModel:ArticleEventsModelService,
         private cargosModel:CargosModelService
     ){  }
 
     @UseGuards(AuthGuard('jwt'))
-    @Get()
+    @Get('events')
     async getArticles(
         @Query('fromdate')    fromdate:string,
         @Query('todate')      todate:string,
         @Query('filterfield') filterfield:string,
         @Query('filtervalue') filtervalue:string,
-        @Query('data')        data:string
+        @Query('event')       event:string
     ): Promise<any> {
-        // return this.ReportsModel.getReport(fromdate, todate, filterfield, filtervalue, data);
-        return this.cargosModel.getAllBoss('948874814091993')
+        if(isEvent(event)){
+            return this.articleEventsModel.getEventCountBy(event, filterfield, filtervalue, fromdate, todate)
+        } else {
+            throw new HttpException({
+                "message": "evento no soportado"
+            }, 400)
+        }        
     }
 }

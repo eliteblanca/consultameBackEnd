@@ -2,7 +2,7 @@ import { Injectable, ConflictException, HttpException } from '@nestjs/common';
 import { CommentsIndexService, comment } from "../indices/commentsIndex.service";
 import { Article, ArticleIndex } from "../indices/articleIndex";
 import { IsOptional, Length } from 'class-validator';
-
+import { ArticleEventsModelService } from "../services/articleEvents-model.service";
 export class commentDTO {
     
     @Length(20, 20, { message: 'debes proporcionar un id valido' })
@@ -18,7 +18,8 @@ export class CommentsModelService {
 
     constructor(
         private commentsIndex: CommentsIndexService,
-        private articleIndex: ArticleIndex
+        private articleIndex: ArticleIndex,
+        private articleEventsModel: ArticleEventsModelService
     ) { }
 
     getComments = async (articleId: string, from:string = '0' , size:string = '10' ): Promise<comment[]> => {
@@ -55,6 +56,7 @@ export class CommentsModelService {
     }
 
     postComment = async (newComment:commentDTO, articleId:string, userId:string, username:string): Promise<comment & { id: string; }> => {
+
         if( newComment.replyTo ){
 
             let replyComment:comment;
@@ -69,7 +71,6 @@ export class CommentsModelService {
                 }, 404)
 
             }
-
             
             replyComment = await this.commentsIndex.getById(newComment.replyTo)
 
@@ -94,6 +95,8 @@ export class CommentsModelService {
             username:username,
             article: articleId
         }
+
+        await this.articleEventsModel.createEvent(articleId, userId, 'comment')
 
         return await this.commentsIndex.create({ ...newComment, ...commnetExtras })
     }

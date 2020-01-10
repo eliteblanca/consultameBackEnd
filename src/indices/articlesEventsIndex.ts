@@ -1,7 +1,13 @@
 import { Esindex } from "./esindex";
 import { Injectable } from "@nestjs/common";
 
-export class articleView {
+export type posibleEvents = 'view'|'fav'|'like'|'dislike'|'lecture'|'comment';
+
+export function isEvent(arg: any): arg is posibleEvents {
+    return ['view','fav','like','dislike','lecture','comment'].includes(arg);
+}
+
+export class articleEvent {
     articleId:string;
     userId:string;
     publicationDate:number;
@@ -11,18 +17,19 @@ export class articleView {
     cliente:string;
     pcrc:string;
     category:string;
-    viewDate:number;
+    eventDate:number;
     director:string;
     gerente:string;
     coordinador:string;
     lider:string;
+    event:posibleEvents;
 }
 
 @Injectable()
-export class ArticlesViewsIndex extends Esindex<articleView> {
+export class ArticlesEventsIndex extends Esindex<articleEvent> {
 
     constructor(){
-        super('articlesviews')
+        super('articlesevents')
     }
 
 }
