@@ -16,12 +16,12 @@ export class S3BucketService {
         accessKeyId: 'AKIA36TUP7PLRILOAXGK',
         secretAccessKey: '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',
         region: 'us-west-1',
-        sslEnabled:false        
+        sslEnabled:false
     });
 
     async uploadFile(idArticle: string, file: any) {
         let params = { 
-            Bucket: 'multiconsultakonecta',
+            Bucket: 'bucketpruebaconsultamekonecta',
             Key: `${idArticle}/${file.originalname}`,
             Body: file.buffer,
             ContentType: file.mimetype
@@ -33,7 +33,7 @@ export class S3BucketService {
 
             let articlefileUploadResul = await this.articlesModel.addArticleFile(idArticle, file.originalname)
 
-        }catch(err){
+        } catch(err) {
             console.log(err)
             throw new InternalServerErrorException('error al guardar el archivo');
         }
