@@ -76,31 +76,33 @@ export class ArticleEventsModelService {
             return await this.articlesEventsIndex.create(view)
         }
 
-
     }
 
-    async getEventCountBy(event:articleEvent['event'], filterfield:string, filtervalue:string, fromdate: string, todate: string){
-        if( !!eventCategories[filterfield] ){
+    async getEventCountBy(event:articleEvent['event'], filters:{ filter:string, value:string }[], fromdate: string, todate: string){
 
-            let query = {
-                query: {
-                    bool: {
-                        filter: [
-                            { term: R.objOf(filtervalue, eventCategories[filterfield] ) },
-                            { term:  { event: event } },
-                            { range: { eventDate: { lt: todate } } },
-                            { range: { eventDate: { gt: fromdate } } }
-                        ]
-                    }
+        let filtersObj:any[] = [
+            { term:  { event: event } },
+            { range: { eventDate: { lt: todate } } },
+            { range: { eventDate: { gt: fromdate } } }
+        ]
+
+        filters.forEach(filter => {
+            let newFilter = { term: R.objOf(filter.value, eventCategories[filter.filter] ) }
+            filtersObj.push(newFilter)
+        })
+
+        let query = {
+            query: {
+                bool: {
+                    filter: filtersObj
                 }
             }
+        }
 
-            return await this.articlesEventsIndex.count(query);
-            // return await this.articlesViewsIndex.all)();
+        let result = await this.articlesEventsIndex.count(query)
 
-        } else {
-            
+        return {
+            value: result
         }
     }
-
 }
