@@ -28,4 +28,18 @@ export class ReportsController {
             }, 400)
         }
     }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('count')
+    async getArticlesCount(
+        @Query('date') date:string,
+        @Query('item') item:string,
+        @Body() filters: { filters:{ filter:string, value:string }[] }
+    ): Promise<any> {
+        if(item == 'articles'){
+            return this.articleEventsModel.getArticlesCountBy(date, 'published', filters.filters)
+        } else {
+            return this.articleEventsModel.getFavoritesCountBy(date, filters.filters, item)
+        }
+    }
 }

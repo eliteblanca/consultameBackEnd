@@ -19,9 +19,7 @@ export class ArticlesController {
     @Get('prueba')
     async getPrueba(): Promise<any> {
         try {
-            
             return this.articlesModel.prueba();
-
         } catch (error) {
             throw error;
             
@@ -39,8 +37,11 @@ export class ArticlesController {
 
     @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
-    deleteArticle(@Param() singleArticleDTO: SingleArticleDTO): any {
-        return this.articlesModel.deleteArticle(singleArticleDTO.id);
+    deleteArticle(
+        @Param() singleArticleDTO: SingleArticleDTO,        
+        @User() user: U,
+    ): any {
+        return this.articlesModel.deleteArticle(singleArticleDTO.id, user.sub);
     }
 
     @UseGuards(AuthGuard('jwt'))
@@ -97,4 +98,12 @@ export class ArticlesController {
     removeFavorite(@Param('id') idArticulo, @User() user: U): any {
         return this.articlesModel.removeFavorite(idArticulo, user.sub);
     }
+    
+    @UseGuards(AuthGuard('jwt'))
+    @Get(':id/history')
+    articleHistory(
+        @Param('id') idArticulo:string
+    ): any {
+        return this.articlesModel.getArticleHistory(idArticulo)
+    }   
 }

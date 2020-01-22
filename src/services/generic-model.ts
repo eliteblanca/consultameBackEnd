@@ -9,7 +9,10 @@ export class GenericModel {
         if (process.env.NODE_ENV == 'development') {
             this.esClient = new Client({
                 node: PUNTO_DE_ENLACE,
-                requestTimeout: 10000
+                requestTimeout: 10000,
+                ssl: {
+                    rejectUnauthorized: false
+                }
             })
             
         } else {

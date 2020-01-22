@@ -20,11 +20,10 @@ export type client = {
 @Injectable()
 export class CargosModelService {
 
-    constructor( private pcrcModel:PcrcModelService ){ 
+    constructor( private pcrcModel:PcrcModelService ){  }
 
-    }
+    async getBoss(cedula:string):Promise<{documento:string}>{       
 
-    async getBoss(cedula:string):Promise<{documento:string}>{
         return await createQueryBuilder<{documento:string}>('Personal')
                 .select(['Personal.documento_jefe as documento'])
                 .where('Personal.documento = :documento',{ documento: cedula })                
@@ -49,7 +48,7 @@ export class CargosModelService {
         info.gerente = gerente.documento
 
         let director = await this.getBoss(info.gerente)
-        
+
         info.director = director.documento
 
         return info
@@ -68,7 +67,7 @@ export class CargosModelService {
           .filter(e => arr[e]).map(e => arr[e]);
       
          return unique;
-      }
+    }
 
     async getClientDirectors(clientId:string, userId:string):Promise<personData[]>{           
 
@@ -248,6 +247,65 @@ export class CargosModelService {
 
         return filteredResult
 
+    }
+
+    async getUserPcrc(userId:string){
+        const entityManager = getManager();
+
+        let pcrc:{ cod_pcrc:string, pcrc:string, id_dp_pcrc: string }
+            = await entityManager.query(sqlstring.format(`
+                select
+                    b.cod_pcrc,
+                    dp.pcrc,
+                    dp.id_dp_pcrc
+                from dp_distribucion_personal b
+                inner join (
+                    select
+                        max(a.fecha_actual) fecha,
+                        a.documento documento
+                    from dp_distribucion_personal a
+                    group by a.documento
+                
+                ) c
+                on c.documento = b.documento and c.fecha = b.fecha_actual
+                inner join dp_pcrc dp on b.cod_pcrc = dp.cod_pcrc
+                where
+                b.documento = ?
+            `,[ userId ])
+        )
+
+        return pcrc
+
+    }
+
+    getGerentePcrcs = async (gerenteId) => {
+        const entityManager = getManager();
+
+        let pcrcs:{ cod_pcrc:string, pcrc:string, id_dp_pcrc: string }[]
+            = await entityManager.query(sqlstring.format(`
+            select b.cod_pcrc, b.id_dp_pcrc, b.pcrc
+            from dp_centros_costos a
+            inner join dp_pcrc b on a.id_dp_centros_costos = b.id_dp_centros_costos
+            where a.documento_gerente = ?
+            `,[ gerenteId ])
+        )
+
+        return pcrcs
+    }
+
+    getDirectorPcrc = async (directorId) => {
+        const entityManager = getManager();
+
+        let pcrcs:{ cod_pcrc:string, pcrc:string, id_dp_pcrc: string }[]
+            = await entityManager.query(sqlstring.format(`
+            select b.cod_pcrc, b.id_dp_pcrc, b.pcrc
+            from dp_centros_costos a
+            inner join dp_pcrc b on a.id_dp_centros_costos = b.id_dp_centros_costos
+            where a.documento_director = ?
+            `,[ directorId ])
+        )
+
+        return pcrcs
     }
 
 }

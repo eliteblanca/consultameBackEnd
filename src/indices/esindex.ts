@@ -15,8 +15,10 @@ export class Esindex<T> {
             console.log('dev')
             this.esClient = new Client({
                 node: PUNTO_DE_ENLACE,
-                requestTimeout: 10000
-                
+                requestTimeout: 10000,
+                ssl: {
+                    rejectUnauthorized: false
+                }
             })
         } else {
             this.esClient = new Client({
@@ -300,6 +302,8 @@ export class Esindex<T> {
             return R.map((x: any) => R.addProp(x._source, 'id', x._id))(result.body.hits.hits)
 
         } catch (error) {
+
+            console.log(error)
 
             let errorCode = '03';
 
@@ -1007,7 +1011,7 @@ export class Esindex<T> {
                 }
             })
 
-        } catch (error) {
+        } catch (error) {            
 
             let errorCode = '08';
 
@@ -1291,6 +1295,9 @@ export class Esindex<T> {
                     }, 500)
 
                 } else {
+
+                    console.log(error.meta.body)
+
                     errorCode += '05'
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,
@@ -1400,7 +1407,7 @@ export class Esindex<T> {
             return result.body.aggregations.operation.value
 
         } catch (error) {
-
+            console.log(error)
             let errorCode = '11';
 
             if (error instanceof errors.ResponseError) {/* 01 */
@@ -1464,6 +1471,9 @@ export class Esindex<T> {
                     }, 500)
 
                 } else {
+
+                   
+
                     errorCode += '02'
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,
@@ -1646,6 +1656,6 @@ export class Esindex<T> {
         }
 
 
-    }
+    }   
 
 }

@@ -24,6 +24,9 @@ import { RolesIndex } from './indices/rolesIndex';
 import { SearchsIndex } from './indices/searchIndex';
 import { UserIndex } from './indices/userIndex';
 import { ArticlesEventsIndex } from "./indices/articlesEventsIndex";
+import { ArticleStateIndex } from "./indices/articleStatesIndex";
+import { FavoriteStatesIndex } from "./indices/favoriteStatesIndex";
+
 import { Clientes } from "./jarvisEntities/clientes.entity";
 import { datosPersonales } from "./jarvisEntities/datosGenerales.entity";
 import { Pcrc } from "./jarvisEntities/pcrc.entity";
@@ -119,9 +122,11 @@ const secretKey = "123";
     ResourcesIndex,
     PermissionsIndex,
     ArticlesEventsIndex,
+    ArticleStateIndex,
     S3BucketService,
     NewsIndex,
     CommentsIndexService,    
+    FavoriteStatesIndex,
     {
       provide: APP_INTERCEPTOR,
       useClass: MorganInterceptor('tiny'),
