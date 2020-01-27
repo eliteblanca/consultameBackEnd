@@ -6,6 +6,8 @@ import { articleEvent, ArticlesEventsIndex } from "../indices/articlesEventsInde
 import { ArticleStateIndex } from "../indices/articleStatesIndex";
 import { CargosModelService } from "./cargos-model.service";
 import { FavoriteStatesIndex } from "../indices/favoriteStatesIndex";
+import { ArticlesViewsIndex } from "../indices/articleViewsIndex";
+import { json } from 'express';
 
 enum eventCategories {
     categoria = 'category',
@@ -26,7 +28,8 @@ export class ArticleEventsModelService {
         private cargosModel: CargosModelService,
         private articleIndex: ArticleIndex,
         private articleStateIndex: ArticleStateIndex,
-        private favoriteStatesIndex: FavoriteStatesIndex
+        private favoriteStatesIndex: FavoriteStatesIndex,
+        private articlesViewsIndex: ArticlesViewsIndex,
     ) { }
 
     createEvent = async (article: Article & { id: string; } | string, userId: string, event: articleEvent['event']) => {
@@ -171,7 +174,7 @@ export class ArticleEventsModelService {
             }
     }
 
-    getFavoritesCountBy = async (fromdate: string, filters: { filter: string, value: string }[], state:string) => {
+    getVotesCountBy = async (fromdate: string, filters: { filter: string, value: string }[], state:string) => {
         let filtersObj: any[] = [            
             { term:  { state: state } },
             { range: { initialDate: { lt: fromdate } } },
@@ -196,6 +199,161 @@ export class ArticleEventsModelService {
         return {
             value: result
         }
+    }
+
+    getViewsCountBy = async (todate: string, filters: { filter: string, value: string }[], minDuration:number = 0, maxDuration:number = 999999999) => {
+
+        let filtersObj: any[] = [      
+            { range: { duration: { lt: maxDuration } } },
+            { range: { duration: { gt: minDuration } } },
+            { range: { initialDate: { lt: todate } } },
+            { range: { finalDate: { lt: todate } } }
+        ]
+
+        filters.forEach(filter => {
+            let newFilter = { term: R.objOf(filter.value, eventCategories[filter.filter]) }
+            filtersObj.push(newFilter)
+        })
+
+        let query = {
+            query: {
+                bool: {
+                    filter: filtersObj
+                }
+            }
+        }
+
+        let result = await this.articlesViewsIndex.count(query)
+
+        return {
+            value: result
+        }
+    }
+
+    getFullReport = async (filters: { filter: string, value: string }[], date: number, from:number, to:number) => {
+
+        // -> articulos ordenados por titulo
+        let filtersObj: any[] = [
+            { term: { state: 'published' } },
+            { range: { initialDate: { lt: date } } },
+            { range: { finalDate: { gt: date } } }
+        ]
+
+        await async.each(filters, async ({ filter, value }:{ filter: string, value: string }) => {
+
+            var newFilter:any
+
+            if(filter == 'gerente'){
+                let pcrcs = await this.cargosModel.getGerentePcrcs(value)
+
+                newFilter = {                    
+                    terms : {
+                        pcrc : pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())
+                    }
+                }
+
+            } else if( filter == 'director' ){
+                let pcrcs = await this.cargosModel.getDirectorPcrc(value)
+
+                newFilter = {
+                    terms : {
+                        pcrc : pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())
+                    }
+                }
+
+            } else if(filter == 'coordinador' || filter == 'lider'){
+
+                let pcrc = await this.cargosModel.getUserPcrc(value)
+
+                newFilter = { term: R.objOf(pcrc.id_dp_pcrc, eventCategories['pcrc']) }
+
+            } else {
+                newFilter = { term: R.objOf(value, eventCategories[filter]) }
+            }
+
+            filtersObj.push(newFilter)
+        })
+
+        let query = {
+            query: {
+                bool: {
+                    filter: filtersObj
+                }
+            },
+            from: from,
+            size: to,
+            sort: [
+                { initialDate :{ order: 'asc' }} // R.objOf(key)(value) = {key : value}
+            ]
+        }
+
+        let result = await this.articleStateIndex.query(query)
+
+        return {
+            value: result
+        }
+
+
+
+// ------------------------------------------------
+
+
+        // let filtersObj: any[] = [
+        //     { term: { state: state } },
+        //     { range: { initialDate: { lt: fromdate } } },
+        //     { range: { finalDate: { gt: fromdate } } }
+        // ]
+
+        // await async.each(filters, async ({ filter, value }:{ filter: string, value: string }) => {
+
+        //     var newFilter:any
+
+        //     if(filter == 'gerente'){
+        //         let pcrcs = await this.cargosModel.getGerentePcrcs(value)
+
+        //         newFilter = {
+        //             terms : {
+        //                 pcrc : pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())
+        //             }
+        //         }
+
+        //     } else if( filter == 'director' ){
+        //         let pcrcs = await this.cargosModel.getDirectorPcrc(value)
+
+        //         newFilter = {
+        //             terms : {
+        //                 pcrc : pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())
+        //             }
+        //         }
+
+        //     } else if(filter == 'coordinador' || filter == 'lider'){
+
+        //         let pcrc = await this.cargosModel.getUserPcrc(value)
+
+        //         newFilter = { term: R.objOf(pcrc.id_dp_pcrc, eventCategories['pcrc']) }
+
+        //     } else {
+
+        //         newFilter = { term: R.objOf(value, eventCategories[filter]) }
+
+        //     }
+
+        //     filtersObj.push(newFilter)
+        // })
+
+        // let query = {
+        //     query: {
+        //         bool: {
+        //             filter: filtersObj
+        //         }
+        //     }
+        // }
+
+        // let result = await this.articleStateIndex.count(query)
+
+        // return {
+        //     value: result
+        // }
     }
 
 }

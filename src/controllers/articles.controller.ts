@@ -2,7 +2,7 @@ import { Controller, UseGuards, Post, Get, Query, Param, Body, Delete, Put } fro
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../user.decorator';
 import { User as U } from '../entities/user';
-import { ArticlesModelService, articleDTO, SingleArticleDTO } from '../services/articles-model.service';
+import { ArticlesModelService, articleDTO, SingleArticleDTO, articleViewsDTO } from '../services/articles-model.service';
 import { SearchModelService } from '../services/search-model.service';
 
 @Controller('api/articles')
@@ -106,4 +106,14 @@ export class ArticlesController {
     ): any {
         return this.articlesModel.getArticleHistory(idArticulo)
     }   
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post(':id/views')
+    addViews(
+        @Param('id') idArticulo,
+        @User() user: U,
+        @Body() body: articleViewsDTO
+    ): any {
+        return this.articlesModel.addArticleView(idArticulo, body.initialDate, body.finalDate, user.sub)
+    }
 }

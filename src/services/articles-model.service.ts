@@ -1,17 +1,18 @@
-import { Injectable, NotFoundException, NotAcceptableException, ConflictException, forwardRef, Inject, HttpException } from '@nestjs/common';
-import { CategoriesModelService } from '../services/categories-model.service';
-import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn, Length } from 'class-validator';
-import { ArticleIndex, Article } from '../indices/articleIndex';
-import { CategoriesIndex, category } from '../indices/categoriesIndex';
-import { LikeUserIndex } from '../indices/likeUserIndex';
-import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
-import { S3BucketService } from '../services/s3-bucket.service';
-import { PcrcModelService } from "../services/pcrc-model.service";
-import { ArticleEventsModelService } from "./articleEvents-model.service";
-import { CargosModelService } from "../services/cargos-model.service";
+import { ConflictException, forwardRef, HttpException, Inject, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import * as async from 'async';
-import { ArticleStateIndex, ArticleState } from "../indices/articlestatesIndex";
-import { FavoriteStatesIndex, favoritestate } from "../indices/favoriteStatesIndex";
+import { IsDate, IsNotEmpty, IsOptional, Length, MaxLength, MinLength } from 'class-validator';
+import { Article, ArticleIndex } from '../indices/articleIndex';
+import { ArticleState, ArticleStateIndex } from "../indices/articlestatesIndex";
+import { CategoriesIndex } from '../indices/categoriesIndex';
+import { FavoriteStatesIndex } from "../indices/favoriteStatesIndex";
+import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
+import { LikeUserIndex } from '../indices/likeUserIndex';
+import { CargosModelService } from "../services/cargos-model.service";
+import { CategoriesModelService } from '../services/categories-model.service';
+import { PcrcModelService } from "../services/pcrc-model.service";
+import { S3BucketService } from '../services/s3-bucket.service';
+import { ArticleEventsModelService } from "./articleEvents-model.service";
+import { ArticlesViewsIndex } from "../indices/articleViewsIndex";
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: 'debes proporcionar un id de articulo' })
@@ -51,6 +52,11 @@ export class articleDTO {
 
 }
 
+export class articleViewsDTO {
+    initialDate:number
+    finalDate:number
+}
+
 type group = { category: string } | { pcrc: string } | { cliente: string };
 
 @Injectable()
@@ -69,6 +75,7 @@ export class ArticlesModelService {
         private cargosModel:CargosModelService,
         private articleStateIndex:ArticleStateIndex,
         private favoriteStatesIndex:FavoriteStatesIndex,
+        private articlesViewsIndex:ArticlesViewsIndex,
 
     ) { }
 
@@ -238,7 +245,7 @@ export class ArticlesModelService {
 
             await this.articleIndex.updateScript(articleId, updateQuery);
 
-            await this.updateFavoriteState({
+            await this.updateVotesState({
                 articleId: articleId,
                 category: article.category,
                 cliente: article.cliente,
@@ -285,7 +292,7 @@ export class ArticlesModelService {
 
             await this.ArticleEventsModel.createEvent(articleId, id_usuario, 'dislike')
 
-            await this.updateFavoriteState({
+            await this.updateVotesState({
                 articleId: articleId,
                 category: article.category,
                 cliente: article.cliente,
@@ -325,7 +332,7 @@ export class ArticlesModelService {
 
                 await this.articleIndex.updateScript(articleId, updateQuery)
 
-                await this.updateFavoriteState({
+                await this.updateVotesState({
                     articleId: articleId,
                     category: article.category,
                     cliente: article.cliente,
@@ -361,7 +368,7 @@ export class ArticlesModelService {
 
                 await this.articleIndex.updateScript(articleId, updateQuery);
 
-                await this.updateFavoriteState({
+                await this.updateVotesState({
                     articleId: articleId,
                     category: article.category,
                     cliente: article.cliente,
@@ -392,7 +399,7 @@ export class ArticlesModelService {
 
             let article = await this.articleIndex.getById(articleId)
 
-            await this.updateFavoriteState({
+            await this.updateVotesState({
                 articleId:article.id,
                 category:article.category,
                 cliente:article.cliente,
@@ -430,7 +437,7 @@ export class ArticlesModelService {
 
                 await this.articleIndex.updateScript(articleId, updateQuery);
 
-                await this.updateFavoriteState({
+                await this.updateVotesState({
                     articleId: articleId,
                     category: article.category,
                     cliente: article.cliente,
@@ -572,7 +579,7 @@ export class ArticlesModelService {
         })
     }
 
-    private updateFavoriteState = async (articleInfo:{ articleId:string, category:string, cliente: string, pcrc:string }, userId:string, operation:'add' | 'delete', state:'favorite' | 'like' | 'dislike') => {
+    private updateVotesState = async (articleInfo:{ articleId:string, category:string, cliente: string, pcrc:string }, userId:string, operation:'add' | 'delete', state:'favorite' | 'like' | 'dislike') => {
 
         if(operation == 'add'){
 
@@ -660,7 +667,7 @@ export class ArticlesModelService {
     }
 
     public async prueba(): Promise<any> {
-        return await this.favoriteStatesIndex.all()
+        return await this.articlesViewsIndex.all()
     }
 
     public getArticleHistory = async (articleId:string) => {
@@ -668,6 +675,40 @@ export class ArticlesModelService {
         let history = await this.articleStateIndex.where({ articleId: articleId })
 
         return history
+    }
+
+    public addArticleView = async (articleId:string, initialDate:number, finalDate:number, userId:string) => {
+
+        var article = await this.articleIndex.getById(articleId)        
+
+        if (!!!article) {
+            throw new HttpException({
+                "message": `articulo no encontrado`
+            }, 404)
+        }
+
+        let allboss = await this.cargosModel.getAllBoss(userId)        
+
+        await this.articlesViewsIndex.create({
+            articleId: articleId,
+            category: article.category,
+            cliente: article.cliente,
+            pcrc: article.pcrc,
+            coordinador: allboss.coordinador,
+            director: allboss.director,
+            gerente: allboss.gerente,
+            lider: allboss.lider,
+            user: userId,
+            initialDate: initialDate,
+            finalDate: finalDate,
+            duration: finalDate - initialDate
+        })
+
+        console.log('created')
+
+        return {
+            status:'created'
+        }
     }
 
 }

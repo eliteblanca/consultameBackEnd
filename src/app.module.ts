@@ -26,6 +26,7 @@ import { UserIndex } from './indices/userIndex';
 import { ArticlesEventsIndex } from "./indices/articlesEventsIndex";
 import { ArticleStateIndex } from "./indices/articleStatesIndex";
 import { FavoriteStatesIndex } from "./indices/favoriteStatesIndex";
+import { ArticlesViewsIndex } from "./indices/articleViewsIndex";
 
 import { Clientes } from "./jarvisEntities/clientes.entity";
 import { datosPersonales } from "./jarvisEntities/datosGenerales.entity";
@@ -127,6 +128,7 @@ const secretKey = "123";
     NewsIndex,
     CommentsIndexService,    
     FavoriteStatesIndex,
+    ArticlesViewsIndex,
     {
       provide: APP_INTERCEPTOR,
       useClass: MorganInterceptor('tiny'),

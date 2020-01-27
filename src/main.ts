@@ -18,11 +18,11 @@ async function bootstrap() {
     const httpsOptions = {
       key: fs.readFileSync('../../../../../../../../key.pem'),
       cert: fs.readFileSync('../../../../../../../../cert.pem'),
-    };
+    }
 
     var app = await NestFactory.create<NestExpressApplication>(AppModule,{
       httpsOptions
-    });
+    })
 
   } catch (error) {
       var app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -39,9 +39,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({transform: true}));
 
   app.useGlobalFilters(new DefaultPageFilter())
-
   
-
   await app.listen(process.env.PORT);
 
   console.log(`Listen in port ${process.env.PORT}`)

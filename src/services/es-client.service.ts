@@ -346,7 +346,30 @@ export class EsClientService extends GenericModel {
                         }
                     })
                     break;
-
+                case 'views':
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body: {
+                            "mappings": {
+                                "properties": {
+                                    "initialDate": { "type": "date", "format": 'epoch_millis' },
+                                    "finalDate": { "type": "date", "format": 'epoch_millis' },
+                                    "articleId": { "type": "keyword" },
+                                    "duration":{ "type": "integer" },
+                                    "user": { "type": "keyword" },
+                                    "cliente": { "type": "keyword" },
+                                    "pcrc": { "type": "keyword" },
+                                    "category": { "type": "keyword" },
+                                    "director": { "type": "keyword" },
+                                    "gerente": { "type": "keyword" },
+                                    "coordinador": { "type": "keyword" },
+                                    "lider": { "type": "keyword" }
+                                }
+                            }
+                        }
+                    })
+                    break;
                 default:
                     break;
             }
