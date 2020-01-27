@@ -4,7 +4,9 @@ import * as fs from 'fs';
 import * as R from 'remeda';
 
 // const PUNTO_DE_ENLACE: string = "https://search-consultamekonecta-xsvrb6f5gky3alwbp3xw7v4e74.us-1.es.com";
-const PUNTO_DE_ENLACE: string = "https://search-consultamekonecta-xsvrb6f5gky3alwbp3xw7v4e74.us-west-1.es.amazonaws.com";
+// const PUNTO_DE_ENLACE: string = "https://search-consultamekonecta-xsvrb6f5gky3alwbp3xw7v4e74.us-west-1.es.amazonaws.com";
+const PUNTO_DE_ENLACE: string = process.env.ES_PUNTO_ENLACE;
+
 type aggsType = 'sum' | 'avg';
 
 export class Esindex<T> {
