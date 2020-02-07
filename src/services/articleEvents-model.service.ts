@@ -6,19 +6,13 @@ import { articleEvent, ArticlesEventsIndex } from "../indices/articlesEventsInde
 import { ArticleStateIndex } from "../indices/articleStatesIndex";
 import { CargosModelService } from "./cargos-model.service";
 import { FavoriteStatesIndex } from "../indices/favoriteStatesIndex";
-import { ArticlesViewsIndex } from "../indices/articleViewsIndex";
-import { json } from 'express';
+import { ArticlesViewsIndex, articleView } from "../indices/articleViewsIndex";
+import { PcrcModelService, cliente } from "../services/pcrc-model.service";
+import { CommentsIndexService } from "../indices/commentsIndex.service";
+import { CategoriesModelService } from "../services/categories-model.service";
+import { category } from "../indices/categoriesIndex";
+import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
 
-enum eventCategories {
-    categoria = 'category',
-    pcrc = 'pcrc',
-    cliente = 'cliente',
-    articulo = 'articleId',
-    director = 'director',
-    coordinador = 'coordinador',
-    gerente = 'gerente',
-    lider = 'lider'
-};
 
 @Injectable()
 export class ArticleEventsModelService {
@@ -30,6 +24,10 @@ export class ArticleEventsModelService {
         private articleStateIndex: ArticleStateIndex,
         private favoriteStatesIndex: FavoriteStatesIndex,
         private articlesViewsIndex: ArticlesViewsIndex,
+        private pcrcModel: PcrcModelService,
+        private commentsIndex: CommentsIndexService,
+        private categoriesModel: CategoriesModelService,
+        private articleChangesIndex: ArticleChangesIndex,
     ) { }
 
     createEvent = async (article: Article & { id: string; } | string, userId: string, event: articleEvent['event']) => {
@@ -95,7 +93,7 @@ export class ArticleEventsModelService {
         ]
 
         filters.forEach(filter => {
-            let newFilter = { term: R.objOf(filter.value, eventCategories[filter.filter]) }
+            let newFilter = { term: R.objOf(filter.value, filter.filter) }
             filtersObj.push(newFilter)
         })
 
@@ -112,6 +110,38 @@ export class ArticleEventsModelService {
         return {
             value: result
         }
+    }
+
+    getEventsBy = async (event: articleEvent['event'], filters: { filter: string, value: string }[], fromdate: string, todate: string, from:number, to:number ) => {
+
+        let filtersObj: any[] = [
+            { term: { event: event } },
+            { range: { eventDate: { lt: todate } } },
+            { range: { eventDate: { gt: fromdate } } }
+        ]
+
+        filters.forEach(filter => {
+            let newFilter = { term: R.objOf(filter.value, filter.filter) }
+            filtersObj.push(newFilter)
+        })
+        
+        let query = {
+            query: {
+                bool: {
+                    filter: filtersObj
+                }
+            },
+            from: from,
+            size: to,
+            sort: [
+                { eventDate :{ order: 'asc' }} // R.objOf(key)(value) = {key : value}
+            ]
+        }
+            
+        let result = await this.articlesEventsIndex.query(query)
+
+        return result
+        
     }
 
     getArticlesCountBy = async (fromdate: string, state:string, filters: { filter: string, value: string }[]) => {
@@ -148,11 +178,11 @@ export class ArticleEventsModelService {
 
                     let pcrc = await this.cargosModel.getUserPcrc(value)
 
-                    newFilter = { term: R.objOf(pcrc.id_dp_pcrc, eventCategories['pcrc']) }
+                    newFilter = { term: R.objOf(pcrc.id_dp_pcrc, 'pcrc') }
 
                 } else {
 
-                    newFilter = { term: R.objOf(value, eventCategories[filter]) }
+                    newFilter = { term: R.objOf(value, filter) }
 
                 }
 
@@ -182,7 +212,7 @@ export class ArticleEventsModelService {
         ]
 
         filters.forEach(filter => {
-            let newFilter = { term: R.objOf(filter.value, eventCategories[filter.filter]) }
+            let newFilter = { term: R.objOf(filter.value, filter.filter) }
             filtersObj.push(newFilter)
         })
 
@@ -201,7 +231,8 @@ export class ArticleEventsModelService {
         }
     }
 
-    getViewsCountBy = async (todate: string, filters: { filter: string, value: string }[], minDuration:number = 0, maxDuration:number = 999999999) => {
+    getViewsCountBy = async (todate: string, filters: { filter: keyof articleView, value: string }[], minDuration:number = 0, maxDuration:number = 999999999) => {
+
 
         let filtersObj: any[] = [      
             { range: { duration: { lt: maxDuration } } },
@@ -211,7 +242,7 @@ export class ArticleEventsModelService {
         ]
 
         filters.forEach(filter => {
-            let newFilter = { term: R.objOf(filter.value, eventCategories[filter.filter]) }
+            let newFilter = { term: R.objOf(filter.value, filter.filter) }
             filtersObj.push(newFilter)
         })
 
@@ -228,7 +259,34 @@ export class ArticleEventsModelService {
         return {
             value: result
         }
-    }
+    }    
+
+    getViewsBy = async (todate: string, filters: { filter: keyof articleView, value: string }[], minDuration:number = 0, maxDuration:number = 999999999) => {
+
+        let filtersObj: any[] = [      
+            { range: { duration: { lt: maxDuration } } },
+            { range: { duration: { gt: minDuration } } },
+            { range: { initialDate: { lt: todate } } },
+            { range: { finalDate: { lt: todate } } }
+        ]
+
+        filters.forEach(filter => {
+            let newFilter = { term: R.objOf(filter.value, filter.filter) }
+            filtersObj.push(newFilter)
+        })
+
+        let query = {
+            query: {
+                bool: {
+                    filter: filtersObj
+                }
+            }
+        }
+
+        let result = await this.articlesViewsIndex.query(query)
+
+        return result
+    } 
 
     getFullReport = async (filters: { filter: string, value: string }[], date: number, from:number, to:number) => {
 
@@ -265,10 +323,10 @@ export class ArticleEventsModelService {
 
                 let pcrc = await this.cargosModel.getUserPcrc(value)
 
-                newFilter = { term: R.objOf(pcrc.id_dp_pcrc, eventCategories['pcrc']) }
+                newFilter = { term: R.objOf(pcrc.id_dp_pcrc, 'pcrc') }
 
             } else {
-                newFilter = { term: R.objOf(value, eventCategories[filter]) }
+                newFilter = { term: R.objOf(value, filter) }
             }
 
             filtersObj.push(newFilter)
@@ -287,73 +345,465 @@ export class ArticleEventsModelService {
             ]
         }
 
-        let result = await this.articleStateIndex.query(query)
+        let articlesStates = await this.articleStateIndex.query(query)
+
+        let articlesAux:any[] = articlesStates.map(article => article.articleId)
+
+        //totalItems
+
+        let totalItems = await this.articleStateIndex.count({ query:query.query })
+
+        // usuariosPorPcrc
+
+        let pcrcs = [...new Set( articlesStates.map(articleInfo => articleInfo.pcrc)) ];
+
+        let listOfPcrcsPromises = pcrcs.map(pcrc => {
+            return async () => {
+                return (await this.pcrcModel.getPcrcUsers(pcrc)).length
+            }
+        })
+
+        let usuariosPorPcrcObj: { pcrc:string, usuarios:number}[] = (await async.parallel(listOfPcrcsPromises))
+            .map((numeroUsuarios, index) => {
+                return {
+                    pcrc: pcrcs[index],
+                    usuarios: numeroUsuarios
+                }
+            }
+        )
+
+        // ------------------------------------------------
+
+        // articulos
+
+        let listOfArticlePromises = articlesAux.map(articleId => {
+            return async ()=>{
+                return await this.articleIndex.getById(articleId)
+            }
+        })
+
+        let articles:(Article & { id: string; })[] = await async.parallel(listOfArticlePromises)
+
+        articles.forEach((article, index) => {
+            articlesAux[index] = { articleId:articlesAux[index], title: articles[index].title }
+        });
+
+        // views
+
+        let listOfArticleViewsPromises = articlesAux.map(article => {
+            return async ( ) => {
+                return await this.getViewsCountBy(date.toString(), [{ filter:"articleId", value: article.articleId }])
+            }
+        })
+
+        let views:{ value: number }[] = await async.parallel(listOfArticleViewsPromises)
+
+        views.forEach((value, index) => {
+            articlesAux[index].views = value.value
+        });
+
+        // // result = result.map()
+
+        // likes
+
+        let listOfArticleLikesPromises = articlesAux.map(article => {
+            return async ( ) => {
+                return await this.getVotesCountBy(date.toString(), [{ filter:"articleId", value: article.articleId }], 'like')
+            }
+        })
+
+        let likes:{ value: number }[] = await async.parallel(listOfArticleLikesPromises)
+
+        likes.forEach((value, index) => {
+            articlesAux[index].likes = value.value
+        })
+
+        // dislikes
+
+        let listOfArticleDisLikesPromises = articlesAux.map(article => {
+            return async ( ) => {
+                return await this.getVotesCountBy(date.toString(), [{ filter:"articleId", value: article.articleId }], 'dislike')
+            }
+        })
+
+        let dislikes:{ value: number }[] = await async.parallel(listOfArticleDisLikesPromises)
+
+        dislikes.forEach((value, index) => {
+            articlesAux[index].dislikes = value.value
+            articlesAux[index].indiceDisgusto = value.value / (articlesAux[index].dislikes + articlesAux[index].likes)
+            articlesAux[index].indiceGusto = articlesAux[index].likes / (articlesAux[index].dislikes + articlesAux[index].likes)
+        })
+
+        // favorites
+
+        let listOfArticleFavoritesPromises = articlesAux.map(article => {
+            return async ( ) => {
+                return await this.getVotesCountBy(date.toString(), [{ filter:"articleId", value: article.articleId }], 'favorite')
+            }
+        })
+
+        let favorites:{ value: number }[] = await async.parallel(listOfArticleFavoritesPromises)
+
+        favorites.forEach((value, index) => {
+            articlesAux[index].favoritos = value.value
+            articlesAux[index].favoritismo = (value.value / usuariosPorPcrcObj.find(pcrc => pcrc.pcrc == articlesStates[index].pcrc).usuarios).toFixed(2)
+        })
+
+        // comments
+
+        let listOfArticleCommentsPromises = articlesAux.map(article => {
+            return async ( ) => {
+
+                let from = (new Date()).setFullYear(2000)
+
+                return await this.getEventCountBy('comment', [{ filter:"articleId", value: article.articleId }], from.toString(), date.toString())
+            }
+        })
+
+        let comments:{ value: number }[] = await async.parallel(listOfArticleCommentsPromises)
+
+        comments.forEach((value, index) => {
+            articlesAux[index].comments = value.value
+        })
+
+        // uso
+
+        let listOfArticleUsersPromises = articlesAux.map(article => {
+            return async ( ) => {
+                return await this.getViewsBy(date.toString(), [{ filter:"articleId", value: article.articleId }] )
+            }
+        })
+
+        let articlesVistas = await async.parallel(listOfArticleUsersPromises)
+
+        articlesVistas.forEach((articleVistas, index) => {
+            let usuariosDistintos = [...new Set( articleVistas.map(vista => vista.user)) ].length
+            let pcrcUsers = usuariosPorPcrcObj.find(pcrc => pcrc.pcrc == articlesStates[index].pcrc).usuarios
+            articlesAux[index].indiceUso = (usuariosDistintos / pcrcUsers).toFixed(2)
+        })
+
+        // lecturabilidad
+
+        let listOfArticleLecturesPromises = articlesAux.map(article => {
+            return async ( ) => {
+                return await this.getViewsCountBy(date.toString(), [{ filter:"articleId", value: article.articleId }],40000)
+            }
+        })
+
+        let lectures:{ value: number }[] = await async.parallel(listOfArticleLecturesPromises)
+
+        lectures.forEach((value, index) => {
+            if(articlesAux[index].views){
+                articlesAux[index].lecturabilidad = (value.value/articlesAux[index].views).toFixed(2)
+            }else{
+                articlesAux[index].lecturabilidad = '0%'
+            }
+        });
 
         return {
-            value: result
+            totalItems:totalItems,
+            items:articlesAux
         }
 
+    }
+
+    getCommentsBy = async (filters: { filter: string, value: string }[], dateFrom: number, dateTo: number, from:number, to:number) => {
+
+        let filtersObj: any[] = [
+            { range: { publicationDate: { lt: dateTo } } },
+            { range: { publicationDate: { gt: dateFrom } } }
+        ]
+
+        filters.forEach(filter => {
+            let newFilter = { term: R.objOf(filter.value, filter.filter) }
+            filtersObj.push(newFilter)
+        })
+
+        let query = {
+            query: {
+                bool: {
+                    filter: filtersObj
+                }
+            },
+            from: from,
+            size: to,
+            sort: [
+                { publicationDate :{ order: 'asc' }} // R.objOf(key)(value) = {key : value}
+            ]
+        }
+
+        let listaComentarios = await this.commentsIndex.query(query)
+
+        // articulos
+
+        let idsArticulos = [...new Set( listaComentarios.map(comentario => comentario.article))]
+
+        let listaArticulosPromises = idsArticulos.map(articleId => {
+            return async () => {
+                return this.articleIndex.getById(articleId)
+            }
+        })
+
+        let articulos:(Article & { id: string; })[] = await async.parallel(listaArticulosPromises)        
+
+        let listaComentariosFinal = listaComentarios.map(comentario => {
+            let tituloArticulo = articulos.find(articulo => articulo.id).title
+
+            return {
+                tituloArticulo: tituloArticulo,
+                ...comentario
+            }
+        })
+
+        // categoria
+
+        let idsCategorias = [...new Set( listaComentarios.map(comentario => comentario.category))]
+
+        let ListaCategoriasPromises = idsCategorias.map(id => {
+            return async () => {
+                return this.categoriesModel.getCategory(id)
+            }
+        })
+
+        let categories:(category & { id: string; })[] = await async.parallel(ListaCategoriasPromises)
+
+        listaComentariosFinal = listaComentariosFinal.map( comentario => {
+
+            let indiceCategoria = idsCategorias.findIndex(id => id == comentario.category )
+
+            let nombreCategoria = categories[indiceCategoria].name
+
+            return {
+                ...comentario,
+                category: nombreCategoria
+            }
+        })
+
+        // pcrc
+
+        let idsPcrc = [...new Set( listaComentarios.map(comentario => comentario.pcrc))]
+
+        let listOfPcrcPromises = idsPcrc.map(id => {
+            return async () => {
+                return this.pcrcModel.getPcrcInfo(id)
+            }
+        })
+
+        let pcrcs:{ id_dp_pcrc:string, ciudad:string, cod_pcrc:string, pcrc:string }[] = await async.parallel(listOfPcrcPromises)
+
+        listaComentariosFinal = listaComentariosFinal.map(comentario => {
+
+            let pcrcIndice = idsPcrc.findIndex( id => id == comentario.pcrc )
+
+            let nombrePcrc = pcrcs[pcrcIndice].pcrc
+
+            return {
+                ...comentario,
+                pcrc: nombrePcrc
+            }
+        })
+
+        // cliente
+
+        let idsClientes = [...new Set( listaComentarios.map(comentario => comentario.cliente))]
+
+        let listOfClientesPromises = idsClientes.map( idCliente => {
+            return async () => {
+                return this.pcrcModel.getClienteInfo(idCliente)
+            }
+        })
+
+        let clientes: cliente[] = await async.parallel(listOfClientesPromises)
+
+        listaComentariosFinal = listaComentariosFinal.map(comentario => {
+
+            let clienteIndice = idsClientes.findIndex( id => id == comentario.cliente )
+
+            let nombreCliente = clientes[clienteIndice].cliente
+
+            return {
+                ...comentario,
+                cliente:nombreCliente
+            }
+        })
+
+        //
+
+        let totalItems = await this.commentsIndex.count({ query: query.query })
+
+        return {
+            totalItems: totalItems,
+            items: listaComentariosFinal
+        }
+    }
+
+    getChangesBy = async (filters: { filter: string, value: string }[], dateFrom: number, dateTo: number, from:number, to:number) => {
+
+        let filtersObj: any[] = [
+            { range: { eventDate: { lt: dateTo } } },
+            { range: { eventDate: { gt: dateFrom } } }
+        ]
+
+        await async.each(filters, async ({ filter, value }:{ filter: string, value: string }) => {
+
+            var newFilter:any
+
+            if(filter == 'gerente'){
+                let pcrcs = await this.cargosModel.getGerentePcrcs(value)
+
+                newFilter = {
+                    terms : {
+                        pcrc : pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())
+                    }
+                }
+
+            } else if( filter == 'director' ){
+                let pcrcs = await this.cargosModel.getDirectorPcrc(value)
+
+                newFilter = {
+                    terms : {
+                        pcrc : pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())
+                    }
+                }
+
+            } else if(filter == 'coordinador' || filter == 'lider'){
+
+                let pcrc = await this.cargosModel.getUserPcrc(value)
+
+                newFilter = { term: R.objOf(pcrc.id_dp_pcrc, 'pcrc') }
+
+            } else {
+
+                newFilter = { term: R.objOf(value, filter) }
+
+            }
+
+            filtersObj.push(newFilter)
+        })
+
+        let query = {
+            query: {
+                bool: {
+                    filter: filtersObj
+                }
+            },
+            from: from,
+            size: to,
+            sort: [
+                { eventDate :{ order: 'desc' }}, // R.objOf(key)(value) = {key : value}
+                { articleId :{ order: 'asc' }} // R.objOf(key)(value) = {key : value}
+            ]
+        }
+
+        let totalItems = await this.articleChangesIndex.count({ query: query.query })
+
+        let listaDeCambios = await this.articleChangesIndex.query(query)
+
+        // categoria
+
+        let idsCategorias = [...new Set( listaDeCambios.map(cambio => cambio.category))]
+
+        let ListaCategoriasPromises = idsCategorias.map(id => {
+            return async () => {
+                return this.categoriesModel.getCategory(id)
+            }
+        })
+
+        let categories:(category & { id: string; })[] = await async.parallel(ListaCategoriasPromises)
+
+        listaDeCambios = listaDeCambios.map( cambio => {
+
+            let indiceCategoria = idsCategorias.findIndex(id => id == cambio.category )
+
+            let nombreCategoria = categories[indiceCategoria].name
+
+            return {
+                ...cambio,
+                category: nombreCategoria
+            }
+        })
+
+        // pcrc
+
+        let idsPcrc = [...new Set( listaDeCambios.map(cambio => cambio.pcrc))]
+
+        let listOfPcrcPromises = idsPcrc.map(id => {
+            return async () => {
+                return this.pcrcModel.getPcrcInfo(id)
+            }
+        })
+
+        let pcrcs:{ id_dp_pcrc:string, ciudad:string, cod_pcrc:string, pcrc:string }[] = await async.parallel(listOfPcrcPromises)
+
+        listaDeCambios = listaDeCambios.map(cambio => {
+
+            let pcrcIndice = idsPcrc.findIndex( id => id == cambio.pcrc )
+
+            let nombrePcrc = pcrcs[pcrcIndice].pcrc
+
+            return {
+                ...cambio,
+                pcrc: nombrePcrc
+            }
+        })
+
+        // cliente
+
+        let idsClientes = [...new Set( listaDeCambios.map(cambio => cambio.cliente))]
+
+        let listOfClientesPromises = idsClientes.map( idCliente => {
+            return async () => {
+                return this.pcrcModel.getClienteInfo(idCliente)
+            }
+        })
+
+        let clientes: cliente[] = await async.parallel(listOfClientesPromises)
+
+        listaDeCambios = listaDeCambios.map(cambio => {
+
+            let clienteIndice = idsClientes.findIndex( id => id == cambio.cliente )
+
+            let nombreCliente = clientes[clienteIndice].cliente
+
+            return {
+                ...cambio,
+                cliente:nombreCliente
+            }
+        })
 
 
-// ------------------------------------------------
+        // articulos
 
+        let idsArticulos = [...new Set( listaDeCambios.map(cambio => cambio.articleId))]
 
-        // let filtersObj: any[] = [
-        //     { term: { state: state } },
-        //     { range: { initialDate: { lt: fromdate } } },
-        //     { range: { finalDate: { gt: fromdate } } }
-        // ]
+        let listOfArticlesPromises = idsArticulos.map( idArticulo => {
+            return async () => {
+                return this.articleIndex.getById(idArticulo)
+            }
+        })
 
-        // await async.each(filters, async ({ filter, value }:{ filter: string, value: string }) => {
+        let articulos:(Article & { id: string; })[] = await async.parallel(listOfArticlesPromises)
 
-        //     var newFilter:any
+        listaDeCambios = listaDeCambios.map(cambio => {
 
-        //     if(filter == 'gerente'){
-        //         let pcrcs = await this.cargosModel.getGerentePcrcs(value)
+            let articleIndice = idsArticulos.findIndex( id => id == cambio.articleId )
 
-        //         newFilter = {
-        //             terms : {
-        //                 pcrc : pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())
-        //             }
-        //         }
+            let nombreArticulo = articulos[articleIndice].title
 
-        //     } else if( filter == 'director' ){
-        //         let pcrcs = await this.cargosModel.getDirectorPcrc(value)
+            return {
+                ...cambio,
+                articulo:nombreArticulo
+            }
+        })
 
-        //         newFilter = {
-        //             terms : {
-        //                 pcrc : pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())
-        //             }
-        //         }
+        return {
+            totalItems: totalItems,
+            items: listaDeCambios
+        }
+    }
 
-        //     } else if(filter == 'coordinador' || filter == 'lider'){
-
-        //         let pcrc = await this.cargosModel.getUserPcrc(value)
-
-        //         newFilter = { term: R.objOf(pcrc.id_dp_pcrc, eventCategories['pcrc']) }
-
-        //     } else {
-
-        //         newFilter = { term: R.objOf(value, eventCategories[filter]) }
-
-        //     }
-
-        //     filtersObj.push(newFilter)
-        // })
-
-        // let query = {
-        //     query: {
-        //         bool: {
-        //             filter: filtersObj
-        //         }
-        //     }
-        // }
-
-        // let result = await this.articleStateIndex.count(query)
-
-        // return {
-        //     value: result
-        // }
+    getChange = async (id:string) => {
+        return this.articleChangesIndex.getById(id)
     }
 
 }

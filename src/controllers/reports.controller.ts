@@ -49,9 +49,41 @@ export class ReportsController {
         @Query('date') date:string,
         @Query('minduration') minDuration:string,
         @Query('maxduration') maxDuration:string,
-        @Body() filters: { filters:{ filter:string, value:string }[] }
+        @Body() filters
     ): Promise<any> {
         return this.articleEventsModel.getViewsCountBy(date, filters.filters, parseInt(minDuration), parseInt(maxDuration))
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('comments')
+    async getCommets(
+        @Query('dateto') dateTo:number,
+        @Query('datefrom') dateFrom:number,
+        @Query('from') from:number,
+        @Query('to') to:number,
+        @Body() filters: { filters:{ filter:string, value:string }[] }
+    ): Promise<any> {
+        return this.articleEventsModel.getCommentsBy(filters.filters, dateFrom, dateTo, from, to)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('changes')
+    async getChanges(
+        @Query('dateto') dateTo:number,
+        @Query('datefrom') dateFrom:number,
+        @Query('from') from:number,
+        @Query('to') to:number,
+        @Body() filters: { filters:{ filter:string, value:string }[] }
+    ): Promise<any> {
+        return this.articleEventsModel.getChangesBy(filters.filters, dateFrom, dateTo, from, to)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('changes/:id')
+    async getChange(
+        @Param('id') idChange:string
+    ): Promise<any> {
+        return this.articleEventsModel.getChange(idChange)
     }
 
     @UseGuards(AuthGuard('jwt'))
@@ -64,5 +96,7 @@ export class ReportsController {
     ): Promise<any> {
         return this.articleEventsModel.getFullReport(filters.filters, parseInt(date), parseInt(from), parseInt(to))
     }
+
+
 
 }

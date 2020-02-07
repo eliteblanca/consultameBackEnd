@@ -303,8 +303,8 @@ export class Esindex<T> {
             return R.map((x: any) => R.addProp(x._source, 'id', x._id))(result.body.hits.hits)
 
         } catch (error) {
-
            
+            console.log(error.meta.body.error)
 
             let errorCode = '03';
 
@@ -1517,7 +1517,7 @@ export class Esindex<T> {
 
     }    
     //13
-    public count = async (query: object): Promise<(T & { id: string; })[]> => {
+    public count = async (query: object): Promise<number> => {
 
         try {
 

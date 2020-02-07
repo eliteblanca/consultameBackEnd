@@ -3,6 +3,7 @@ import { CommentsIndexService, comment } from "../indices/commentsIndex.service"
 import { Article, ArticleIndex } from "../indices/articleIndex";
 import { IsOptional, Length } from 'class-validator';
 import { ArticleEventsModelService } from "../services/articleEvents-model.service";
+import { CargosModelService } from "../services/cargos-model.service";
 export class commentDTO {
     
     @Length(20, 20, { message: 'debes proporcionar un id valido' })
@@ -19,7 +20,8 @@ export class CommentsModelService {
     constructor(
         private commentsIndex: CommentsIndexService,
         private articleIndex: ArticleIndex,
-        private articleEventsModel: ArticleEventsModelService
+        private articleEventsModel: ArticleEventsModelService,
+        private cargosModel: CargosModelService,
     ) { }
 
     getComments = async (articleId: string, from:string = '0' , size:string = '10' ): Promise<comment[]> => {
@@ -57,20 +59,20 @@ export class CommentsModelService {
 
     postComment = async (newComment:commentDTO, articleId:string, userId:string, username:string): Promise<comment & { id: string; }> => {
 
+        var article:Article;
+
+        article = await this.articleIndex.getById(articleId)
+
+        if(!!!article){
+            throw new HttpException({
+                "message": `articulo no encontrado`
+            }, 404)
+
+        }
+
         if( newComment.replyTo ){
 
             let replyComment:comment;
-
-            let article:Article;
-
-            article = await this.articleIndex.getById(articleId) 
-
-            if(!!!article){
-                throw new HttpException({
-                    "message": `articulo no encontrado`
-                }, 404)
-
-            }
             
             replyComment = await this.commentsIndex.getById(newComment.replyTo)
 
@@ -89,11 +91,22 @@ export class CommentsModelService {
             }
         }
 
-        let commnetExtras = {
+        let bossInfo = await this.cargosModel.getAllBoss(userId)
+
+        
+
+        let commnetExtras:Omit<comment, 'replyTo'|'text'> = {
             publicationDate: Date.now(),
             user: userId,
             username:username,
-            article: articleId
+            article: articleId,
+            lider: bossInfo.lider,
+            coordinador: bossInfo.coordinador,
+            gerente: bossInfo.gerente,
+            director: bossInfo.director,
+            category: article.category,
+            cliente: article.cliente,
+            pcrc: article.pcrc
         }
 
         await this.articleEventsModel.createEvent(articleId, userId, 'comment')

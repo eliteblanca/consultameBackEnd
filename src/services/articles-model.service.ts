@@ -13,6 +13,7 @@ import { PcrcModelService } from "../services/pcrc-model.service";
 import { S3BucketService } from '../services/s3-bucket.service';
 import { ArticleEventsModelService } from "./articleEvents-model.service";
 import { ArticlesViewsIndex } from "../indices/articleViewsIndex";
+import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: 'debes proporcionar un id de articulo' })
@@ -76,6 +77,7 @@ export class ArticlesModelService {
         private articleStateIndex:ArticleStateIndex,
         private favoriteStatesIndex:FavoriteStatesIndex,
         private articlesViewsIndex:ArticlesViewsIndex,
+        private articleChangesIndex:ArticleChangesIndex,
 
     ) { }
 
@@ -461,11 +463,13 @@ export class ArticlesModelService {
             await this.S3BucketService.deleteFile(id, fileName)
         })
 
-        try {
-            await this.articleIndex.delete(id);
-        } catch (error) {
-            console.log(error)
-        }
+        // try {
+        //     await this.articleIndex.delete(id);
+        // } catch (error) {
+        //     console.log(error)
+        // }
+
+        await this.articleIndex.updatePartialDocument(id, { state:'deleted' })
 
         await this.favoriteUserIndex.deleteWhere({ article: id })
 
@@ -537,22 +541,40 @@ export class ArticlesModelService {
         }
 
         let newArticle: Partial<Article> = { ...articleExtas, ...article };
-
-        try {
             
-            await this.updateArticleState({
-                articleId: id,
-                category: newArticle.category,
-                cliente: newArticle.cliente, 
-                pcrc: newArticle.pcrc
-            },
-            newArticle.state,
-            modificationUser)
+        await this.updateArticleState({
+            articleId: id,
+            category: newArticle.category,
+            cliente: newArticle.cliente, 
+            pcrc: newArticle.pcrc
+        },
+        newArticle.state,
+        modificationUser)
+    
+        let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articleId', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
 
-            return await this.articleIndex.updatePartialDocument(id, newArticle);
-        } catch (error) {
-            console.log(error.meta.body.error)
+        let previousState = ''
+
+        if(prevState.items.length){
+            previousState = prevState.items[0].id
         }
+
+        if(!!article.obj){
+            this.articleChangesIndex.create({
+                articleId: id,
+                articlecontent: article.obj,
+                category: newArticle.category,
+                cliente: newArticle.cliente,
+                pcrc: newArticle.pcrc,
+                event: 'articulo actualizado',
+                eventDate: (new Date()).getTime(),
+                previoustate: previousState,
+                user: modificationUser
+            })
+        }
+
+        return await this.articleIndex.updatePartialDocument(id, newArticle);
+        
     }
 
     private updateArticleState = async (articleInfo:  Omit<ArticleState, 'initialDate'|'finalDate'|'initialDateUser'|'finalDateUser'|'state'>, newState:string, userId:string) => {
@@ -710,5 +732,4 @@ export class ArticlesModelService {
             status:'created'
         }
     }
-
 }

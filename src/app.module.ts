@@ -52,7 +52,7 @@ import { ClientesController } from './controllers/clientes.controller';
 import { DirectoresController } from './controllers/directores.controller';
 import { GerentesController } from './controllers/gerentes.controller';
 import { CoordinadoresController } from './controllers/coordinadores.controller';
-
+import { ArticleChangesIndex } from "./indices/articlesChangesIndex";
 
 
 const secretKey = "123";
@@ -129,6 +129,7 @@ const secretKey = "123";
     CommentsIndexService,    
     FavoriteStatesIndex,
     ArticlesViewsIndex,
+    ArticleChangesIndex,
     {
       provide: APP_INTERCEPTOR,
       useClass: MorganInterceptor('tiny'),
