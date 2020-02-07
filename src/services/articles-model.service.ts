@@ -217,6 +217,31 @@ export class ArticlesModelService {
             creator
         )
 
+        let previousState = ''
+
+        let articleEvent = ''
+
+        if(article.state == 'published'){
+            articleEvent = 'articulo creado'
+        } else {
+            articleEvent = 'borrador creado'
+        }
+
+        if(!!article.obj){
+            await this.articleChangesIndex.create({
+                articleId: creationResult.id,
+                articlecontent: article.obj,
+                category: newArticle.category,
+                cliente: newArticle.cliente,
+                pcrc: newArticle.pcrc,
+                event: articleEvent,
+                eventDate: (new Date()).getTime(),
+                previoustate: previousState,
+                user: creator,
+                articlestate: article.state
+            })
+        }
+
         return creationResult
     }
 
@@ -463,12 +488,6 @@ export class ArticlesModelService {
             await this.S3BucketService.deleteFile(id, fileName)
         })
 
-        // try {
-        //     await this.articleIndex.delete(id);
-        // } catch (error) {
-        //     console.log(error)
-        // }
-
         await this.articleIndex.updatePartialDocument(id, { state:'deleted' })
 
         await this.favoriteUserIndex.deleteWhere({ article: id })
@@ -484,6 +503,37 @@ export class ArticlesModelService {
             'deleted',
             userId
         )
+
+        let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articleId', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
+
+        let previousState = ''
+
+        if(prevState.items.length){
+            previousState = prevState.items[0].id
+        }
+
+        let articleEvent = ''
+
+        if(article.state == 'published'){
+            articleEvent = 'articulo eliminado'
+        } else {
+            articleEvent = 'borrador eliminado'
+        }
+
+        if(!!article.obj){
+            await this.articleChangesIndex.create({
+                articleId: id,
+                articlecontent: '',
+                category: article.category,
+                cliente: article.cliente,
+                pcrc: article.pcrc,
+                event: articleEvent,
+                eventDate: (new Date()).getTime(),
+                previoustate: previousState,
+                user: userId,
+                articlestate: article.state
+            })
+        }
 
     }
 
@@ -555,21 +605,38 @@ export class ArticlesModelService {
 
         let previousState = ''
 
+        var articleEvent = ''
+
         if(prevState.items.length){
             previousState = prevState.items[0].id
+
+            if(article.state){
+
+                var articleEvent = 'articulo actualizado'
+                
+                if(prevState.items[0].articlestate == 'published' && article.state != 'published'){
+                    var articleEvent = 'articulo archivado'
+                }
+
+                if(prevState.items[0].articlestate != 'published' && article.state == 'published'){
+                    var articleEvent = 'articulo publicado'
+                }
+            }
         }
 
+
         if(!!article.obj){
-            this.articleChangesIndex.create({
+            await this.articleChangesIndex.create({
                 articleId: id,
                 articlecontent: article.obj,
                 category: newArticle.category,
                 cliente: newArticle.cliente,
                 pcrc: newArticle.pcrc,
-                event: 'articulo actualizado',
+                event: articleEvent,
                 eventDate: (new Date()).getTime(),
                 previoustate: previousState,
-                user: modificationUser
+                user: modificationUser,
+                articlestate: article.state
             })
         }
 

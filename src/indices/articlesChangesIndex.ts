@@ -12,6 +12,7 @@ export class articleChanges {
     event:string;
     articlecontent:string;
     previoustate:string;
+    articlestate:string;
 }
 
 @Injectable()
