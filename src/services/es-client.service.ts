@@ -350,7 +350,8 @@ export class EsClientService extends GenericModel {
                                         "category": { "type": "keyword" },
                                         "event": { "type": "keyword" },
                                         "articlecontent": { "type": "keyword", "ignore_above": 250 },
-                                        "prevstate": { "type": "keyword" }
+                                        "prevstate": { "type": "keyword" },
+                                        "articlestate": { "type": "keyword" }
                                     }
                                 }
                             }
