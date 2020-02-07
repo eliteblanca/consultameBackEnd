@@ -1,12 +1,11 @@
 import { ConflictException, Injectable, NotAcceptableException } from '@nestjs/common';
-import { IsNotEmpty, MinLength } from 'class-validator';
-import { createQueryBuilder } from 'typeorm';
-import { Personal } from "../jarvisEntities/personal.entity";
-import { UserIndex, user } from "../indices/userIndex";
-import { UserModelService } from "../services/user-model.service";
-import { Pcrc } from 'src/jarvisEntities/pcrc.entity';
+import { IsNotEmpty } from 'class-validator';
 import * as R from 'remeda';
-
+import * as sqlstring from 'sqlstring';
+import { createQueryBuilder, getManager } from 'typeorm';
+import { UserIndex } from "../indices/userIndex";
+import { Personal } from "../jarvisEntities/personal.entity";
+import { UserModelService } from "../services/user-model.service";
 export class postUserPcrcDTO {
 
     @IsNotEmpty({ message: 'debes proporcionar un pcrc' })
@@ -317,4 +316,35 @@ export class PcrcModelService {
         })
     }
 
+    getPcrcInfo = async (idPcrc:string) => {
+
+        const entityManager = getManager();
+
+        let result = await entityManager.query(
+            sqlstring.format(`
+                SELECT 
+                    id_dp_pcrc,
+                    ciudad,
+                    cod_pcrc,
+                    pcrc
+                FROM dp_pcrc
+                WHERE id_dp_pcrc = ?`,[idPcrc]
+            )
+        )
+
+        return result[0]
+    }
+
+    getClienteInfo = async (idCliente:string) => {
+        return await createQueryBuilder<cliente>('Clientes')
+        .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
+        .where('pcrc.estado = 1')
+        .andWhere('Clientes.estado = 1')
+        .andWhere('Clientes.id_dp_clientes = :idCliente', { idCliente: idCliente })
+        .select(['Clientes.id_dp_clientes', 'Clientes.cliente', 'pcrc.id_dp_pcrc', 'pcrc.cod_pcrc', 'pcrc.pcrc'])
+        .getOne()
+    }
+
 }
+
+

@@ -1,15 +1,19 @@
-import { Injectable, NotFoundException, NotAcceptableException, ConflictException, forwardRef, Inject, HttpException } from '@nestjs/common';
-import { CategoriesModelService } from '../services/categories-model.service';
-import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn, Length } from 'class-validator';
-import { ArticleIndex, Article } from '../indices/articleIndex';
-import { CategoriesIndex } from '../indices/categoriesIndex';
-import { LikeUserIndex } from '../indices/likeUserIndex';
-import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
-import { S3BucketService } from '../services/s3-bucket.service';
-import { PcrcModelService } from "../services/pcrc-model.service";
-import { ArticleEventsModelService } from "./articleEvents-model.service";
-import { CargosModelService } from "../services/cargos-model.service";
+import { ConflictException, forwardRef, HttpException, Inject, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import * as async from 'async';
+import { IsDate, IsNotEmpty, IsOptional, Length, MaxLength, MinLength } from 'class-validator';
+import { Article, ArticleIndex } from '../indices/articleIndex';
+import { ArticleState, ArticleStateIndex } from "../indices/articlestatesIndex";
+import { CategoriesIndex } from '../indices/categoriesIndex';
+import { FavoriteStatesIndex } from "../indices/favoriteStatesIndex";
+import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
+import { LikeUserIndex } from '../indices/likeUserIndex';
+import { CargosModelService } from "../services/cargos-model.service";
+import { CategoriesModelService } from '../services/categories-model.service';
+import { PcrcModelService } from "../services/pcrc-model.service";
+import { S3BucketService } from '../services/s3-bucket.service';
+import { ArticleEventsModelService } from "./articleEvents-model.service";
+import { ArticlesViewsIndex } from "../indices/articleViewsIndex";
+import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: 'debes proporcionar un id de articulo' })
@@ -49,6 +53,11 @@ export class articleDTO {
 
 }
 
+export class articleViewsDTO {
+    initialDate:number
+    finalDate:number
+}
+
 type group = { category: string } | { pcrc: string } | { cliente: string };
 
 @Injectable()
@@ -63,8 +72,13 @@ export class ArticlesModelService {
         private favoriteUserIndex: FavoriteUserIndex,
         private S3BucketService: S3BucketService,
         private pcrcModel: PcrcModelService,
-        private ArticleViewsModel: ArticleEventsModelService,
-        private cargosModel:CargosModelService
+        private ArticleEventsModel: ArticleEventsModelService,
+        private cargosModel:CargosModelService,
+        private articleStateIndex:ArticleStateIndex,
+        private favoriteStatesIndex:FavoriteStatesIndex,
+        private articlesViewsIndex:ArticlesViewsIndex,
+        private articleChangesIndex:ArticleChangesIndex,
+
     ) { }
 
     public async getArticlesByCategory(category: string, state: string = 'published', from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> {
@@ -115,7 +129,7 @@ export class ArticlesModelService {
         return result
     }
 
-    public getAllArticles = async (): Promise<(Article & { id: string; })[]> => {
+    public getAllArticles = async (): Promise<(Article & { id: string; })[]> => {        
         return await this.articleIndex.all();
     }
 
@@ -130,7 +144,7 @@ export class ArticlesModelService {
                 'lang': 'painless'
             });
 
-            await this.ArticleViewsModel.createEvent(article, userId, 'view')
+            await this.ArticleEventsModel.createEvent(article, userId, 'view')
 
             return article
 
@@ -144,10 +158,10 @@ export class ArticlesModelService {
 
     public async createArticle(article: articleDTO, creator: string): Promise<Article & { id: string }> {
 
-        let pcrc: string = null;
-        let cliente: { id: number; cliente: string; };
+        let pcrc: string = null
+        let cliente: { id: number; cliente: string; }
 
-        var category = await this.categoriesIndex.getById(article.category);
+        var category = await this.categoriesIndex.getById(article.category)
 
         if (!!!category) {
             throw new HttpException({
@@ -187,14 +201,34 @@ export class ArticlesModelService {
             publicationDate: (new Date).getTime(),
             modificationDate: (new Date).getTime(),
             views: 0
-        };
+        }
 
-        let newArticle: Article = { ...articleExtras, ...article };
+        let newArticle: Article = { ...articleExtras, ...article }
+        
+        let creationResult = await this.articleIndex.create(newArticle)        
 
-        return await this.articleIndex.create(newArticle);
+        await this.updateArticleState({
+                articleId:creationResult.id,
+                category:creationResult.category,
+                cliente:creationResult.cliente,
+                pcrc:creationResult.pcrc
+            },
+            creationResult.state,
+            creator
+        )
+
+        return creationResult
     }
 
     public async addLike(articleId: string, id_usuario: string): Promise<any> {
+
+        let article = await this.articleIndex.getById(articleId)
+
+        if(!!!article){
+            throw new HttpException({
+                "message": "articulo no encontrado"
+            }, 404)
+        }
 
         await this.removeDisLike(articleId, id_usuario);                
 
@@ -213,7 +247,14 @@ export class ArticlesModelService {
 
             await this.articleIndex.updateScript(articleId, updateQuery);
 
-            await this.ArticleViewsModel.createEvent(articleId, id_usuario, 'like')
+            await this.updateVotesState({
+                articleId: articleId,
+                category: article.category,
+                cliente: article.cliente,
+                pcrc: article.pcrc
+            }, id_usuario, 'add', 'like')
+
+            await this.ArticleEventsModel.createEvent(articleId, id_usuario, 'like')
 
         } else {
             return new ConflictException('ya has dado like en este articulo');
@@ -225,12 +266,21 @@ export class ArticlesModelService {
 
     public async addDisLike(articleId: string, id_usuario: string): Promise<any> {
 
+        let article = await this.articleIndex.getById(articleId)
+
+        if(!!!article){
+            throw new HttpException({
+                "message": "articulo no encontrado"
+            }, 404)
+        }
+
         await this.removeLike(articleId, id_usuario);
+
 
         let existingDislikes = await this.likeUserIndex.where({ type: 'dislike', article: articleId, user: id_usuario });
 
         if (!existingDislikes.length) {
-            await this.likeUserIndex.create({ article: articleId, type: 'dislike', user: id_usuario });
+            await this.likeUserIndex.create({ article: articleId, type: 'dislike', user: id_usuario })
 
             let updateQuery = {
                 'source': 'ctx._source.disLikes.add(params.user)',
@@ -238,11 +288,18 @@ export class ArticlesModelService {
                 'params': {
                     'user': id_usuario
                 }
-            };
+            }
 
-            await this.articleIndex.updateScript(articleId, updateQuery);
+            await this.articleIndex.updateScript(articleId, updateQuery)
 
-            await this.ArticleViewsModel.createEvent(articleId, id_usuario, 'dislike')
+            await this.ArticleEventsModel.createEvent(articleId, id_usuario, 'dislike')
+
+            await this.updateVotesState({
+                articleId: articleId,
+                category: article.category,
+                cliente: article.cliente,
+                pcrc: article.pcrc
+            }, id_usuario, 'add', 'dislike')
 
         } else {
             return new ConflictException('ya has dado like en este articulo');
@@ -253,31 +310,37 @@ export class ArticlesModelService {
     }
 
     public async removeDisLike(articleId: string, id_usuario: string): Promise<any> {
-        let result = await this.likeUserIndex.deleteWhere({ article: articleId, user: id_usuario, type: 'dislike' });
 
+        var article = await this.articleIndex.getById(articleId)
+
+        if(!!!article){
+            throw new HttpException({
+                "message": `articulo no encontrado`
+            }, 404)
+        }
+
+        let result = await this.likeUserIndex.deleteWhere({ article: articleId, user: id_usuario, type: 'dislike' })
 
         if (result.deleted) {
-            var article = await this.articleIndex.getById(articleId)
 
-            if(!!!article){
-                throw new HttpException({
-                    "message": `articulo no encontrado`
-                }, 404)
-            }
+            let index = article.disLikes.findIndex(userId => userId == id_usuario)
 
-            let index = article.disLikes.findIndex(userId => userId == id_usuario);
             if (index >= 0) {
 
                 let updateQuery = {
                     'source': 'ctx._source.disLikes.remove(' + index + ')',
                     'lang': 'painless'
-                };
-
-                try {
-                    await this.articleIndex.updateScript(articleId, updateQuery);
-                } catch (error) {
-                    console.log(error.meta.body.error);
                 }
+
+                await this.articleIndex.updateScript(articleId, updateQuery)
+
+                await this.updateVotesState({
+                    articleId: articleId,
+                    category: article.category,
+                    cliente: article.cliente,
+                    pcrc: article.pcrc
+                }, id_usuario, 'delete', 'dislike')
+
             }
         }
     }
@@ -297,6 +360,7 @@ export class ArticlesModelService {
             }
 
             let index = article.likes.findIndex(userId => userId == id_usuario);
+
             if (index >= 0) {
 
                 let updateQuery = {
@@ -304,11 +368,14 @@ export class ArticlesModelService {
                     'lang': 'painless'
                 };
 
-                try {
-                    await this.articleIndex.updateScript(articleId, updateQuery);
-                } catch (error) {
-                    console.log(error.meta.body.error);
-                }
+                await this.articleIndex.updateScript(articleId, updateQuery);
+
+                await this.updateVotesState({
+                    articleId: articleId,
+                    category: article.category,
+                    cliente: article.cliente,
+                    pcrc: article.pcrc
+                }, id_usuario, 'delete', 'like')
             }
         }
     }
@@ -327,10 +394,20 @@ export class ArticlesModelService {
                     'user': id_usuario
                 }
             };
-
+            
             await this.articleIndex.updateScript(articleId, updateQuery);
             
-            await this.ArticleViewsModel.createEvent(articleId, id_usuario, 'fav');
+            await this.ArticleEventsModel.createEvent(articleId, id_usuario, 'fav');
+
+            let article = await this.articleIndex.getById(articleId)
+
+            await this.updateVotesState({
+                articleId:article.id,
+                category:article.category,
+                cliente:article.cliente,
+                pcrc:article.pcrc
+            },
+            id_usuario, 'add','favorite')
 
         } else {
             return new ConflictException('ya has agregado este articulo a tus favoritos');
@@ -353,22 +430,26 @@ export class ArticlesModelService {
             }
 
             let index = article.favorites.findIndex(userId => userId == id_usuario);
+
             if (index >= 0) {
                 let updateQuery = {
                     'source': 'ctx._source.favorites.remove(' + index + ')',
                     'lang': 'painless'
                 };
 
-                try {
-                    await this.articleIndex.updateScript(articleId, updateQuery);
-                } catch (error) {
-                    console.log(error.meta.body.error);
-                }
+                await this.articleIndex.updateScript(articleId, updateQuery);
+
+                await this.updateVotesState({
+                    articleId: articleId,
+                    category: article.category,
+                    cliente: article.cliente,
+                    pcrc: article.pcrc
+                }, id_usuario, 'delete','favorite')                
             }
         }
     }
 
-    public deleteArticle = async (id: string): Promise<any> => {
+    public deleteArticle = async (id: string, userId:string): Promise<any> => {
 
         var article = await this.articleIndex.getById(id)
 
@@ -382,23 +463,35 @@ export class ArticlesModelService {
             await this.S3BucketService.deleteFile(id, fileName)
         })
 
-        try {
-            await this.articleIndex.delete(id);
-        } catch (error) {
-            console.log(error);
-        }
+        // try {
+        //     await this.articleIndex.delete(id);
+        // } catch (error) {
+        //     console.log(error)
+        // }
 
-        await this.favoriteUserIndex.deleteWhere({ article: id });
+        await this.articleIndex.updatePartialDocument(id, { state:'deleted' })
 
-        await this.likeUserIndex.deleteWhere({ article: id });
+        await this.favoriteUserIndex.deleteWhere({ article: id })
+
+        await this.likeUserIndex.deleteWhere({ article: id })
+
+        await this.updateArticleState({
+                articleId:id,
+                category:article.category,
+                cliente: article.cliente,
+                pcrc:article.pcrc
+            },
+            'deleted',
+            userId
+        )
 
     }
 
     public updateArticle = async (id: string, article: Partial<articleDTO>, modificationUser: string): Promise<any> => {
 
-        let pcrc: string = null;
-        let cliente: { id: number; cliente: string; };
-        let articleExtas: Partial<Article>;
+        let pcrc: string = null
+        let cliente: { id: number; cliente: string; }
+        let articleExtas: Partial<Article>
 
         if (!!article.category) {
 
@@ -413,19 +506,19 @@ export class ArticlesModelService {
             try {
                 var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
             } catch (error) {
-                console.log(error);
+                console.log(error)
             }
 
             if (isLeaft) {
                 pcrc = category.pcrc;
             } else {
-                throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias');
+                throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias')
             }
 
             try {
-                cliente = await this.pcrcModel.getClienteOfPcrc(pcrc);
+                cliente = await this.pcrcModel.getClienteOfPcrc(pcrc)
             } catch (error) {
-                throw error;
+                throw error
                 if (error.meta.statusCode == 404) {
                     throw new NotFoundException('error al guardar el articulo');
                 }
@@ -436,23 +529,122 @@ export class ArticlesModelService {
                 cliente: cliente.id.toString(),
                 modificationUser: modificationUser,
                 modificationDate: (new Date).getTime()
-            };
+            }
 
         } else {
 
             articleExtas = {
                 modificationUser: modificationUser,
                 modificationDate: (new Date).getTime()
-            };
+            }
 
         }
 
         let newArticle: Partial<Article> = { ...articleExtas, ...article };
+            
+        await this.updateArticleState({
+            articleId: id,
+            category: newArticle.category,
+            cliente: newArticle.cliente, 
+            pcrc: newArticle.pcrc
+        },
+        newArticle.state,
+        modificationUser)
+    
+        let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articleId', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
 
-        try {
-            return await this.articleIndex.updatePartialDocument(id, newArticle);
-        } catch (error) {
-            console.log(error.meta.body.error);
+        let previousState = ''
+
+        if(prevState.items.length){
+            previousState = prevState.items[0].id
+        }
+
+        if(!!article.obj){
+            this.articleChangesIndex.create({
+                articleId: id,
+                articlecontent: article.obj,
+                category: newArticle.category,
+                cliente: newArticle.cliente,
+                pcrc: newArticle.pcrc,
+                event: 'articulo actualizado',
+                eventDate: (new Date()).getTime(),
+                previoustate: previousState,
+                user: modificationUser
+            })
+        }
+
+        return await this.articleIndex.updatePartialDocument(id, newArticle);
+        
+    }
+
+    private updateArticleState = async (articleInfo:  Omit<ArticleState, 'initialDate'|'finalDate'|'initialDateUser'|'finalDateUser'|'state'>, newState:string, userId:string) => {
+        let currentArticleStates = await this.articleStateIndex.where({ articleId: articleInfo.articleId })
+
+        if(!!currentArticleStates.length){
+            let estadoActual = currentArticleStates.find(state => {
+                return  (new Date(state.finalDate)).getFullYear() == 9999
+            })
+
+            await this.articleStateIndex.updatePartialDocument(estadoActual.id, { finalDate:(new Date).getTime(), finalDateUser:userId })
+        }
+
+        await this.articleStateIndex.create({
+            articleId: articleInfo.articleId,
+            category: articleInfo.category,
+            cliente: articleInfo.cliente,
+            initialDate: (new Date).getTime(),
+            initialDateUser: userId,
+            finalDate: (new Date).setFullYear(9999),
+            finalDateUser: userId,
+            pcrc: articleInfo.pcrc,
+            state: newState
+        })
+    }
+
+    private updateVotesState = async (articleInfo:{ articleId:string, category:string, cliente: string, pcrc:string }, userId:string, operation:'add' | 'delete', state:'favorite' | 'like' | 'dislike') => {
+
+        if(operation == 'add'){
+
+            let userBoss = await this.cargosModel.getAllBoss(userId)
+
+
+            await this.favoriteStatesIndex.create({
+                articleId:articleInfo.articleId,
+                category:articleInfo.category,
+                cliente:articleInfo.cliente,
+                coordinador:userBoss.coordinador,
+                director:userBoss.director,
+                gerente:userBoss.gerente,
+                lider:userBoss.lider,
+                pcrc:articleInfo.pcrc,
+                user:userId,
+                initialDate:(new Date()).getTime(),
+                finalDate: (new Date).setFullYear(9999),
+                state:state
+            })
+
+        } else {
+
+            let query = {
+                query: {
+                    bool: {
+                        filter: [
+                            { term: { articleId: articleInfo.articleId } },
+                            { term: { user: userId } },
+                            { range: { initialDate: { lt: (new Date()).getTime() } } },
+                            { range: { finalDate: { gt: (new Date()).getTime() } } }
+                        ]
+                    }
+                }
+            }
+
+            let estadoActual = await this.favoriteStatesIndex.query(query)
+
+            if( !!estadoActual.length ){
+                if( (new Date( estadoActual[0].finalDate)).getFullYear() == 9999 ){
+                    await this.favoriteStatesIndex.updatePartialDocument(estadoActual[0].id, { finalDate: (new Date()).getTime() })
+                }
+            }
         }
     }
 
@@ -497,7 +689,47 @@ export class ArticlesModelService {
     }
 
     public async prueba(): Promise<any> {
-        // return await this.cargosModel.getClientDirectors('110')
+        return await this.articlesViewsIndex.all()
     }
 
+    public getArticleHistory = async (articleId:string) => {
+
+        let history = await this.articleStateIndex.where({ articleId: articleId })
+
+        return history
+    }
+
+    public addArticleView = async (articleId:string, initialDate:number, finalDate:number, userId:string) => {
+
+        var article = await this.articleIndex.getById(articleId)        
+
+        if (!!!article) {
+            throw new HttpException({
+                "message": `articulo no encontrado`
+            }, 404)
+        }
+
+        let allboss = await this.cargosModel.getAllBoss(userId)        
+
+        await this.articlesViewsIndex.create({
+            articleId: articleId,
+            category: article.category,
+            cliente: article.cliente,
+            pcrc: article.pcrc,
+            coordinador: allboss.coordinador,
+            director: allboss.director,
+            gerente: allboss.gerente,
+            lider: allboss.lider,
+            user: userId,
+            initialDate: initialDate,
+            finalDate: finalDate,
+            duration: finalDate - initialDate
+        })
+
+        console.log('created')
+
+        return {
+            status:'created'
+        }
+    }
 }

@@ -2,7 +2,7 @@ import { Controller, UseGuards, Post, Get, Query, Param, Body, Delete, Put } fro
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../user.decorator';
 import { User as U } from '../entities/user';
-import { ArticlesModelService, articleDTO, SingleArticleDTO } from '../services/articles-model.service';
+import { ArticlesModelService, articleDTO, SingleArticleDTO, articleViewsDTO } from '../services/articles-model.service';
 import { SearchModelService } from '../services/search-model.service';
 
 @Controller('api/articles')
@@ -19,9 +19,7 @@ export class ArticlesController {
     @Get('prueba')
     async getPrueba(): Promise<any> {
         try {
-            
             return this.articlesModel.prueba();
-
         } catch (error) {
             throw error;
             
@@ -39,8 +37,11 @@ export class ArticlesController {
 
     @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
-    deleteArticle(@Param() singleArticleDTO: SingleArticleDTO): any {
-        return this.articlesModel.deleteArticle(singleArticleDTO.id);
+    deleteArticle(
+        @Param() singleArticleDTO: SingleArticleDTO,        
+        @User() user: U,
+    ): any {
+        return this.articlesModel.deleteArticle(singleArticleDTO.id, user.sub);
     }
 
     @UseGuards(AuthGuard('jwt'))
@@ -96,5 +97,23 @@ export class ArticlesController {
     @Delete(':id/favorites')
     removeFavorite(@Param('id') idArticulo, @User() user: U): any {
         return this.articlesModel.removeFavorite(idArticulo, user.sub);
+    }
+    
+    @UseGuards(AuthGuard('jwt'))
+    @Get(':id/history')
+    articleHistory(
+        @Param('id') idArticulo:string
+    ): any {
+        return this.articlesModel.getArticleHistory(idArticulo)
+    }   
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post(':id/views')
+    addViews(
+        @Param('id') idArticulo,
+        @User() user: U,
+        @Body() body: articleViewsDTO
+    ): any {
+        return this.articlesModel.addArticleView(idArticulo, body.initialDate, body.finalDate, user.sub)
     }
 }

@@ -214,48 +214,6 @@ export class EsClientService extends GenericModel {
                         }
                     })
                     break;
-                case 'permissions':
-                    return await this.esClient.indices.create({
-                        index: index,
-                        include_type_name: false,
-                        body: {
-                            "mappings": {
-                                "properties": {
-                                    "role": { "type": "keyword" },
-                                    "resource": { "type": "keyword" },
-                                    "action": { "type": "keyword" },
-                                    "attributes": { "type": "keyword" }
-                                }
-                            }
-                        }
-                    })
-                    break;
-                case 'roles':
-                    return await this.esClient.indices.create({
-                        index: index,
-                        include_type_name: false,
-                        body: {
-                            "mappings": {
-                                "properties": {
-                                    "role": { "type": "keyword" }
-                                }
-                            }
-                        }
-                    })
-                    break;
-                case 'resources':
-                    return await this.esClient.indices.create({
-                        index: index,
-                        include_type_name: false,
-                        body: {
-                            "mappings": {
-                                "properties": {
-                                    "resource": { "type": "keyword" }
-                                }
-                            }
-                        }
-                    })
-                    break;
                 case 'comments':
                     return await this.esClient.indices.create({
                         index: index,
@@ -268,7 +226,14 @@ export class EsClientService extends GenericModel {
                                     "user": { "type": "keyword" },
                                     "username": { "type": "keyword" },
                                     "replyTo": { "type": "keyword" },
-                                    "text": { "type": "keyword" }
+                                    "text": { "type": "keyword" },
+                                    "director": { "type": "keyword" },
+                                    "gerente": { "type": "keyword" },
+                                    "coordinador": { "type": "keyword" },
+                                    "lider": { "type": "keyword" },
+                                    "cliente": { "type": "keyword" },
+                                    "pcrc": { "type": "keyword" },
+                                    "category": { "type": "keyword" },
                                 }
                             }
                         }
@@ -300,8 +265,97 @@ export class EsClientService extends GenericModel {
                             }
                         }
                     })
-                    break;                
-
+                    break;
+                case 'articlestates':
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body: {
+                            "mappings": {
+                                "properties": {
+                                    "articleId": { "type": "keyword" },
+                                    "cliente": { "type": "keyword" },
+                                    "pcrc": { "type": "keyword" },
+                                    "category": { "type": "keyword" },
+                                    "state": { "type": "keyword" },
+                                    "initialDate": { "type": "date", "format": 'epoch_millis' },
+                                    "finalDate": { "type": "date", "format": 'epoch_millis' },
+                                    "initialDateUser": { "type": "keyword" },
+                                    "finalDateUser": { "type": "keyword" }
+                                }
+                            }
+                        }
+                    })
+                    break;
+                case 'favoritestates':
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body: {
+                            "mappings": {
+                                "properties": {
+                                    "initialDate": { "type": "date", "format": 'epoch_millis' },
+                                    "finalDate": { "type": "date", "format": 'epoch_millis' },
+                                    "articleId": { "type": "keyword" },
+                                    "user": { "type": "keyword" },
+                                    "cliente": { "type": "keyword" },
+                                    "pcrc": { "type": "keyword" },
+                                    "category": { "type": "keyword" },
+                                    "director": { "type": "keyword" },
+                                    "gerente": { "type": "keyword" },
+                                    "coordinador": { "type": "keyword" },
+                                    "lider": { "type": "keyword" },
+                                    "state": { "type": "keyword" }
+                                }
+                            }
+                        }
+                    })
+                    break;
+                case 'views':
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body: {
+                            "mappings": {
+                                "properties": {
+                                    "initialDate": { "type": "date", "format": 'epoch_millis' },
+                                    "finalDate": { "type": "date", "format": 'epoch_millis' },
+                                    "articleId": { "type": "keyword" },
+                                    "duration":{ "type": "integer" },
+                                    "user": { "type": "keyword" },
+                                    "cliente": { "type": "keyword" },
+                                    "pcrc": { "type": "keyword" },
+                                    "category": { "type": "keyword" },
+                                    "director": { "type": "keyword" },
+                                    "gerente": { "type": "keyword" },
+                                    "coordinador": { "type": "keyword" },
+                                    "lider": { "type": "keyword" }
+                                }
+                            }
+                        }
+                    })
+                    break;
+                case 'articlechanges':
+                        return await this.esClient.indices.create({
+                            index: index,
+                            include_type_name: false,
+                            body: {
+                                "mappings": {
+                                    "properties": {
+                                        "eventDate": { "type": "date", "format": 'epoch_millis' },
+                                        "articleId": { "type": "keyword" },
+                                        "user": { "type": "keyword" },
+                                        "cliente": { "type": "keyword" },
+                                        "pcrc": { "type": "keyword" },
+                                        "category": { "type": "keyword" },
+                                        "event": { "type": "keyword" },
+                                        "articlecontent": { "type": "keyword", "ignore_above": 250 },
+                                        "prevstate": { "type": "keyword" }
+                                    }
+                                }
+                            }
+                        })
+                        break;
                 default:
                     break;
             }
@@ -314,7 +368,7 @@ export class EsClientService extends GenericModel {
         try {
             return await this.esClient.indices.delete({ index: index })
         } catch (err) {
-            console.log(err.meta.body.error)
+            console.log(err)
         }
     }
 

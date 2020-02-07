@@ -14,11 +14,12 @@ export class Esindex<T> {
     constructor(protected index: string) {
 
         if (process.env.NODE_ENV == 'development') {
-            console.log('dev')
             this.esClient = new Client({
                 node: PUNTO_DE_ENLACE,
-                requestTimeout: 10000
-                
+                requestTimeout: 10000,
+                ssl: {
+                    rejectUnauthorized: false
+                }
             })
         } else {
             this.esClient = new Client({
@@ -93,7 +94,7 @@ export class Esindex<T> {
                 } else {
                     errorCode += '04'
 
-                    console.log(error)
+                   
 
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,
@@ -212,7 +213,7 @@ export class Esindex<T> {
                     }, 400)
 
                 } else {
-                    console.log(error)
+                    
                     errorCode += '04'
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,
@@ -302,6 +303,8 @@ export class Esindex<T> {
             return R.map((x: any) => R.addProp(x._source, 'id', x._id))(result.body.hits.hits)
 
         } catch (error) {
+           
+            console.log(error.meta.body.error)
 
             let errorCode = '03';
 
@@ -521,7 +524,6 @@ export class Esindex<T> {
                     }, 500)
 
                 } else {
-                    console.log(error)
                     errorCode += '05'
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,
@@ -549,7 +551,6 @@ export class Esindex<T> {
                     }, 500)
 
                 } else {
-                    console.log(error.meta.meta.request)
                     errorCode += '02'
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,
@@ -593,7 +594,6 @@ export class Esindex<T> {
                 }, 500)
 
             } else {
-                console.log(error)
                 errorCode += '09'
                 throw new HttpException({
                     "error": `error code: ${errorCode}`,
@@ -734,7 +734,6 @@ export class Esindex<T> {
                 }, 500)
 
             } else {
-                console.log(error)
                 errorCode += '09'
                 throw new HttpException({
                     "error": `error code: ${errorCode}`,
@@ -861,7 +860,6 @@ export class Esindex<T> {
                 }, 500)
 
             } else {
-                console.log(error)
                 errorCode += '09'
                 throw new HttpException({
                     "error": `error code: ${errorCode}`,
@@ -987,7 +985,6 @@ export class Esindex<T> {
                 }, 500)
 
             } else {
-                console.log(error)
                 errorCode += '09'
                 throw new HttpException({
                     "error": `error code: ${errorCode}`,
@@ -1009,7 +1006,7 @@ export class Esindex<T> {
                 }
             })
 
-        } catch (error) {
+        } catch (error) {            
 
             let errorCode = '08';
 
@@ -1114,7 +1111,6 @@ export class Esindex<T> {
                 }, 500)
 
             } else {
-                console.log(error)
                 errorCode += '09'
                 throw new HttpException({
                     "error": `error code: ${errorCode}`,
@@ -1235,7 +1231,6 @@ export class Esindex<T> {
                 }, 500)
 
             } else {
-                console.log(error)
                 errorCode += '09'
                 throw new HttpException({
                     "error": `error code: ${errorCode}`,
@@ -1293,6 +1288,8 @@ export class Esindex<T> {
                     }, 500)
 
                 } else {
+
+
                     errorCode += '05'
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,
@@ -1363,7 +1360,6 @@ export class Esindex<T> {
                 }, 500)
 
             } else {
-                console.log(error)
                 errorCode += '09'
                 throw new HttpException({
                     "error": `error code: ${errorCode}`,
@@ -1402,7 +1398,6 @@ export class Esindex<T> {
             return result.body.aggregations.operation.value
 
         } catch (error) {
-
             let errorCode = '11';
 
             if (error instanceof errors.ResponseError) {/* 01 */
@@ -1437,7 +1432,6 @@ export class Esindex<T> {
 
                 } else {
 
-                    console.log(error.body.error)
 
                     errorCode += '05'
                     throw new HttpException({
@@ -1466,6 +1460,9 @@ export class Esindex<T> {
                     }, 500)
 
                 } else {
+
+                   
+
                     errorCode += '02'
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,
@@ -1509,7 +1506,6 @@ export class Esindex<T> {
                 }, 500)
 
             } else {
-                console.log(error)
                 errorCode += '09'
                 throw new HttpException({
                     "error": `error code: ${errorCode}`,
@@ -1521,7 +1517,7 @@ export class Esindex<T> {
 
     }    
     //13
-    public count = async (query: object): Promise<(T & { id: string; })[]> => {
+    public count = async (query: object): Promise<number> => {
 
         try {
 
@@ -1534,6 +1530,8 @@ export class Esindex<T> {
         } catch (error) {
 
             let errorCode = '13';
+
+            console.log(error.meta.body.error)
 
             if (error instanceof errors.ResponseError) {/* 01 */
 
@@ -1566,9 +1564,7 @@ export class Esindex<T> {
                     }, 500)
 
                 } else {
-                    errorCode += '05'
-
-                    console.log(error.meta.body.error)
+                    errorCode += '05'                    
 
                     throw new HttpException({
                         "error": `error code: ${errorCode}`,
@@ -1648,6 +1644,6 @@ export class Esindex<T> {
         }
 
 
-    }
+    }   
 
 }
