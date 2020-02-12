@@ -23,7 +23,7 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
             server: {
                 url: 'ldap://sm1dc01w12s.multienlace.com.co',
                 bindDN: 'julian.vargas.a@multienlace.com.co',
-                bindCredentials: 'Konecta2030',
+                bindCredentials: 'Konecta2031',
                 searchFilter: '(SAMAccountName={{username}})',
                 searchBase: 'dc=multienlace,dc=com,dc=co'
             }
