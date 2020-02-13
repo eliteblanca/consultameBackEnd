@@ -5,27 +5,13 @@ const PUNTO_DE_ENLACE: string = process.env.ES_PUNTO_ENLACE;
 
 export class GenericModel {
     constructor() {
-
-        if (process.env.NODE_ENV == 'development') {
-            this.esClient = new Client({
-                node: PUNTO_DE_ENLACE,
-                requestTimeout: 10000,
-                ssl: {
-                    rejectUnauthorized: false
-                }
-            })
-            
-        } else {
-                this.esClient = new Client({
-                    node: PUNTO_DE_ENLACE,
-                    requestTimeout: 10000,
-                    ssl: {
-                        ca: fs.readFileSync('../../../../../../../../cert.pem'),
-                        rejectUnauthorized: false
-                    }
-                })
-        }
-
+        this.esClient = new Client({
+            node: PUNTO_DE_ENLACE,
+            requestTimeout: 10000,
+            ssl: {
+                rejectUnauthorized: false
+            }
+        })
     }
 
     protected readonly esClient: Client;

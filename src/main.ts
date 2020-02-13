@@ -13,20 +13,8 @@ import { json } from 'body-parser';
 
 async function bootstrap() {
 
-  try {
-
-    const httpsOptions = {
-      key: fs.readFileSync('../../../../../../../../key.pem'),
-      cert: fs.readFileSync('../../../../../../../../cert.pem'),
-    }
-
-    var app = await NestFactory.create<NestExpressApplication>(AppModule,{
-      httpsOptions
-    })
-
-  } catch (error) {
-      var app = await NestFactory.create<NestExpressApplication>(AppModule);
-  }
+  var app = await NestFactory.create<NestExpressApplication>(AppModule);
+  
 
   app.use(compression());
 
