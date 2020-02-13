@@ -97,6 +97,4 @@ export class ReportsController {
         return this.articleEventsModel.getFullReport(filters.filters, parseInt(date), parseInt(from), parseInt(to))
     }
 
-
-
 }

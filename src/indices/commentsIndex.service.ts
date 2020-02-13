@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Esindex } from "./esindex";
 
 export interface comment {
-    article:string;
+    articulo:string;
     publicationDate:number;
     user:string;
     username:string;
@@ -14,7 +14,7 @@ export interface comment {
     lider:string;
     cliente:string;
     pcrc:string;
-    category:string;
+    categoria:string;
 }
 
 @Injectable()

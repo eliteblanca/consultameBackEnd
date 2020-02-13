@@ -2,10 +2,10 @@ import { Esindex } from "./esindex";
 import { Injectable } from "@nestjs/common";
 
 export class ArticleState {
-    articleId:string
+    articulo:string
     cliente:string
     pcrc:string
-    category:string
+    categoria:string
     state:string
     initialDate:number
     finalDate?:number

@@ -221,7 +221,7 @@ export class EsClientService extends GenericModel {
                         body: {
                             "mappings": {
                                 "properties": {
-                                    "article": { "type": "keyword" },
+                                    "articulo": { "type": "keyword" },
                                     "publicationDate": { "type": "date", "format": 'epoch_millis' },
                                     "user": { "type": "keyword" },
                                     "username": { "type": "keyword" },
@@ -233,7 +233,7 @@ export class EsClientService extends GenericModel {
                                     "lider": { "type": "keyword" },
                                     "cliente": { "type": "keyword" },
                                     "pcrc": { "type": "keyword" },
-                                    "category": { "type": "keyword" },
+                                    "categoria": { "type": "keyword" },
                                 }
                             }
                         }
@@ -246,7 +246,7 @@ export class EsClientService extends GenericModel {
                         body: {
                             "mappings": {
                                 "properties": {
-                                    "articleId": { "type": "keyword" },
+                                    "articulo": { "type": "keyword" },
                                     "userId": { "type": "keyword" },
                                     "publicationDate": { "type": "date", "format": 'epoch_millis' },
                                     "modificationDate": { "type": "date", "format": 'epoch_millis' },
@@ -254,7 +254,7 @@ export class EsClientService extends GenericModel {
                                     "creator": { "type": "keyword" },
                                     "cliente": { "type": "keyword" },
                                     "pcrc": { "type": "keyword" },
-                                    "category": { "type": "keyword" },
+                                    "categoria": { "type": "keyword" },
                                     "eventDate": { "type": "date", "format": 'epoch_millis' },
                                     "director": { "type": "keyword" },
                                     "gerente": { "type": "keyword" },
@@ -273,10 +273,10 @@ export class EsClientService extends GenericModel {
                         body: {
                             "mappings": {
                                 "properties": {
-                                    "articleId": { "type": "keyword" },
+                                    "articulo": { "type": "keyword" },
                                     "cliente": { "type": "keyword" },
                                     "pcrc": { "type": "keyword" },
-                                    "category": { "type": "keyword" },
+                                    "categoria": { "type": "keyword" },
                                     "state": { "type": "keyword" },
                                     "initialDate": { "type": "date", "format": 'epoch_millis' },
                                     "finalDate": { "type": "date", "format": 'epoch_millis' },
@@ -296,11 +296,11 @@ export class EsClientService extends GenericModel {
                                 "properties": {
                                     "initialDate": { "type": "date", "format": 'epoch_millis' },
                                     "finalDate": { "type": "date", "format": 'epoch_millis' },
-                                    "articleId": { "type": "keyword" },
+                                    "articulo": { "type": "keyword" },
                                     "user": { "type": "keyword" },
                                     "cliente": { "type": "keyword" },
                                     "pcrc": { "type": "keyword" },
-                                    "category": { "type": "keyword" },
+                                    "categoria": { "type": "keyword" },
                                     "director": { "type": "keyword" },
                                     "gerente": { "type": "keyword" },
                                     "coordinador": { "type": "keyword" },
@@ -320,12 +320,12 @@ export class EsClientService extends GenericModel {
                                 "properties": {
                                     "initialDate": { "type": "date", "format": 'epoch_millis' },
                                     "finalDate": { "type": "date", "format": 'epoch_millis' },
-                                    "articleId": { "type": "keyword" },
-                                    "duration":{ "type": "integer" },
+                                    "articulo": { "type": "keyword" },
+                                    "duration": { "type": "integer" },
                                     "user": { "type": "keyword" },
                                     "cliente": { "type": "keyword" },
                                     "pcrc": { "type": "keyword" },
-                                    "category": { "type": "keyword" },
+                                    "categoria": { "type": "keyword" },
                                     "director": { "type": "keyword" },
                                     "gerente": { "type": "keyword" },
                                     "coordinador": { "type": "keyword" },
@@ -336,27 +336,27 @@ export class EsClientService extends GenericModel {
                     })
                     break;
                 case 'articlechanges':
-                        return await this.esClient.indices.create({
-                            index: index,
-                            include_type_name: false,
-                            body: {
-                                "mappings": {
-                                    "properties": {
-                                        "eventDate": { "type": "date", "format": 'epoch_millis' },
-                                        "articleId": { "type": "keyword" },
-                                        "user": { "type": "keyword" },
-                                        "cliente": { "type": "keyword" },
-                                        "pcrc": { "type": "keyword" },
-                                        "category": { "type": "keyword" },
-                                        "event": { "type": "keyword" },
-                                        "articlecontent": { "type": "keyword", "ignore_above": 250 },
-                                        "prevstate": { "type": "keyword" },
-                                        "articlestate": { "type": "keyword" }
-                                    }
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body: {
+                            "mappings": {
+                                "properties": {
+                                    "eventDate": { "type": "date", "format": 'epoch_millis' },
+                                    "articulo": { "type": "keyword" },
+                                    "user": { "type": "keyword" },
+                                    "cliente": { "type": "keyword" },
+                                    "pcrc": { "type": "keyword" },
+                                    "categoria": { "type": "keyword" },
+                                    "event": { "type": "keyword" },
+                                    "articlecontent": { "type": "keyword", "ignore_above": 250 },
+                                    "prevstate": { "type": "keyword" },
+                                    "articlestate": { "type": "keyword" }
                                 }
                             }
-                        })
-                        break;
+                        }
+                    })
+                    break;
                 default:
                     break;
             }

@@ -27,7 +27,7 @@ export class ArticleEventsModelService {
         private pcrcModel: PcrcModelService,
         private commentsIndex: CommentsIndexService,
         private categoriesModel: CategoriesModelService,
-        private articleChangesIndex: ArticleChangesIndex,
+        private articleChangesIndex: ArticleChangesIndex
     ) { }
 
     createEvent = async (article: Article & { id: string; } | string, userId: string, event: articleEvent['event']) => {
@@ -39,8 +39,8 @@ export class ArticleEventsModelService {
             let bossInfo = await this.cargosModel.getAllBoss(userId)
 
             let view: articleEvent = {
-                articleId: articleObj.id,
-                category: articleObj.category,
+                articulo: articleObj.id,
+                categoria: articleObj.category,
                 cliente: articleObj.cliente,
                 creator: articleObj.creator,
                 modificationDate: articleObj.modificationDate,
@@ -62,8 +62,8 @@ export class ArticleEventsModelService {
             let bossInfo = await this.cargosModel.getAllBoss(userId)
 
             let view: articleEvent = {
-                articleId: article.id,
-                category: article.category,
+                articulo: article.id,
+                categoria: article.category,
                 cliente: article.cliente,
                 creator: article.creator,
                 modificationDate: article.modificationDate,
@@ -347,7 +347,7 @@ export class ArticleEventsModelService {
 
         let articlesStates = await this.articleStateIndex.query(query)
 
-        let articlesAux:any[] = articlesStates.map(article => article.articleId)
+        let articlesAux:any[] = articlesStates.map(article => article.articulo)        
 
         //totalItems
 
@@ -392,7 +392,7 @@ export class ArticleEventsModelService {
 
         let listOfArticleViewsPromises = articlesAux.map(article => {
             return async ( ) => {
-                return await this.getViewsCountBy(date.toString(), [{ filter:"articleId", value: article.articleId }])
+                return await this.getViewsCountBy(date.toString(), [{ filter:"articulo", value: article.articleId }])
             }
         })
 
@@ -408,7 +408,7 @@ export class ArticleEventsModelService {
 
         let listOfArticleLikesPromises = articlesAux.map(article => {
             return async ( ) => {
-                return await this.getVotesCountBy(date.toString(), [{ filter:"articleId", value: article.articleId }], 'like')
+                return await this.getVotesCountBy(date.toString(), [{ filter:"articulo", value: article.articleId }], 'like')
             }
         })
 
@@ -422,7 +422,7 @@ export class ArticleEventsModelService {
 
         let listOfArticleDisLikesPromises = articlesAux.map(article => {
             return async ( ) => {
-                return await this.getVotesCountBy(date.toString(), [{ filter:"articleId", value: article.articleId }], 'dislike')
+                return await this.getVotesCountBy(date.toString(), [{ filter:"articulo", value: article.articleId }], 'dislike')
             }
         })
 
@@ -430,15 +430,15 @@ export class ArticleEventsModelService {
 
         dislikes.forEach((value, index) => {
             articlesAux[index].dislikes = value.value
-            articlesAux[index].indiceDisgusto = value.value / (articlesAux[index].dislikes + articlesAux[index].likes)
-            articlesAux[index].indiceGusto = articlesAux[index].likes / (articlesAux[index].dislikes + articlesAux[index].likes)
+            articlesAux[index].indiceDisgusto = value.value == 0 ? 0 : value.value / (articlesAux[index].dislikes + articlesAux[index].likes)
+            articlesAux[index].indiceGusto = articlesAux[index].likes == 0 ? 0 :articlesAux[index].likes / (articlesAux[index].dislikes + articlesAux[index].likes)
         })
 
         // favorites
 
         let listOfArticleFavoritesPromises = articlesAux.map(article => {
             return async ( ) => {
-                return await this.getVotesCountBy(date.toString(), [{ filter:"articleId", value: article.articleId }], 'favorite')
+                return await this.getVotesCountBy(date.toString(), [{ filter:"articulo", value: article.articleId }], 'favorite')
             }
         })
 
@@ -451,12 +451,14 @@ export class ArticleEventsModelService {
 
         // comments
 
+
+
         let listOfArticleCommentsPromises = articlesAux.map(article => {
             return async ( ) => {
 
                 let from = (new Date()).setFullYear(2000)
 
-                return await this.getEventCountBy('comment', [{ filter:"articleId", value: article.articleId }], from.toString(), date.toString())
+                return await this.getEventCountBy('comment', [{ filter:"articulo", value: article.articleId }], from.toString(), date.toString())
             }
         })
 
@@ -470,7 +472,7 @@ export class ArticleEventsModelService {
 
         let listOfArticleUsersPromises = articlesAux.map(article => {
             return async ( ) => {
-                return await this.getViewsBy(date.toString(), [{ filter:"articleId", value: article.articleId }] )
+                return await this.getViewsBy(date.toString(), [{ filter:"articulo", value: article.articleId }] )
             }
         })
 
@@ -486,7 +488,7 @@ export class ArticleEventsModelService {
 
         let listOfArticleLecturesPromises = articlesAux.map(article => {
             return async ( ) => {
-                return await this.getViewsCountBy(date.toString(), [{ filter:"articleId", value: article.articleId }],40000)
+                return await this.getViewsCountBy(date.toString(), [{ filter:"articulo", value: article.articleId }],40000)
             }
         })
 
@@ -536,7 +538,7 @@ export class ArticleEventsModelService {
 
         // articulos
 
-        let idsArticulos = [...new Set( listaComentarios.map(comentario => comentario.article))]
+        let idsArticulos = [...new Set( listaComentarios.map(comentario => comentario.articulo))]
 
         let listaArticulosPromises = idsArticulos.map(articleId => {
             return async () => {
@@ -557,7 +559,7 @@ export class ArticleEventsModelService {
 
         // categoria
 
-        let idsCategorias = [...new Set( listaComentarios.map(comentario => comentario.category))]
+        let idsCategorias = [...new Set( listaComentarios.map(comentario => comentario.categoria))]
 
         let ListaCategoriasPromises = idsCategorias.map(id => {
             return async () => {
@@ -569,13 +571,13 @@ export class ArticleEventsModelService {
 
         listaComentariosFinal = listaComentariosFinal.map( comentario => {
 
-            let indiceCategoria = idsCategorias.findIndex(id => id == comentario.category )
+            let indiceCategoria = idsCategorias.findIndex(id => id == comentario.categoria )
 
             let nombreCategoria = categories[indiceCategoria].name
 
             return {
                 ...comentario,
-                category: nombreCategoria
+                categoria: nombreCategoria
             }
         })
 
@@ -691,7 +693,7 @@ export class ArticleEventsModelService {
             size: to,
             sort: [
                 { eventDate :{ order: 'desc' }}, // R.objOf(key)(value) = {key : value}
-                { articleId :{ order: 'asc' }} // R.objOf(key)(value) = {key : value}
+                { articulo :{ order: 'asc' }} // R.objOf(key)(value) = {key : value}
             ]
         }
 
@@ -701,7 +703,7 @@ export class ArticleEventsModelService {
 
         // categoria
 
-        let idsCategorias = [...new Set( listaDeCambios.map(cambio => cambio.category))]
+        let idsCategorias = [...new Set( listaDeCambios.map(cambio => cambio.categoria))]
 
         let ListaCategoriasPromises = idsCategorias.map(id => {
             return async () => {
@@ -713,13 +715,13 @@ export class ArticleEventsModelService {
 
         listaDeCambios = listaDeCambios.map( cambio => {
 
-            let indiceCategoria = idsCategorias.findIndex(id => id == cambio.category )
+            let indiceCategoria = idsCategorias.findIndex(id => id == cambio.categoria )
 
             let nombreCategoria = categories[indiceCategoria].name
 
             return {
                 ...cambio,
-                category: nombreCategoria
+                categoria: nombreCategoria
             }
         })
 
@@ -774,7 +776,7 @@ export class ArticleEventsModelService {
 
         // articulos
 
-        let idsArticulos = [...new Set( listaDeCambios.map(cambio => cambio.articleId))]
+        let idsArticulos = [...new Set( listaDeCambios.map(cambio => cambio.articulo))]
 
         let listOfArticlesPromises = idsArticulos.map( idArticulo => {
             return async () => {
@@ -786,7 +788,7 @@ export class ArticleEventsModelService {
 
         listaDeCambios = listaDeCambios.map(cambio => {
 
-            let articleIndice = idsArticulos.findIndex( id => id == cambio.articleId )
+            let articleIndice = idsArticulos.findIndex( id => id == cambio.articulo )
 
             let nombreArticulo = articulos[articleIndice].title
 

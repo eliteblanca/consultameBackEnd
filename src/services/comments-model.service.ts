@@ -5,13 +5,13 @@ import { IsOptional, Length } from 'class-validator';
 import { ArticleEventsModelService } from "../services/articleEvents-model.service";
 import { CargosModelService } from "../services/cargos-model.service";
 export class commentDTO {
-    
+
     @Length(20, 20, { message: 'debes proporcionar un id valido' })
     @IsOptional()
-    replyTo:string
+    replyTo: string
 
     @Length(2, 2000)
-    text:string
+    text: string
 }
 
 @Injectable()
@@ -24,87 +24,84 @@ export class CommentsModelService {
         private cargosModel: CargosModelService,
     ) { }
 
-    getComments = async (articleId: string, from:string = '0' , size:string = '10' ): Promise<comment[]> => {
+    getComments = async (articleId: string, from: string = '0', size: string = '10'): Promise<comment[]> => {
 
-        try {
-            let query = {
-                query: {
-                    bool: {
-                        filter: [
-                            { term: { article: articleId } }
-                        ],
-                        must_not : {
-                            exists: {
-                                field: "replyTo"
-                            }
+
+        let query = {
+            query: {
+                bool: {
+                    filter: [
+                        { term: { articulo: articleId } }
+                    ],
+                    must_not: {
+                        exists: {
+                            field: "replyTo"
                         }
                     }
-                },
-                from : parseInt(from),
-                size : parseInt(size),
-                sort : [
-                    { publicationDate: { order : 'desc' }}
-                ]
-            };
+                }
+            },
+            from: parseInt(from),
+            size: parseInt(size),
+            sort: [
+                { publicationDate: { order: 'desc' } }
+            ]
+        };
 
-            let result = await this.commentsIndex.query(query);
+        let result = await this.commentsIndex.query(query);
 
-            return result
+        return result
 
-        } catch (err) {
-            console.log(err.meta.body.error);
-        }
 
     }
 
-    postComment = async (newComment:commentDTO, articleId:string, userId:string, username:string): Promise<comment & { id: string; }> => {
+    postComment = async (newComment: commentDTO, articleId: string, userId: string, username: string): Promise<comment & { id: string; }> => {
 
-        var article:Article;
+        var article: Article;
 
         article = await this.articleIndex.getById(articleId)
 
-        if(!!!article){
+        if (!!!article) {
             throw new HttpException({
                 "message": `articulo no encontrado`
             }, 404)
 
         }
 
-        if( newComment.replyTo ){
+        if (newComment.replyTo) {
 
-            let replyComment:comment;
-            
+            let replyComment: comment;
+
             replyComment = await this.commentsIndex.getById(newComment.replyTo)
 
-            if(!!!replyComment){
+            if (!!!replyComment) {
                 throw new HttpException({
                     "message": `el comentario a responder no existe`
                 }, 404)
             }
 
-            if( replyComment.replyTo){
+            if (replyComment.replyTo) {
                 throw new ConflictException('no puedes responder a una respuesta de un commentario');
             }
 
-            if( replyComment.article != articleId ){
+            if (replyComment.articulo != articleId) {
                 throw new ConflictException('el comentario a responder no pertenece al articulo');
             }
         }
 
         let bossInfo = await this.cargosModel.getAllBoss(userId)
 
-        
 
-        let commnetExtras:Omit<comment, 'replyTo'|'text'> = {
+
+        let commnetExtras: Omit<comment, 'replyTo' | 'text'> = {
             publicationDate: Date.now(),
             user: userId,
-            username:username,
-            article: articleId,
+            username: username,
+            articulo: articleId,
             lider: bossInfo.lider,
             coordinador: bossInfo.coordinador,
             gerente: bossInfo.gerente,
             director: bossInfo.director,
-            category: article.category,
+            categoria: article.category,
             cliente: article.cliente,
             pcrc: article.pcrc
         }
@@ -114,8 +111,8 @@ export class CommentsModelService {
         return await this.commentsIndex.create({ ...newComment, ...commnetExtras })
     }
 
-    getRepliesTo = async (replyTo: string, from:string = '0' , size:string = '10' ): Promise<comment[]> => {
-        return this.commentsIndex.where({ replyTo: replyTo }, from, size, { orderby:'publicationDate',order:'desc' })
+    getRepliesTo = async (replyTo: string, from: string = '0', size: string = '10'): Promise<comment[]> => {
+        return this.commentsIndex.where({ replyTo: replyTo }, from, size, { orderby: 'publicationDate', order: 'desc' })
     }
 
 }

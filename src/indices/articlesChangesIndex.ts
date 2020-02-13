@@ -4,11 +4,11 @@ import { Injectable } from "@nestjs/common";
 
 export class articleChanges {
     eventDate:number;
-    articleId:string;
+    articulo:string;
     user:string;
     cliente:string;
     pcrc:string;
-    category:string;
+    categoria:string;
     event:string;
     articlecontent:string;
     previoustate:string;

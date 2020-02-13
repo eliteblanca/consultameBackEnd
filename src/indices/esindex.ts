@@ -302,9 +302,9 @@ export class Esindex<T> {
 
             return R.map((x: any) => R.addProp(x._source, 'id', x._id))(result.body.hits.hits)
 
-        } catch (error) {
-           
-            console.log(error.meta.body.error)
+        } catch (error) {           
+
+            console.log(error)
 
             let errorCode = '03';
 
@@ -1530,8 +1530,6 @@ export class Esindex<T> {
         } catch (error) {
 
             let errorCode = '13';
-
-            console.log(error.meta.body.error)
 
             if (error instanceof errors.ResponseError) {/* 01 */
 

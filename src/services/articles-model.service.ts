@@ -208,8 +208,8 @@ export class ArticlesModelService {
         let creationResult = await this.articleIndex.create(newArticle)        
 
         await this.updateArticleState({
-                articleId:creationResult.id,
-                category:creationResult.category,
+                articulo:creationResult.id,
+                categoria:creationResult.category,
                 cliente:creationResult.cliente,
                 pcrc:creationResult.pcrc
             },
@@ -229,9 +229,9 @@ export class ArticlesModelService {
 
         if(!!article.obj){
             await this.articleChangesIndex.create({
-                articleId: creationResult.id,
+                articulo: creationResult.id,
                 articlecontent: article.obj,
-                category: newArticle.category,
+                categoria: newArticle.category,
                 cliente: newArticle.cliente,
                 pcrc: newArticle.pcrc,
                 event: articleEvent,
@@ -495,8 +495,8 @@ export class ArticlesModelService {
         await this.likeUserIndex.deleteWhere({ article: id })
 
         await this.updateArticleState({
-                articleId:id,
-                category:article.category,
+                articulo:id,
+                categoria:article.category,
                 cliente: article.cliente,
                 pcrc:article.pcrc
             },
@@ -522,9 +522,9 @@ export class ArticlesModelService {
 
         if(!!article.obj){
             await this.articleChangesIndex.create({
-                articleId: id,
+                articulo: id,
                 articlecontent: '',
-                category: article.category,
+                categoria: article.category,
                 cliente: article.cliente,
                 pcrc: article.pcrc,
                 event: articleEvent,
@@ -593,8 +593,8 @@ export class ArticlesModelService {
         let newArticle: Partial<Article> = { ...articleExtas, ...article };
             
         await this.updateArticleState({
-            articleId: id,
-            category: newArticle.category,
+            articulo: id,
+            categoria: newArticle.category,
             cliente: newArticle.cliente, 
             pcrc: newArticle.pcrc
         },
@@ -627,9 +627,9 @@ export class ArticlesModelService {
 
         if(!!article.obj){
             await this.articleChangesIndex.create({
-                articleId: id,
+                articulo: id,
                 articlecontent: article.obj,
-                category: newArticle.category,
+                categoria: newArticle.category,
                 cliente: newArticle.cliente,
                 pcrc: newArticle.pcrc,
                 event: articleEvent,
@@ -645,7 +645,7 @@ export class ArticlesModelService {
     }
 
     private updateArticleState = async (articleInfo:  Omit<ArticleState, 'initialDate'|'finalDate'|'initialDateUser'|'finalDateUser'|'state'>, newState:string, userId:string) => {
-        let currentArticleStates = await this.articleStateIndex.where({ articleId: articleInfo.articleId })
+        let currentArticleStates = await this.articleStateIndex.where({ articulo: articleInfo.articulo })
 
         if(!!currentArticleStates.length){
             let estadoActual = currentArticleStates.find(state => {
@@ -656,8 +656,8 @@ export class ArticlesModelService {
         }
 
         await this.articleStateIndex.create({
-            articleId: articleInfo.articleId,
-            category: articleInfo.category,
+            articulo: articleInfo.articulo,
+            categoria: articleInfo.categoria,
             cliente: articleInfo.cliente,
             initialDate: (new Date).getTime(),
             initialDateUser: userId,
@@ -676,8 +676,8 @@ export class ArticlesModelService {
 
 
             await this.favoriteStatesIndex.create({
-                articleId:articleInfo.articleId,
-                category:articleInfo.category,
+                articulo:articleInfo.articleId,
+                categoria:articleInfo.category,
                 cliente:articleInfo.cliente,
                 coordinador:userBoss.coordinador,
                 director:userBoss.director,
@@ -761,7 +761,7 @@ export class ArticlesModelService {
 
     public getArticleHistory = async (articleId:string) => {
 
-        let history = await this.articleStateIndex.where({ articleId: articleId })
+        let history = await this.articleStateIndex.where({ articulo: articleId })
 
         return history
     }
@@ -779,8 +779,8 @@ export class ArticlesModelService {
         let allboss = await this.cargosModel.getAllBoss(userId)        
 
         await this.articlesViewsIndex.create({
-            articleId: articleId,
-            category: article.category,
+            articulo: articleId,
+            categoria: article.category,
             cliente: article.cliente,
             pcrc: article.pcrc,
             coordinador: allboss.coordinador,

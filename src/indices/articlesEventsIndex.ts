@@ -8,7 +8,7 @@ export function isEvent(arg: any): arg is posibleEvents {
 }
 
 export class articleEvent {
-    articleId:string;
+    articulo:string;
     userId:string;
     publicationDate:number;
     modificationDate:number;
@@ -16,7 +16,7 @@ export class articleEvent {
     creator:string;
     cliente:string;
     pcrc:string;
-    category:string;
+    categoria:string;
     eventDate:number;
     director:string;
     gerente:string;

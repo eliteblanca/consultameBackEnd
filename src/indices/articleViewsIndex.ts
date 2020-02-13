@@ -4,12 +4,12 @@ import { Injectable } from "@nestjs/common";
 export class articleView {
     initialDate:number;
     finalDate:number;
-    articleId:string;
+    articulo:string;
     duration:number;
     user:string;
     cliente:string;
     pcrc:string;
-    category:string;
+    categoria:string;
     director:string;
     gerente:string;
     coordinador:string;
