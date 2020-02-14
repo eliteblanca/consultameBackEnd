@@ -62,7 +62,7 @@ const secretKey = "123";
     JwtModule.register({
       secret:secretKey,
       signOptions:{
-        expiresIn:'1h'
+        expiresIn:'1y'
       }
     }),
     TypeOrmModule.forRoot({
