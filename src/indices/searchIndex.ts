@@ -2,9 +2,10 @@ import { Esindex } from "./esindex";
 import { Injectable } from "@nestjs/common";
 
 export interface search {
-    subline:string;
-    query:string;
-    searches:number;
+    query:string,
+    subline:string,
+    user:string,
+    publicationDate:number
 }
 
 @Injectable()

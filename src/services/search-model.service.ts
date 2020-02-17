@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
 import { SearchsIndex, search } from "../indices/searchIndex";
-import * as R from 'remeda';
+import { IsNotEmpty, Length } from 'class-validator';
 
+export class newSearchDTO {
+    @IsNotEmpty({ message: 'debes proporcionar una query' })
+    query
 
+    @IsNotEmpty({ message: 'debes proporcionar una sublinea' })
+    subline
+}
 
 @Injectable()
 export class SearchModelService extends GenericModel {
@@ -38,14 +44,13 @@ export class SearchModelService extends GenericModel {
         return await this.searchsIndex.updateScript(id, { "source": "ctx._source.searches += 1" })
     }
 
-    public async newSearch(options: { query: string; subline: string; }): Promise<any> {
-        let searchs = await this.getByQuery(options.subline, options.query)
-
-        if (searchs.length) {
-            await this.increaseSearchCount(searchs[0]['id'])
-        } else {
-            await this.searchsIndex.create({ searches: 1, ...options })
-        }
+    public async newSearch(query: string, subline: string, userId:string): Promise<any> {
+        await this.searchsIndex.create({
+            publicationDate:(new Date()).getTime(),
+            query:query,
+            subline:subline,
+            user:userId  
+        })
     }
 
     public async getSuggestions(input: string, subline: string): Promise<(search & { id: string; })[]> {

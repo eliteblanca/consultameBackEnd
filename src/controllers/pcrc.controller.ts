@@ -59,8 +59,17 @@ export class PcrcController {
         @Query('tag') tag: string
     ): Promise<any> {
         if (query) {
-            await this.searchModel.newSearch({ query: query, subline: idPcrc })
-            return this.articlesModel.getArticlesByQuery(query, { pcrc:idPcrc }, state, from, size)
+
+            let start = process.hrtime()
+
+            let result = await this.articlesModel.getArticlesByQuery(query, { pcrc:idPcrc }, state, from, size)
+
+            let end = process.hrtime(start)
+
+            console.info('Execution time (hr): %ds %dms', end[0], end[1] / 1000000)
+
+            return result
+
         } else if (tag) {
             return this.articlesModel.getArticlesByTag({ subline: idPcrc, tag: tag, from: from, size: size })
         } else {

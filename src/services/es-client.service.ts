@@ -84,7 +84,8 @@ export class EsClientService extends GenericModel {
                                         }
                                     },
                                     subline: { type: "keyword" },
-                                    searches: { type: "integer" }
+                                    user: { type: "keyword" },                                    
+                                    publicationDate: { "type": "date", "format": 'epoch_millis' },
                                 }
                             },
                             settings: {

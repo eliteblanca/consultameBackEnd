@@ -1,14 +1,16 @@
-import { Controller, UseGuards, Get, Query } from '@nestjs/common';
+import { Controller, UseGuards, Get, Query, Post, Body } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { SearchModelService } from "../services/search-model.service";
+import { SearchModelService, newSearchDTO } from "../services/search-model.service";
+import { User as U } from '../entities/user';
+import { User } from '../user.decorator';
 
-@Controller('api/suggestions')
+@Controller('api')
 export class searchController {
 
     constructor(private searchModel:SearchModelService) {}
 
     @UseGuards(AuthGuard('jwt'))
-    @Get()
+    @Get('suggestions')
     getSuggestions(
         @Query('input') input:string,
         @Query('subline') subline:string){
@@ -21,5 +23,13 @@ export class searchController {
             return this.searchModel.getAll();
         }
     }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('search')
+    newSearch(
+        @Body() body:newSearchDTO,        
+        @User() user: U
+    ){
+        this.searchModel.newSearch(body.query, body.subline, user.sub)
+    }
 }
-            
