@@ -6,6 +6,8 @@ import { SearchModelService } from "./../services/search-model.service";
 import { ArticlesModelService } from "./../services/articles-model.service";
 import { NewsModelService } from "./../services/news-model.service";
 
+import { User } from '../user.decorator';
+import { User as U } from '../entities/user';
 
 @Controller('api/pcrc')
 export class PcrcController {
@@ -56,9 +58,14 @@ export class PcrcController {
         @Query('from') from: string,
         @Query('size') size: string,
         @Query('state') state: string,
-        @Query('tag') tag: string
+        @Query('tag') tag: string,
+        @User() user: U
     ): Promise<any> {
         if (query) {
+
+            if(from == '0'){
+                await this.searchModel.newSearch(query, idPcrc, user.sub)
+            }
 
             let start = process.hrtime()
 

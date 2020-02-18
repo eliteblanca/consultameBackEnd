@@ -49,7 +49,7 @@ export class SearchModelService extends GenericModel {
             publicationDate:(new Date()).getTime(),
             query:query,
             subline:subline,
-            user:userId  
+            user:userId
         })
     }
 
