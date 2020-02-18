@@ -111,7 +111,7 @@ export class UserModelService {
     }
 
     public async getUserFavorites(userId: string, from: string, size: string): Promise<(Article & { id: string; })[]> {
-        return await this.articleIndex.where({ favorites:  userId  }, from, size, { orderby: 'publicationDate', order: 'desc' })
+        return await this.articleIndex.where({ favorites:  userId, state:'published'  }, from, size, { orderby: 'publicationDate', order: 'desc' })
     }
 
     public searchUsers = async (query: string) => {
