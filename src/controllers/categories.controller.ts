@@ -59,11 +59,6 @@ export class CategoriesController {
     @UseGuards(AuthGuard('jwt'))
     @Get('')
     async getAll(
-        @Param('idCategory') idCategory: string,
-        @Query('query') query: string,
-        @Query('from') from: string,
-        @Query('size') size: string,
-        @Query('state') state: string
     ): Promise<any> {
         return await this.categoriesModel.getAllCategories()
     }
