@@ -991,7 +991,9 @@ export class Esindex<T> {
             return this.query({
                 query: {
                     "match_all": {}
-                }
+                },
+                from: 0,
+                size: 10000
             })
 
         } catch (error) {            
