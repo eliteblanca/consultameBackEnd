@@ -173,4 +173,8 @@ export class CategoriesModelService {
     public updateCategory = async (id, newCategory: udpateCategoryDTO): Promise<any> => {
         return await this.categoriesIndex.updatePartialDocument(id, newCategory)
     }
+
+    public getAllCategories = async () => {
+        return await this.categoriesIndex.all()
+    }
 }

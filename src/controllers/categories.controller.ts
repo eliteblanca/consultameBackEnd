@@ -55,4 +55,11 @@ export class CategoriesController {
             return this.articlesModel.getArticlesByCategory(idCategory, state, from, size);        
         }
     }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('')
+    async getAll(
+    ): Promise<any> {
+        return await this.categoriesModel.getAllCategories()
+    }
 }
