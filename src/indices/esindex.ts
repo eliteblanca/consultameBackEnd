@@ -470,7 +470,9 @@ export class Esindex<T> {
                                     R.map(obj => R.objOf(obj, 'term'))
                                 )
                             }
-                        }
+                        },
+                        from: 0,
+                        size: 10000
                     }
                 })
             }
