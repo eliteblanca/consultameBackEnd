@@ -13,8 +13,10 @@ npm install
 npm run buildprod
 sudo yum install nginx
 sudo yum install vim    
+cd ../consultameBackEnd/
 sudo mv ngxapp.conf /etc/nginx/conf.d/
 sudo restorecon  /etc/nginx/conf.d/
 sudo restorecon  /etc/nginx/conf.d/*
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/server.key -out /etc/nginx/server.crt
 npm install pm2 -g
+pm2 start dist/main.js

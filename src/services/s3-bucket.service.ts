@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException, Inject, forwardRef } from '@nestjs/common';
 import { ArticlesModelService } from "../services/articles-model.service";
 import * as S3 from 'aws-sdk/clients/s3';
-import * as aws from 'aws-sdk';
 
 
 @Injectable()
@@ -21,7 +20,7 @@ export class S3BucketService {
 
     async uploadFile(idArticle: string, file: any) {
         let params = { 
-            Bucket: 'bucketpruebaconsultamekonecta',
+            Bucket: process.env.BUCKET_NAME,
             Key: `${idArticle}/${file.originalname}`,
             Body: file.buffer,
             ContentType: file.mimetype
@@ -40,14 +39,14 @@ export class S3BucketService {
     }
 
     getFile(idArticle:string, fileName:string){
-        let params = { Bucket: 'bucketpruebaconsultamekonecta', Key: `${idArticle}/${fileName}` };
+        let params = { Bucket: process.env.BUCKET_NAME, Key: `${idArticle}/${fileName}` };
 
         return this.s3Client.getObject(params).createReadStream();
     }
 
     deleteFile = async (idArticle:string, fileName:any) => {
 
-        let params = { Bucket: 'bucketpruebaconsultamekonecta', Key: `${idArticle}/${fileName}` };
+        let params = { Bucket: process.env.BUCKET_NAME, Key: `${idArticle}/${fileName}` };
 
         let deleteResult = await this.s3Client.deleteObject(params).promise();
 
