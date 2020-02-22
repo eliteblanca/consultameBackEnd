@@ -573,12 +573,22 @@ export class ArticleEventsModelService {
 
             let indiceCategoria = idsCategorias.findIndex(id => id == comentario.categoria )
 
-            let nombreCategoria = categories[indiceCategoria].name
+            let categoria = categories[indiceCategoria]
 
-            return {
-                ...comentario,
-                categoria: nombreCategoria
+            if(categoria){
+                return {
+                    ...comentario,
+                    categoria: categoria.name
+                }
+
+            }else{                   
+                
+                return {
+                    ...comentario,
+                    categoria: 'eliminada'
+                }
             }
+
         })
 
         // pcrc
@@ -715,14 +725,24 @@ export class ArticleEventsModelService {
 
         listaDeCambios = listaDeCambios.map( cambio => {
 
-            let indiceCategoria = idsCategorias.findIndex(id => id == cambio.categoria )
+            let indiceCategoria = idsCategorias.findIndex(id => id == cambio.categoria )        
 
-            let nombreCategoria = categories[indiceCategoria].name
+            let categoria = categories[indiceCategoria]
 
-            return {
-                ...cambio,
-                categoria: nombreCategoria
+            if(categoria){
+                return {
+                    ...cambio,
+                    categoria: categoria.name
+                }
+
+            }else{                   
+                
+                return {
+                    ...cambio,
+                    categoria: 'eliminada'
+                }
             }
+            
         })
 
         // pcrc
