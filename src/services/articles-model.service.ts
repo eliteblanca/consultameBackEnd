@@ -504,7 +504,7 @@ export class ArticlesModelService {
             userId
         )
 
-        let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articleId', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
+        let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
 
         let previousState = ''
 
@@ -601,7 +601,7 @@ export class ArticlesModelService {
         newArticle.state,
         modificationUser)
     
-        let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articleId', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
+        let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
 
         let previousState = ''
 
@@ -756,7 +756,7 @@ export class ArticlesModelService {
     }
 
     public async prueba(): Promise<any> {
-        return await this.articlesViewsIndex.all()
+        return await this.ArticleEventsModel.getChangesBy([{filter:'articulo', value:'6nTXbXABnJwgvpSTB1bB'}], 949784794968, (new Date()).getTime(),0 , 1)
     }
 
     public getArticleHistory = async (articleId:string) => {
