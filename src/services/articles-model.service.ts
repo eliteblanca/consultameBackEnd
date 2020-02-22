@@ -144,8 +144,6 @@ export class ArticlesModelService {
                 'lang': 'painless'
             });
 
-            await this.ArticleEventsModel.createEvent(article, userId, 'view')
-
             return article
 
         } else {
@@ -778,22 +776,24 @@ export class ArticlesModelService {
 
         let allboss = await this.cargosModel.getAllBoss(userId)        
 
-        await this.articlesViewsIndex.create({
-            articulo: articleId,
-            categoria: article.category,
-            cliente: article.cliente,
-            pcrc: article.pcrc,
-            coordinador: allboss.coordinador,
-            director: allboss.director,
-            gerente: allboss.gerente,
-            lider: allboss.lider,
-            user: userId,
-            initialDate: initialDate,
-            finalDate: finalDate,
-            duration: finalDate - initialDate
-        })
+        let result = await Promise.all([
+            await this.articlesViewsIndex.create({
+                articulo: articleId,
+                categoria: article.category,
+                cliente: article.cliente,
+                pcrc: article.pcrc,
+                coordinador: allboss.coordinador,
+                director: allboss.director,
+                gerente: allboss.gerente,
+                lider: allboss.lider,
+                user: userId,
+                initialDate: initialDate,
+                finalDate: finalDate,
+                duration: finalDate - initialDate
+            }),
 
-        console.log('created')
+            await this.ArticleEventsModel.createEvent(article, userId, 'view')
+        ])
 
         return {
             status:'created'
