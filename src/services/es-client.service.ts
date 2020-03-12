@@ -362,7 +362,7 @@ export class EsClientService extends GenericModel {
                     break;
             }
         } catch (err) {
-            console.log(err.meta.body.error)
+            console.log(err)
         }
     }
 
