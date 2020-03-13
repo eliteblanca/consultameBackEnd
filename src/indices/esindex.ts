@@ -54,6 +54,8 @@ export class Esindex<T> {
 
         } catch (error) {
 
+            console.log(error)
+
             let errorCode = '01';
 
             if (error instanceof errors.ResponseError) {/* 01 */
@@ -175,6 +177,9 @@ export class Esindex<T> {
             return R.addProp(result.body._source, 'id', result.body._id);
 
         } catch (error) {
+
+            console.log(error)
+
             let errorCode = '02';
 
             if (error instanceof errors.ResponseError) {/* 01 */

@@ -39,6 +39,50 @@ export class S3BucketService {
         }
     }
 
+    base64MimeType(encoded) {
+        var result = null;
+      
+        if (typeof encoded !== 'string') {
+          return result;
+        }
+      
+        var mime = encoded.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
+      
+        if (mime && mime.length) {
+          result = mime[1];
+        }
+      
+        return result;
+    }
+    
+    async uploadImage(base64String:string, idArticle:string){
+
+        
+        var mimeType = this.base64MimeType(base64String)
+
+        // buf = new Buffer(req.body.imageBinary.replace(/^data:image\/\w+;base64,/, ""),'base64')
+        let buf = new Buffer(base64String.replace(/^data:image\/\w+;base64,/, "") ,'base64')
+
+        let params = { 
+            Bucket: 'bucketpruebaconsultamekonecta',
+            Key: `${idArticle}/${idArticle}${(new Date()).getTime()}`,
+            Body: buf,
+            ContentType: mimeType
+        };
+
+        try {
+
+            let uploadResul = await this.s3Client.upload(params).promise()
+
+            return uploadResul
+
+        } catch(err) {
+            console.log(err)
+            throw new InternalServerErrorException('error al guardar el archivo');
+        }
+
+    }
+
     getFile(idArticle:string, fileName:string){
         let params = { Bucket: 'bucketpruebaconsultamekonecta', Key: `${idArticle}/${fileName}` };
 
@@ -57,5 +101,16 @@ export class S3BucketService {
         
     }
 
-    
+    deleteImage = async (key:any) => {
+
+        console.log(key)
+
+        let params = { Bucket: 'bucketpruebaconsultamekonecta', Key: `${key}` };
+
+        let deleteResult = await this.s3Client.deleteObject(params).promise();
+
+        console.log(deleteResult)
+
+        return deleteResult
+    }
 }
