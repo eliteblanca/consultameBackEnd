@@ -869,7 +869,7 @@ export class ArticlesModelService {
         var base64Strings = quillJsObj.map((action, index) => {
 
             if(action?.insert?.image){
-                if((action.insert.image as string).startsWith('data:image/jpeg;base64',0) ){
+                if((action.insert.image as string).startsWith('data:image/',0) ){
                     return { originalIndex:index, base64string: action.insert.image }
                 }
             }
