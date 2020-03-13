@@ -42,7 +42,7 @@ export class ArticleIndex extends Esindex<Article> {
             })(result.body.hits.hits)
 
         } catch (error) {
-
+            
             let errorCode = '11';
 
             if (error instanceof errors.ResponseError) {/* 01 */

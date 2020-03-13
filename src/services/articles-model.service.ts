@@ -202,8 +202,12 @@ export class ArticlesModelService {
         }
 
         let newArticle: Article = { ...articleExtras, ...article }
-        
-        let creationResult = await this.articleIndex.create(newArticle)        
+
+        let creationResult = await this.articleIndex.create(newArticle)
+
+        let newQuillJsObj = await this.updateArticleImages(creationResult.id, creationResult.obj)
+
+        await this.articleIndex.updatePartialDocument(creationResult.id, { obj: newQuillJsObj})
 
         await this.updateArticleState({
                 articulo:creationResult.id,
@@ -566,10 +570,10 @@ export class ArticlesModelService {
             try {
                 cliente = await this.pcrcModel.getClienteOfPcrc(pcrc)
             } catch (error) {
-                throw error
                 if (error.meta.statusCode == 404) {
                     throw new NotFoundException('error al guardar el articulo');
                 }
+                throw error
             }
 
             articleExtas = {
@@ -622,7 +626,6 @@ export class ArticlesModelService {
             }
         }
 
-
         if(!!article.obj){
             await this.articleChangesIndex.create({
                 articulo: id,
@@ -638,8 +641,57 @@ export class ArticlesModelService {
             })
         }
 
-        return await this.articleIndex.updatePartialDocument(id, newArticle);
-        
+        let objWithoutImages = await this.updateArticleImages(id, newArticle.obj)
+
+        newArticle.obj = objWithoutImages
+
+        await this.compareDeletedImages( id, objWithoutImages)
+
+        await this.articleIndex.updatePartialDocument(id, newArticle);
+
+    }
+
+    private async compareDeletedImages(articleId:string, newQuillsObj:string){
+        let oldQuillObj = (await this.articleIndex.getById(articleId)).obj
+
+        let oldQuillObjImages = JSON.parse(oldQuillObj).ops.map((action, index) => {
+            if(action?.insert?.image){
+                //!modificar para pasar a produccion quitar http://localhost:3001
+                if( (action.insert.image as string).startsWith(`http://localhost:${process.env.PORT}/files/${articleId}/${articleId}`,0) ) {
+                    return action.insert.image
+                }
+            }
+
+            return null
+
+        }).filter( data => data )
+
+        let newQuillsObjImages = JSON.parse(newQuillsObj).ops.map((action, index) => {
+            if(action?.insert?.image){
+                //!modificar para pasar a produccion quitar http://localhost:3001
+                if( (action.insert.image as string).startsWith(`http://localhost:${process.env.PORT}/files/${articleId}/${articleId}`,0) ) {
+                    return action.insert.image
+                }
+            }
+
+            return null
+
+        }).filter( data => data )
+
+        //http://localhost:3001/files/WtNf1XAB7zOoFg7QvT75/WtNf1XAB7zOoFg7QvT751584127786529
+        var imagesTodelete = oldQuillObjImages.filter( key => {
+            return !newQuillsObjImages.includes(key)
+        })
+
+        let imageDeletePromises = imagesTodelete.map((s3Key:string) =>{
+            //!modificar para pasar a produccion quitar .replace('http://localhost:3001/files','')
+            return async () => {
+                return await this.S3BucketService.deleteImage(s3Key.replace('http://localhost:3001/files/',''))
+            }
+        })
+
+        let result = await async.parallel(imageDeletePromises)
+
     }
 
     private updateArticleState = async (articleInfo:  Omit<ArticleState, 'initialDate'|'finalDate'|'initialDateUser'|'finalDateUser'|'state'>, newState:string, userId:string) => {
@@ -753,10 +805,6 @@ export class ArticlesModelService {
         return { status: 'updated' };
     }
 
-    public async prueba(): Promise<any> {
-        return await this.ArticleEventsModel.getChangesBy([{filter:'articulo', value:'6nTXbXABnJwgvpSTB1bB'}], 949784794968, (new Date()).getTime(),0 , 1)
-    }
-
     public getArticleHistory = async (articleId:string) => {
 
         let history = await this.articleStateIndex.where({ articulo: articleId })
@@ -791,7 +839,6 @@ export class ArticlesModelService {
                 finalDate: finalDate,
                 duration: finalDate - initialDate
             }),
-
             await this.ArticleEventsModel.createEvent(article, userId, 'view')
         ])
 
@@ -799,4 +846,101 @@ export class ArticlesModelService {
             status:'created'
         }
     }
+
+    public async prueba(): Promise<any> {
+        // return await this.updateArticleImages('89Nl0HAB7zOoFg7QyT3A')
+        return await this.deleteArticleImagenes('89Nl0HAB7zOoFg7QyT3A')
+        // return await this.articleIndex.getById('89Nl0HAB7zOoFg7QyT3A')
+    }
+
+    async updateArticleImages(articleId:string, quillJsObjString?:string) {
+        
+        let quillJsObj:any
+        
+        if(!quillJsObjString){
+
+            let article = await this.articleIndex.getById(articleId)
+            
+            quillJsObj = JSON.parse(article.obj).ops
+
+        } else {
+
+            quillJsObj = JSON.parse(quillJsObjString).ops
+
+        }
+
+        var base64Strings = quillJsObj.map((action, index) => {
+
+            if(action?.insert?.image){
+                if((action.insert.image as string).startsWith('data:image/jpeg;base64',0) ){
+                    return { originalIndex:index, base64string: action.insert.image }
+                }
+            }
+
+            return null
+
+        }).filter( data => data )
+
+        let result = await async.map(base64Strings, async stringData => {
+
+            let uploadResult = await this.S3BucketService.uploadImage(stringData.base64string, articleId)
+
+            return { ...stringData, uploadResult: uploadResult }
+
+        })
+
+        //!modificar para pasar a produccion quitar http://localhost:${process.env.PORT}
+
+        result.forEach(element => {
+            quillJsObj[element.originalIndex] = { insert:{ image: `http://localhost:${process.env.PORT}/files/` + element.uploadResult.Key } }
+        });
+
+        
+        if(quillJsObjString){
+            
+            return JSON.stringify({ ops: quillJsObj })
+            
+        } else {            
+
+            let updateArticleResult = await this.articleIndex.updatePartialDocument(articleId,{ obj: JSON.stringify({ ops: quillJsObj }) })
+    
+            return updateArticleResult
+        }
+
+
+    }
+
+    async deleteArticleImagenes(articleId:string) {
+
+        let article = await this.articleIndex.getById(articleId)
+
+        let quillJsObj = JSON.parse(article.obj).ops
+
+
+        var base64Strings = quillJsObj.map((action, index) => {
+
+            if(action?.insert?.image){
+                //!modificar para pasar a produccion quitar http://localhost:3001
+                if( (action.insert.image as string).startsWith(`http://localhost:${process.env.PORT}/files/${articleId}/${articleId}`,0) ) {
+                    return action.insert.image
+                }
+            }
+
+            return null
+
+        }).filter( data => data )        
+
+        let imageDeletePromises = base64Strings.map((s3Key:string) =>{
+            //!modificar para pasar a produccion quitar .replace('http://localhost:3001/files','')
+            return async () => {
+                return await this.S3BucketService.deleteImage(s3Key.replace('http://localhost:3001/files/',''))
+            }
+        })
+        
+        let result = await async.parallel(imageDeletePromises)
+
+        return result
+
+    }
+
 }
