@@ -21,7 +21,7 @@ export class S3BucketService {
 
     async uploadFile(idArticle: string, file: any) {
         let params = { 
-            Bucket: 'bucketpruebaconsultamekonecta',
+            Bucket: process.env.BUCKET_NAME,
             Key: `${idArticle}/${file.originalname}`,
             Body: file.buffer,
             ContentType: file.mimetype
@@ -64,7 +64,7 @@ export class S3BucketService {
         let buf = new Buffer(base64String.replace(/^data:image\/\w+;base64,/, "") ,'base64')
 
         let params = { 
-            Bucket: 'bucketpruebaconsultamekonecta',
+            Bucket: process.env.BUCKET_NAME,
             Key: `${idArticle}/${idArticle}${(new Date()).getTime()}`,
             Body: buf,
             ContentType: mimeType
@@ -84,14 +84,14 @@ export class S3BucketService {
     }
 
     getFile(idArticle:string, fileName:string){
-        let params = { Bucket: 'bucketpruebaconsultamekonecta', Key: `${idArticle}/${fileName}` };
+        let params = { Bucket: process.env.BUCKET_NAME, Key: `${idArticle}/${fileName}` };
 
         return this.s3Client.getObject(params).createReadStream();
     }
 
     deleteFile = async (idArticle:string, fileName:any) => {
 
-        let params = { Bucket: 'bucketpruebaconsultamekonecta', Key: `${idArticle}/${fileName}` };
+        let params = { Bucket: process.env.BUCKET_NAME, Key: `${idArticle}/${fileName}` };
 
         let deleteResult = await this.s3Client.deleteObject(params).promise();
 
@@ -105,7 +105,7 @@ export class S3BucketService {
 
         console.log(key)
 
-        let params = { Bucket: 'bucketpruebaconsultamekonecta', Key: `${key}` };
+        let params = { Bucket: process.env.BUCKET_NAME, Key: `${key}` };
 
         let deleteResult = await this.s3Client.deleteObject(params).promise();
 
