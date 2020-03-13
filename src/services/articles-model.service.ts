@@ -656,8 +656,7 @@ export class ArticlesModelService {
 
         let oldQuillObjImages = JSON.parse(oldQuillObj).ops.map((action, index) => {
             if(action?.insert?.image){
-                //!modificar para pasar a produccion quitar http://localhost:3001
-                if( (action.insert.image as string).startsWith(`http://localhost:${process.env.PORT}/files/${articleId}/${articleId}`,0) ) {
+                if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
                     return action.insert.image
                 }
             }
@@ -668,8 +667,7 @@ export class ArticlesModelService {
 
         let newQuillsObjImages = JSON.parse(newQuillsObj).ops.map((action, index) => {
             if(action?.insert?.image){
-                //!modificar para pasar a produccion quitar http://localhost:3001
-                if( (action.insert.image as string).startsWith(`http://localhost:${process.env.PORT}/files/${articleId}/${articleId}`,0) ) {
+                if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
                     return action.insert.image
                 }
             }
@@ -684,9 +682,8 @@ export class ArticlesModelService {
         })
 
         let imageDeletePromises = imagesTodelete.map((s3Key:string) =>{
-            //!modificar para pasar a produccion quitar .replace('http://localhost:3001/files','')
             return async () => {
-                return await this.S3BucketService.deleteImage(s3Key.replace('http://localhost:3001/files/',''))
+                return await this.S3BucketService.deleteImage(s3Key)
             }
         })
 
@@ -889,10 +886,8 @@ export class ArticlesModelService {
 
         })
 
-        //!modificar para pasar a produccion quitar http://localhost:${process.env.PORT}
-
         result.forEach(element => {
-            quillJsObj[element.originalIndex] = { insert:{ image: `http://localhost:${process.env.PORT}/files/` + element.uploadResult.Key } }
+            quillJsObj[element.originalIndex] = { insert:{ image: `/files/` + element.uploadResult.Key } }
         });
 
         
@@ -920,8 +915,7 @@ export class ArticlesModelService {
         var base64Strings = quillJsObj.map((action, index) => {
 
             if(action?.insert?.image){
-                //!modificar para pasar a produccion quitar http://localhost:3001
-                if( (action.insert.image as string).startsWith(`http://localhost:${process.env.PORT}/files/${articleId}/${articleId}`,0) ) {
+                if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
                     return action.insert.image
                 }
             }
@@ -931,9 +925,8 @@ export class ArticlesModelService {
         }).filter( data => data )        
 
         let imageDeletePromises = base64Strings.map((s3Key:string) =>{
-            //!modificar para pasar a produccion quitar .replace('http://localhost:3001/files','')
             return async () => {
-                return await this.S3BucketService.deleteImage(s3Key.replace('http://localhost:3001/files/',''))
+                return await this.S3BucketService.deleteImage(s3Key)
             }
         })
         
