@@ -63,7 +63,7 @@ export class S3BucketService {
         let buf = new Buffer(base64String.replace(/^data:image\/\w+;base64,/, "") ,'base64')
 
         let params = { 
-            Bucket: 'bucketpruebaconsultamekonecta',
+            Bucket: process.env.BUCKET_NAME,
             Key: `${idArticle}/${idArticle}${(new Date()).getTime()}`,
             Body: buf,
             ContentType: mimeType
@@ -104,7 +104,7 @@ export class S3BucketService {
 
         console.log(key)
 
-        let params = { Bucket: 'bucketpruebaconsultamekonecta', Key: `${key}` };
+        let params = { Bucket: process.env.BUCKET_NAME, Key: `${key}` };
 
         let deleteResult = await this.s3Client.deleteObject(params).promise();
 
