@@ -74,40 +74,20 @@ export class EsClientService extends GenericModel {
                         body: {
                             mappings: {
                                 properties: {
-                                    query: {
-                                        type: "text",
-                                        analyzer: "autocomplete",
-                                        fields: {
-                                            raw: {
-                                                "type": "keyword"
+                                    query : { 
+                                        type : "completion",
+                                        contexts: [
+                                            {
+                                                name: "subline",
+                                                type: "category",
+                                                path: "subline"
                                             }
-                                        }
+                                        ]
                                     },
+                                    didyoumean: { type: "text" },
                                     subline: { type: "keyword" },
-                                    user: { type: "keyword" },                                    
+                                    user: { type: "keyword" },
                                     publicationDate: { "type": "date", "format": 'epoch_millis' },
-                                }
-                            },
-                            settings: {
-                                number_of_shards: 1,
-                                analysis: {
-                                    filter: {
-                                        autocomplete_filter: {
-                                            type: "edge_ngram",
-                                            min_gram: 1,
-                                            max_gram: 20
-                                        }
-                                    },
-                                    analyzer: {
-                                        autocomplete: {
-                                            type: "custom",
-                                            tokenizer: "standard",
-                                            filter: [
-                                                "lowercase",
-                                                "autocomplete_filter"
-                                            ]
-                                        }
-                                    }
                                 }
                             }
                         }

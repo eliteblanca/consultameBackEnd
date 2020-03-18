@@ -67,13 +67,13 @@ export class PcrcController {
                 await this.searchModel.newSearch(query, idPcrc, user.sub)
             }
 
-            let start = process.hrtime()
+            let didYouMean = await this.searchModel.getDidYouMean(query);
 
-            let result = await this.articlesModel.getArticlesByQuery(query, { pcrc:idPcrc }, state, from, size)
+            let result = await this.articlesModel.getArticlesByQuery(didYouMean, { pcrc:idPcrc }, state, from, size)
 
-            let end = process.hrtime(start)
-
-            console.info('Execution time (hr): %ds %dms', end[0], end[1] / 1000000)
+            if(!result){
+                result = await this.articlesModel.getArticlesByQuery(query, { pcrc:idPcrc }, state, from, size)
+            }
 
             return result
 
@@ -115,6 +115,14 @@ export class PcrcController {
         } else {
             return this.searchModel.getAll();
         }
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get(':idPcrc/didYouMean')
+    async getDidYouMean(
+        @Query('input') input: string,
+        @Param('idPcrc') idPcrc: string) {
+            return this.searchModel.getDidYouMean(input);
     }
 
 }
