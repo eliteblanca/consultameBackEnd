@@ -96,7 +96,10 @@ export class ArticlesModelService {
                             {
                                 multi_match: {
                                     'query': query,
-                                    'fields': ['title^3', 'content^2', 'tags']
+                                    'fields': ['title^3', 'content^2', 'tags'],
+                                    'tie_breaker' : 0.7,
+                                    'fuzziness' : 2,
+                                    'prefix_length': 3
                                 }
                             }
                         ],

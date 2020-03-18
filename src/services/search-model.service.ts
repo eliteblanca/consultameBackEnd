@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { GenericModel } from "../services/generic-model";
 import { SearchsIndex, search } from "../indices/searchIndex";
 import { IsNotEmpty, Length } from 'class-validator';
+import { ArticleIndex } from "../indices/articleIndex";
 
 export class newSearchDTO {
     @IsNotEmpty({ message: 'debes proporcionar una query' })
@@ -14,68 +15,94 @@ export class newSearchDTO {
 @Injectable()
 export class SearchModelService extends GenericModel {
 
-    constructor(private searchsIndex: SearchsIndex) {
+    constructor(
+        private searchsIndex: SearchsIndex,
+        private articleIndex: ArticleIndex,
+    ) {
         super()
-    }
-
-    private suggestionList: string[] = [
-        'prueba 1',
-        'prueba 2',
-        'prueba 3',
-        'prueba 4',
-        'prueba 5'];
-
-    private async getByQuery(subline: string, query: string): Promise<(search & { id: string; })[]> {
-
-        return await this.searchsIndex.query({
-            query: {
-                bool: {
-                    filter: [
-                        { term: { subline: subline } },
-                        { term: { "query.raw": query } }
-                    ]
-                }
-            }
-        })
-
-    }
-
-    private async increaseSearchCount(id: string): Promise<any> {
-        return await this.searchsIndex.updateScript(id, { "source": "ctx._source.searches += 1" })
     }
 
     public async newSearch(query: string, subline: string, userId:string): Promise<any> {
         await this.searchsIndex.create({
             publicationDate:(new Date()).getTime(),
             query:query,
+            didyoumean:query,
             subline:subline,
             user:userId
         })
     }
 
-    public async getSuggestions(input: string, subline: string): Promise<(search & { id: string; })[]> {
+    public async getSuggestions(input: string, subline: string): Promise<string[]> {
 
         try {
 
+            let fraseCorregida = await this.getDidYouMean(input)
+
+            console.log(input)
+            console.log(fraseCorregida)
+
             let query = {
-                query: {
-                    bool: {
-                        must: {
-                            match: {
-                                "query": input
-                            },
-                        },
-                        filter: [
-                            { "term": { "subline": subline } }
-                        ]
+                suggest: {
+                    sugerencias : {
+                        prefix : fraseCorregida,
+                        completion : {
+                            field : "query",
+                            skip_duplicates:true,
+                            contexts: {
+                                subline: [ subline ]
+                            }
+                        }
                     }
                 }
             }
 
-            return await this.searchsIndex.query(query)
+            let result = await this.searchsIndex.query(query)
+
+            return result.body.suggest.sugerencias[0].options.map(op => op.text)
 
         } catch (error) {
-            console.log(error.meta.body.error)
+            console.log(error)
+        }
+    }
+
+    public async getDidYouMean(input: string): Promise<string> {
+
+        try {
+
+            let query = {
+                suggest: {
+                    sugerencias : {
+                        text : input,
+                        term : {
+                            analyzer: "spanish",
+                            field : "content",
+                            sort : 'score',
+                            suggest_mode : 'missing',
+                            max_edits : 2,
+                            prefix_length: 3
+                        }
+                    }
+                }
+            }
+
+            let result = await this.articleIndex.didYouMean(query)            
+
+            let replaceMents = result.body.suggest.sugerencias.map(suj => {
+                if( suj.options.length ){
+                    return { offset: suj.offset , length: suj.length, value: suj.options[0].text }
+                }
+
+                return null
+            }).filter(data => data)
+
+            for(var i = replaceMents.length - 1; i >= 0 ; i--){
+                input = input.slice(0,replaceMents[i].offset) + replaceMents[i].value + input.slice(replaceMents[i].offset + replaceMents[i].length)
+            }
+
+            return input
+
+        } catch (error) {
+            console.log(error)
         }
     }
 
