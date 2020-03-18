@@ -69,9 +69,6 @@ export class PcrcController {
 
             let didYouMean = await this.searchModel.getDidYouMean(query);
 
-            console.log(query)
-            console.log(didYouMean)
-
             let result = await this.articlesModel.getArticlesByQuery(didYouMean, { pcrc:idPcrc }, state, from, size)
 
             if(!result){
