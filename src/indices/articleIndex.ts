@@ -43,6 +43,8 @@ export class ArticleIndex extends Esindex<Article> {
 
         } catch (error) {
 
+            console.log(error.meta.body.error)
+
             let errorCode = '11';
 
             if (error instanceof errors.ResponseError) {/* 01 */

@@ -87,28 +87,39 @@ export class ArticlesModelService {
 
     public async getArticlesByQuery(query: string, group: group, state: string = 'published', from: string = '0', size: string = '10'): Promise<(Article & { id: string, highlight: string })[]> {
 
-        try {
+        
 
             let q = {
                 query: {
-                    bool: {
-                        must: [
-                            {
-                                multi_match: {
-                                    'query': query,
-                                    'fields': ['title^3', 'content^2', 'tags'],
-                                    'tie_breaker' : 0.7,
-                                    'fuzziness' : 2,
-                                    'prefix_length': 3
-                                }
+                    function_score: {
+                        query: {                        
+                            bool: {
+                                must: [
+                                    {
+                                        multi_match: {
+                                            'query': query,
+                                            'fields': ['title^3', 'content^2', 'tags'],
+                                            'tie_breaker' : 0.7,
+                                            'fuzziness' : 2,
+                                            'prefix_length': 3
+                                        }
+                                    }
+                                ],
+                                filter: [
+                                    { 'term': group },
+                                    { 'term': { 'state': state } }
+                                ]
                             }
-                        ],
-                        filter: [
-                            { 'term': group },
-                            { 'term': { 'state': state } }
-                        ]
+                        },
+                        exp: { 
+                            modificationDate: {
+                                scale: "60d",
+                                offset: "30d",
+                                decay: 0.8
+                            }
+                        }
                     }
-                },
+                },    
                 from: parseInt(from),
                 size: parseInt(size),
                 highlight: {
@@ -122,9 +133,6 @@ export class ArticlesModelService {
 
             return result
 
-        } catch (err) {
-            console.log(err.meta.body.error);
-        }
     }
 
     public async getArticlesByTag(options: { tag: string; subline: string; from?: string; size?: string }): Promise<(Article & { id: string })[]> {
