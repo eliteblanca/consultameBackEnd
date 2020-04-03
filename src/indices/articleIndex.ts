@@ -22,6 +22,7 @@ export interface Article {
     pcrc: string;
     cliente: string;
     views: number;
+    type: string;
 }
 
 @Injectable()

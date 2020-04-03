@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Client, ClientOptions, ApiResponse } from "@elastic/elasticsearch";
+import { ApiResponse } from "@elastic/elasticsearch";
 import { GenericModel } from "../services/generic-model";
+import * as R from 'remeda';
 
 @Injectable()
 export class EsClientService extends GenericModel {
@@ -37,7 +38,8 @@ export class EsClientService extends GenericModel {
                                     "cliente": { "type": "keyword" },
                                     "pcrc": { "type": "keyword" },
                                     "category": { "type": "keyword" },
-                                    "views": { "type": "integer" }
+                                    "views": { "type": "integer" },
+                                    "type": { "type": "keyword" }
                                 }
                             }
                         }
@@ -92,33 +94,7 @@ export class EsClientService extends GenericModel {
                             }
                         }
                     })
-                    break;
-                case 'lines':
-                    return await this.esClient.indices.create({
-                        index: index,
-                        include_type_name: false,
-                        body: {
-                            "mappings": {
-                                "properties": {
-                                    "name": { "type": "keyword" }
-                                }
-                            }
-                        }
-                    })
-                    break;
-                case 'sublines':
-                    return await this.esClient.indices.create({
-                        index: index,
-                        include_type_name: false,
-                        body: {
-                            "mappings": {
-                                "properties": {
-                                    "name": { "type": "keyword" },
-                                    "line": { "type": "keyword" }
-                                }
-                            }
-                        }
-                    })
+                    break;                
                 case 'users':
                     return await this.esClient.indices.create({
                         index: index,
@@ -344,6 +320,15 @@ export class EsClientService extends GenericModel {
         } catch (err) {
             console.log(err)
         }
+    }
+
+    public async addFieldToIndex(index:string, fieldName:string, fieldType:'text' | 'keyword' | 'integer'): Promise<ApiResponse>{
+        return await this.esClient.indices.putMapping({
+            index: index,
+            body: {
+                "properties": R.objOf({ "type": fieldType }, fieldName)
+            }
+        })
     }
 
     public async deleteIndex(index: string): Promise<any> {

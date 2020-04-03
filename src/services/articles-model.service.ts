@@ -23,34 +23,23 @@ export class SingleArticleDTO {
 
 export class articleDTO {
 
-    @IsNotEmpty({ message: 'debes proporcionar un nombre al articulo' })
-    @MinLength(3, { message: 'has proporcionado un titulo demasiado corto, debe contener minimo $constraint1 caracteres' })
     public title: string;
 
     public content: string;
 
     public obj: string;
 
-    @MinLength(3, { message: 'has proporcionado un tag demasiado corto, debe contener minimo $constraint1 caracteres', each: true })
-    @MaxLength(150, { message: 'has proporcionado un tag demasiado largo, debe contener maximo $constraint1 caracteres', each: true })
-    @IsOptional()
     public tags?: string[];
 
-    @MinLength(3, { message: 'has proporcionado un resumen demasiado corto, debe contener minimo $constraint1 caracteres' })
-    @IsOptional()
     public resume?: string;
 
-    @MinLength(3, { message: 'has proporcionado un vinculo demasiado corto, debe contener minimo $constraint1 caracteres', each: true })
-    @IsOptional()
     public attached?: string[];
-
-    @IsNotEmpty({ message: 'debes proporcionar un estado al articulo' })
+  
     public state: string;
 
-    @IsNotEmpty({ message: 'debes proporcionar una categoria' })
-    @Length(20, 20, { message: 'debes proporcionar un id valido' })
     public category: string;
 
+    public type: string;
 }
 
 export class articleViewsDTO {
@@ -193,10 +182,10 @@ export class ArticlesModelService {
         try {
             cliente = await this.pcrcModel.getClienteOfPcrc(pcrc);
         } catch (error) {
-            throw error;
             if (error.meta.statusCode == 404) {
                 throw new NotFoundException('error al guardar el articulo');
             }
+            throw error;
         }
 
         let articleExtras = {
@@ -662,7 +651,7 @@ export class ArticlesModelService {
 
     }
 
-    private async compareDeletedImages(articleId:string, newQuillsObj:string){
+    public async compareDeletedImages(articleId:string, newQuillsObj:string){
         let oldQuillObj = (await this.articleIndex.getById(articleId)).obj
 
         let oldQuillObjImages = JSON.parse(oldQuillObj).ops.map((action, index) => {
@@ -702,7 +691,7 @@ export class ArticlesModelService {
 
     }
 
-    private updateArticleState = async (articleInfo:  Omit<ArticleState, 'initialDate'|'finalDate'|'initialDateUser'|'finalDateUser'|'state'>, newState:string, userId:string) => {
+    public updateArticleState = async (articleInfo:  Omit<ArticleState, 'initialDate'|'finalDate'|'initialDateUser'|'finalDateUser'|'state'>, newState:string, userId:string) => {
         let currentArticleStates = await this.articleStateIndex.where({ articulo: articleInfo.articulo })
 
         if(!!currentArticleStates.length){

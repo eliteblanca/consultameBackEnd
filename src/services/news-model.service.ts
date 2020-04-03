@@ -1,7 +1,11 @@
-import { Injectable, BadRequestException, HttpException } from '@nestjs/common';
-import { NewsIndex, news } from "../indices/newsIndex";
-import { MinLength, ValidateIf, IsNotEmpty, IsAscii, IsOptional, MaxLength, IsIn, Length } from 'class-validator';
-
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { IsNotEmpty } from 'class-validator';
+import { news, NewsIndex } from "../indices/newsIndex";
+import { ArticleIndex, Article } from "../indices/articleIndex";
+import { PcrcModelService } from "../services/pcrc-model.service";
+import { ArticlesModelService } from "../services/articles-model.service";
+import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
+import { ArticleEventsModelService } from "../services/articleEvents-model.service";
 
 export class postNewsDTO {
 
@@ -17,8 +21,7 @@ export class postNewsDTO {
     @IsNotEmpty({ message: "debes proporcionar un estado a la noticia" })
     state: news['state'];
 
-    @IsNotEmpty({ message: "debes asignar la noticia a una sublinea" })
-    subline: string;
+    pcrc: string;
 }
 
 export class updateNewsDTO {
@@ -41,9 +44,14 @@ export class NewsModelService {
 
     constructor(
         private newsIndex: NewsIndex,
+        private articleIndex: ArticleIndex,
+        private pcrcModel: PcrcModelService,
+        private articlesModel: ArticlesModelService,
+        private articleChangesIndex: ArticleChangesIndex,
+        private articleEventsModelService: ArticleEventsModelService,
     ) { }
 
-    getNews = async (sublineId: string, from = '0', size = '20', date = (new Date).getTime().toString(), query?: string): Promise<(news & { id: string; })[]> => {
+    getNews = async (pcrcId: string, from = '0', size = '20', date = (new Date).getTime().toString(), query?: string): Promise<(Article & { id: string; })[]> => {
         try {
 
             let esQuery: any;
@@ -53,7 +61,8 @@ export class NewsModelService {
                     query: {
                         bool: {
                             filter: [
-                                { term: { subline: sublineId } },
+                                { term: { type: 'news' } },
+                                { term: { pcrc: pcrcId } },
                                 { term: { state: 'published' } },
                                 { range: { publicationDate: { lt: date } } }
                             ]
@@ -75,12 +84,13 @@ export class NewsModelService {
                                 {
                                     multi_match: {
                                         'query': query,
-                                        'fields': [ 'title^3', 'content^2']
+                                        'fields': ['title^3', 'content^2']
                                     }
                                 }
                             ],
                             filter: [
-                                { term: { subline: sublineId } },
+                                { term: { type: 'news' } },
+                                { term: { pcrc: pcrcId } },
                                 { term: { state: 'published' } },
                                 { range: { publicationDate: { lt: date } } }
                             ]
@@ -94,19 +104,19 @@ export class NewsModelService {
                 }
             }
 
-            return await this.newsIndex.query(esQuery)
+            return await this.articleIndex.query(esQuery)
 
         } catch (error) {
             console.log(error.meta.body.error)
         }
     }
 
-    getSingleNews = async (newsId: string): Promise<(news & { id: string; })> => {        
+    getSingleNews = async (newsId: string): Promise<(Article & { id: string; })> => {
 
-        let news = await this.newsIndex.getById(newsId)
+        let news = await this.articleIndex.getById(newsId)
 
-        if(!!news){
-            let result = await this.newsIndex.updateScript(newsId, {
+        if (!!news) {
+            let result = await this.articleIndex.updateScript(newsId, {
                 'source': 'ctx._source.views += 1',
                 'lang': 'painless'
             });
@@ -117,48 +127,171 @@ export class NewsModelService {
             throw new HttpException({
                 "message": `Noticia no encontrada`
             }, 404)
-        }        
+        }
     }
 
-    postNews = async (news: postNewsDTO, userId: string): Promise<(news & { id: string; })> => {
+    postNews = async (news: postNewsDTO, userId: string): Promise<(Article & { id: string; })> => {
+            
+            let cliente: { id: number; cliente: string; }    
+    
+            try {
+                cliente = await this.pcrcModel.getClienteOfPcrc(news.pcrc);
+            } catch (error) {
+                if (error.meta.statusCode == 404) {
+                    throw new NotFoundException('error al guardar la noticia');
+                }
 
-        let newsExtras = {
-            publicationDate: Date.now(),
-            modificationDate: Date.now(),
-            modificationUser: userId,
-            creator: userId,
-            commentsList: '',
-            attached: [],
-            views: 0
-        };
+                throw error;
+            }
+    
+            let articleExtras = {
+                likes: [],
+                disLikes: [],
+                favorites: [],
+                pcrc: news.pcrc,
+                cliente: cliente.id.toString(),
+                creator: userId,
+                modificationUser: userId,
+                publicationDate: (new Date).getTime(),
+                modificationDate: (new Date).getTime(),
+                views: 0,
+                category: null,
+                type: 'news'
+            }
+    
+            let newArticle: Article = { ...articleExtras, ...news }
+    
+            let creationResult = await this.articleIndex.create(newArticle)
+    
+            let newQuillJsObj = await this.articlesModel.updateArticleImages(creationResult.id, creationResult.obj)
+    
+            await this.articleIndex.updatePartialDocument(creationResult.id, { obj: newQuillJsObj})
+    
+            await this.articlesModel.updateArticleState({
+                    articulo:creationResult.id,
+                    categoria:creationResult.category,
+                    cliente:creationResult.cliente,
+                    pcrc:creationResult.pcrc
+                },
+                creationResult.state,
+                userId
+            )
+    
+            let previousState = ''
+    
+            let articleEvent = ''
+    
+            if(news.state == 'published'){
+                articleEvent = 'articulo creado'
+            } else {
+                articleEvent = 'borrador creado'
+            }
 
-        return await this.newsIndex.create({ ...newsExtras, ...news })
-
+            if(!!news.obj){
+                await this.articleChangesIndex.create({
+                    articulo: creationResult.id,
+                    articlecontent: news.obj,
+                    categoria: newArticle.category,
+                    cliente: newArticle.cliente,
+                    pcrc: newArticle.pcrc,
+                    event: articleEvent,
+                    eventDate: (new Date()).getTime(),
+                    previoustate: previousState,
+                    user: userId,
+                    articlestate: news.state
+                })
+            }
+    
+            return creationResult
+        
     }
 
-    updateNews = async (idArticulo: string, news: Partial<updateNewsDTO>, idUsuario: string): Promise<any> => {
-        let newsExtras = {
-            modificationDate: Date.now(),
-            modificationUser: idUsuario
+    updateNews = async (id: string, article: Partial<updateNewsDTO>, modificationUser: string): Promise<any> => {
+
+        let { pcrc, cliente } = await this.articleIndex.getById(id)
+
+        let articleExtas: Partial<Article>
+
+        articleExtas = {
+            modificationUser: modificationUser,
+            modificationDate: (new Date).getTime()
         }
 
-        try {
-            return await this.newsIndex.updatePartialDocument(idArticulo, { ...news, ...newsExtras })
-        } catch (error) {
-            console.log(error)
+        let newArticle: Partial<Article> = { ...articleExtas, ...article };
+
+        await this.articlesModel.updateArticleState({
+            articulo: id,
+            categoria: null,
+            cliente: cliente, 
+            pcrc: pcrc
+        },
+        newArticle.state,
+        modificationUser)
+
+        let prevState = await this.articleEventsModelService.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
+
+        let previousState = ''
+
+        var articleEvent = ''
+
+        if(prevState.items.length){
+            previousState = prevState.items[0].id
+
+            if(article.state){
+
+                var articleEvent = 'articulo actualizado'
+                
+                if(prevState.items[0].articlestate == 'published' && article.state != 'published'){
+                    var articleEvent = 'articulo archivado'
+                }
+
+                if(prevState.items[0].articlestate != 'published' && article.state == 'published'){
+                    var articleEvent = 'articulo publicado'
+                }
+            }
         }
 
+        if(!!article.obj){
+            await this.articleChangesIndex.create({
+                articulo: id,
+                articlecontent: article.obj,
+                categoria: newArticle.category,
+                cliente: newArticle.cliente,
+                pcrc: newArticle.pcrc,
+                event: articleEvent,
+                eventDate: (new Date()).getTime(),
+                previoustate: previousState,
+                user: modificationUser,
+                articlestate: article.state
+            })
+        }
+
+        let objWithoutImages = await this.articlesModel.updateArticleImages(id, newArticle.obj)
+
+        newArticle.obj = objWithoutImages
+
+        await this.articlesModel.compareDeletedImages( id, objWithoutImages)
+
+        await this.articleIndex.updatePartialDocument(id, newArticle);
+
+
+        // let newsExtras = {
+        //     modificationDate: Date.now(),
+        //     modificationUser: idUsuario
+        // }
+
+        // return await this.articleIndex.updatePartialDocument(idArticulo, { ...news, ...newsExtras })
     }
 
     deleteNews = async (idArticulo: string): Promise<any> => {
         try {
-            return await this.newsIndex.delete(idArticulo)
+            return await this.articleIndex.delete(idArticulo)
         } catch (error) {
             console.log(error)
         }
     }
 
-    getDrafts = async (idSubline: string, from = '0', size = '20', query?:string): Promise<(news & { id: string; })[]> => {
+    getDrafts = async (idPcrc: string, from = '0', size = '20', query?: string): Promise<(Article & { id: string; })[]> => {
         try {
 
             let esQuery: any;
@@ -168,7 +301,8 @@ export class NewsModelService {
                     query: {
                         bool: {
                             filter: [
-                                { term: { subline: idSubline } },
+                                { term: { pcrc: idPcrc } },
+                                { term: { type: 'news' } },
                                 { term: { state: 'archived' } }
                             ]
                         }
@@ -189,12 +323,13 @@ export class NewsModelService {
                                 {
                                     multi_match: {
                                         'query': query,
-                                        'fields': [ 'title^3', 'content^2']
+                                        'fields': ['title^3', 'content^2']
                                     }
                                 }
                             ],
                             filter: [
-                                { term: { subline: idSubline } },
+                                { term: { pcrc: idPcrc } },
+                                { term: { type: 'news' } },
                                 { term: { state: 'archived' } }
                             ]
                         }
@@ -207,7 +342,7 @@ export class NewsModelService {
                 }
             }
 
-            return await this.newsIndex.query(esQuery)
+            return await this.articleIndex.query(esQuery)
 
         } catch (error) {
             console.log(error.meta.body.error)
