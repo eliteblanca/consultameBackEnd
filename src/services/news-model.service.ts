@@ -5,6 +5,7 @@ import { ArticleIndex, Article } from "../indices/articleIndex";
 import { PcrcModelService } from "../services/pcrc-model.service";
 import { ArticlesModelService } from "../services/articles-model.service";
 import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
+import { ArticleEventsModelService } from "../services/articleEvents-model.service";
 
 export class postNewsDTO {
 
@@ -47,6 +48,7 @@ export class NewsModelService {
         private pcrcModel: PcrcModelService,
         private articlesModel: ArticlesModelService,
         private articleChangesIndex: ArticleChangesIndex,
+        private articleEventsModelService: ArticleEventsModelService,
     ) { }
 
     getNews = async (pcrcId: string, from = '0', size = '20', date = (new Date).getTime().toString(), query?: string): Promise<(Article & { id: string; })[]> => {
@@ -204,27 +206,29 @@ export class NewsModelService {
         
     }
 
-    updateNews = async (idArticulo: string, news: Partial<updateNewsDTO>, idUsuario: string): Promise<any> => {
+    updateNews = async (id: string, article: Partial<updateNewsDTO>, modificationUser: string): Promise<any> => {
 
-        let articleExtas: Partial<Article>       
+        let { pcrc, cliente } = await this.articleIndex.getById(id)
+
+        let articleExtas: Partial<Article>
 
         articleExtas = {
             modificationUser: modificationUser,
             modificationDate: (new Date).getTime()
-        }        
+        }
 
         let newArticle: Partial<Article> = { ...articleExtas, ...article };
-            
-        await this.updateArticleState({
+
+        await this.articlesModel.updateArticleState({
             articulo: id,
-            categoria: newArticle.category,
-            cliente: newArticle.cliente, 
-            pcrc: newArticle.pcrc
+            categoria: null,
+            cliente: cliente, 
+            pcrc: pcrc
         },
         newArticle.state,
         modificationUser)
-    
-        let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
+
+        let prevState = await this.articleEventsModelService.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
 
         let previousState = ''
 
@@ -262,11 +266,11 @@ export class NewsModelService {
             })
         }
 
-        let objWithoutImages = await this.updateArticleImages(id, newArticle.obj)
+        let objWithoutImages = await this.articlesModel.updateArticleImages(id, newArticle.obj)
 
         newArticle.obj = objWithoutImages
 
-        await this.compareDeletedImages( id, objWithoutImages)
+        await this.articlesModel.compareDeletedImages( id, objWithoutImages)
 
         await this.articleIndex.updatePartialDocument(id, newArticle);
 
@@ -281,13 +285,13 @@ export class NewsModelService {
 
     deleteNews = async (idArticulo: string): Promise<any> => {
         try {
-            return await this.newsIndex.delete(idArticulo)
+            return await this.articleIndex.delete(idArticulo)
         } catch (error) {
             console.log(error)
         }
     }
 
-    getDrafts = async (idSubline: string, from = '0', size = '20', query?: string): Promise<(news & { id: string; })[]> => {
+    getDrafts = async (idPcrc: string, from = '0', size = '20', query?: string): Promise<(Article & { id: string; })[]> => {
         try {
 
             let esQuery: any;
@@ -297,7 +301,8 @@ export class NewsModelService {
                     query: {
                         bool: {
                             filter: [
-                                { term: { pcrc: idSubline } },
+                                { term: { pcrc: idPcrc } },
+                                { term: { type: 'news' } },
                                 { term: { state: 'archived' } }
                             ]
                         }
@@ -323,7 +328,8 @@ export class NewsModelService {
                                 }
                             ],
                             filter: [
-                                { term: { pcrc: idSubline } },
+                                { term: { pcrc: idPcrc } },
+                                { term: { type: 'news' } },
                                 { term: { state: 'archived' } }
                             ]
                         }
@@ -336,7 +342,7 @@ export class NewsModelService {
                 }
             }
 
-            return await this.newsIndex.query(esQuery)
+            return await this.articleIndex.query(esQuery)
 
         } catch (error) {
             console.log(error.meta.body.error)

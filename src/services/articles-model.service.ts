@@ -643,7 +643,7 @@ export class ArticlesModelService {
 
     }
 
-    private async compareDeletedImages(articleId:string, newQuillsObj:string){
+    public async compareDeletedImages(articleId:string, newQuillsObj:string){
         let oldQuillObj = (await this.articleIndex.getById(articleId)).obj
 
         let oldQuillObjImages = JSON.parse(oldQuillObj).ops.map((action, index) => {
