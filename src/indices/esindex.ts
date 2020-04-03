@@ -1,6 +1,5 @@
 import { ApiResponse, Client, errors, RequestParams } from "@elastic/elasticsearch";
 import { HttpException } from "@nestjs/common";
-import * as fs from 'fs';
 import * as R from 'remeda';
 
 // const PUNTO_DE_ENLACE: string = "https://search-consultamekonecta-xsvrb6f5gky3alwbp3xw7v4e74.us-1.es.com";
