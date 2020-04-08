@@ -717,7 +717,13 @@ export class ArticleEventsModelService {
 
         let ListaCategoriasPromises = idsCategorias.map(id => {
             return async () => {
-                return this.categoriesModel.getCategory(id)
+
+                if(id){
+                    return this.categoriesModel.getCategory(id)
+                }else{
+                    return null
+                }
+
             }
         })
 
