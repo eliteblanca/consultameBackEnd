@@ -707,9 +707,11 @@ export class ArticleEventsModelService {
             ]
         }
 
+        //!verificar si se puede eliminar esta linea
         let totalItems = await this.articleChangesIndex.count({ query: query.query })
 
         let listaDeCambios = await this.articleChangesIndex.query(query)
+
 
         // categoria
 
@@ -751,7 +753,7 @@ export class ArticleEventsModelService {
             
         })
 
-        // pcrc
+        // pcrc        
 
         let idsPcrc = [...new Set( listaDeCambios.map(cambio => cambio.pcrc))]
 

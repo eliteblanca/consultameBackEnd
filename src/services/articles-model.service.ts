@@ -845,9 +845,18 @@ export class ArticlesModelService {
     }
 
     public async prueba(): Promise<any> {
-        // return await this.updateArticleImages('89Nl0HAB7zOoFg7QyT3A')
-        return await this.deleteArticleImagenes('89Nl0HAB7zOoFg7QyT3A')
-        // return await this.articleIndex.getById('89Nl0HAB7zOoFg7QyT3A')
+        
+        return await this.articleChangesIndex.query({
+            query:{
+                "bool": {
+                    "must_not": {
+                        "exists": {
+                            "field": "pcrc"
+                        }
+                    }
+                }
+            }
+        })
     }
 
     async updateArticleImages(articleId:string, quillJsObjString?:string) {

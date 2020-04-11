@@ -296,7 +296,7 @@ export class Esindex<T> {
 
         } catch (error) {           
 
-            console.log(error)
+            console.log(error.body.error)
 
             let errorCode = '03';
 

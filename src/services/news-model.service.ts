@@ -165,8 +165,9 @@ export class NewsModelService {
     
             let newQuillJsObj = await this.articlesModel.updateArticleImages(creationResult.id, creationResult.obj)
     
-            await this.articleIndex.updatePartialDocument(creationResult.id, { obj: newQuillJsObj})
-    
+            await this.articleIndex.updatePartialDocument(creationResult.id, { obj: newQuillJsObj})   
+            
+
             await this.articlesModel.updateArticleState({
                     articulo:creationResult.id,
                     categoria:creationResult.category,
@@ -186,6 +187,19 @@ export class NewsModelService {
             } else {
                 articleEvent = 'borrador creado'
             }
+
+            console.log({
+                articulo: creationResult.id,
+                articlecontent: news.obj,
+                categoria: newArticle.category,
+                cliente: newArticle.cliente,
+                pcrc: newArticle.pcrc,
+                event: articleEvent,
+                eventDate: (new Date()).getTime(),
+                previoustate: previousState,
+                user: userId,
+                articlestate: news.state
+            })
 
             if(!!news.obj){
                 await this.articleChangesIndex.create({
@@ -214,7 +228,10 @@ export class NewsModelService {
 
         articleExtas = {
             modificationUser: modificationUser,
-            modificationDate: (new Date).getTime()
+            modificationDate: (new Date).getTime(),
+            cliente:cliente,
+            pcrc:pcrc,
+            category:null
         }
 
         let newArticle: Partial<Article> = { ...articleExtas, ...article };
