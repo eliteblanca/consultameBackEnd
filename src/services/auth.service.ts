@@ -34,6 +34,8 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
 
         var user = await this.UserIndex.getById(ldapUserInfo.postOfficeBox)
 
+        console.log(user)
+
         if (!!user) {
 
             return {

@@ -27,7 +27,6 @@ import { ArticlesEventsIndex } from "./indices/articlesEventsIndex";
 import { ArticleStateIndex } from "./indices/articleStatesIndex";
 import { FavoriteStatesIndex } from "./indices/favoriteStatesIndex";
 import { ArticlesViewsIndex } from "./indices/articleViewsIndex";
-
 import { Clientes } from "./jarvisEntities/clientes.entity";
 import { datosPersonales } from "./jarvisEntities/datosGenerales.entity";
 import { Pcrc } from "./jarvisEntities/pcrc.entity";
@@ -53,6 +52,8 @@ import { DirectoresController } from './controllers/directores.controller';
 import { GerentesController } from './controllers/gerentes.controller';
 import { CoordinadoresController } from './controllers/coordinadores.controller';
 import { ArticleChangesIndex } from "./indices/articlesChangesIndex";
+import { NotificationsGateway } from './webSockets/notifications.gateway';
+
 
 
 const secretKey = "123";
@@ -134,7 +135,8 @@ const secretKey = "123";
       provide: APP_INTERCEPTOR,
       useClass: MorganInterceptor('tiny'),
     },
-    ReportsModelService
+    ReportsModelService,
+    NotificationsGateway
   ],
 })
 export class AppModule {  }
