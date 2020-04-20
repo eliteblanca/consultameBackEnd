@@ -76,8 +76,8 @@ export class EsClientService extends GenericModel {
                         body: {
                             mappings: {
                                 properties: {
-                                    query : { 
-                                        type : "completion",
+                                    query: {
+                                        type: "completion",
                                         contexts: [
                                             {
                                                 name: "subline",
@@ -94,7 +94,7 @@ export class EsClientService extends GenericModel {
                             }
                         }
                     })
-                    break;                
+                    break;
                 case 'users':
                     return await this.esClient.indices.create({
                         index: index,
@@ -314,6 +314,56 @@ export class EsClientService extends GenericModel {
                         }
                     })
                     break;
+                case 'notifications':
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body: {
+                            "mappings": {
+                                "properties": {
+                                    "event": { "type": "keyword" },
+                                    "date": { "type": "date", "format": 'epoch_millis' },
+                                    "room": { "type": "keyword" },
+                                    "data": { "type": "keyword" }
+                                }
+                            }
+                        }
+                    })
+                    break;
+                case 'usersesions':
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body: {
+                            "mappings": {
+                                "properties": {
+                                    "login": { "type": "date", "format": 'epoch_millis' },
+                                    "logout": { "type": "date", "format": 'epoch_millis' },
+                                    "userid": { "type": "keyword" },
+                                    "pcrc": { "type": "keyword" }
+                                }
+                            }
+                        }
+                    })
+                    break;
+                case 'usernotifications':
+                    return await this.esClient.indices.create({
+                        index: index,
+                        include_type_name: false,
+                        body: {
+                            "mappings": {
+                                "properties": {
+                                    "event": { "type": "keyword" },
+                                    "date": { "type": "date", "format": 'epoch_millis' },
+                                    "room": { "type": "keyword" },
+                                    "data": { "type": "keyword" },
+                                    "userid": { "type": "keyword" },
+                                    "notificationId": { "type": "keyword" },
+                                }
+                            }
+                        }
+                    })
+                    break;
                 default:
                     break;
             }
@@ -322,7 +372,7 @@ export class EsClientService extends GenericModel {
         }
     }
 
-    public async addFieldToIndex(index:string, fieldName:string, fieldType:'text' | 'keyword' | 'integer'): Promise<ApiResponse>{
+    public async addFieldToIndex(index: string, fieldName: string, fieldType: 'text' | 'keyword' | 'integer'): Promise<ApiResponse> {
         return await this.esClient.indices.putMapping({
             index: index,
             body: {

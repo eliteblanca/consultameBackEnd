@@ -1,8 +1,10 @@
 import { ConflictException, forwardRef, HttpException, Inject, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import * as async from 'async';
-import { IsDate, IsNotEmpty, IsOptional, Length, MaxLength, MinLength } from 'class-validator';
+import { IsNotEmpty, Length } from 'class-validator';
 import { Article, ArticleIndex } from '../indices/articleIndex';
+import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
 import { ArticleState, ArticleStateIndex } from "../indices/articleStatesIndex";
+import { ArticlesViewsIndex } from "../indices/articleViewsIndex";
 import { CategoriesIndex } from '../indices/categoriesIndex';
 import { FavoriteStatesIndex } from "../indices/favoriteStatesIndex";
 import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
@@ -12,8 +14,7 @@ import { CategoriesModelService } from '../services/categories-model.service';
 import { PcrcModelService } from "../services/pcrc-model.service";
 import { S3BucketService } from '../services/s3-bucket.service';
 import { ArticleEventsModelService } from "./articleEvents-model.service";
-import { ArticlesViewsIndex } from "../indices/articleViewsIndex";
-import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
+import { UsersesionsIndex } from "../indices/usersesionsIndex";
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: 'debes proporcionar un id de articulo' })
@@ -67,6 +68,7 @@ export class ArticlesModelService {
         private favoriteStatesIndex:FavoriteStatesIndex,
         private articlesViewsIndex:ArticlesViewsIndex,
         private articleChangesIndex:ArticleChangesIndex,
+        private UsersesionsIndex:UsersesionsIndex,
 
     ) { }
 
@@ -844,19 +846,8 @@ export class ArticlesModelService {
         }
     }
 
-    public async prueba(): Promise<any> {
-        
-        return await this.articleChangesIndex.query({
-            query:{
-                "bool": {
-                    "must_not": {
-                        "exists": {
-                            "field": "pcrc"
-                        }
-                    }
-                }
-            }
-        })
+    public async prueba(): Promise<any> {        
+        return await this.UsersesionsIndex.all()
     }
 
     async updateArticleImages(articleId:string, quillJsObjString?:string) {

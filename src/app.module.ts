@@ -27,6 +27,10 @@ import { ArticlesEventsIndex } from "./indices/articlesEventsIndex";
 import { ArticleStateIndex } from "./indices/articleStatesIndex";
 import { FavoriteStatesIndex } from "./indices/favoriteStatesIndex";
 import { ArticlesViewsIndex } from "./indices/articleViewsIndex";
+import { NotificationsIndex } from "./indices/notificationsIndex";
+import { UsersesionsIndex } from "./indices/usersesionsIndex";
+import { UsernotificationsIndex } from "./indices/userNotificationsIndex";
+
 import { Clientes } from "./jarvisEntities/clientes.entity";
 import { datosPersonales } from "./jarvisEntities/datosGenerales.entity";
 import { Pcrc } from "./jarvisEntities/pcrc.entity";
@@ -53,8 +57,9 @@ import { GerentesController } from './controllers/gerentes.controller';
 import { CoordinadoresController } from './controllers/coordinadores.controller';
 import { ArticleChangesIndex } from "./indices/articlesChangesIndex";
 import { NotificationsGateway } from './webSockets/notifications.gateway';
-
-
+import { NotificationsModelService } from './services/notifications-model.service';
+import { UsersesionsModelService } from './services/usersesions-model.service';
+import { UserNotificationsModelService } from "./services/userNotifications-model.service";
 
 const secretKey = "123";
 
@@ -131,12 +136,18 @@ const secretKey = "123";
     FavoriteStatesIndex,
     ArticlesViewsIndex,
     ArticleChangesIndex,
+    NotificationsIndex,
     {
       provide: APP_INTERCEPTOR,
       useClass: MorganInterceptor('tiny'),
     },
     ReportsModelService,
-    NotificationsGateway
+    NotificationsGateway,
+    NotificationsModelService,
+    UsersesionsModelService,
+    UsersesionsIndex,
+    UsernotificationsIndex,
+    UserNotificationsModelService,
   ],
 })
 export class AppModule {  }
