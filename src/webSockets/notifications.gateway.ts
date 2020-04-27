@@ -4,7 +4,6 @@ import { PcrcModelService } from "../services/pcrc-model.service";
 import { NotificationsModelService } from "../services/notifications-model.service";
 import { notification } from "../indices/notificationsIndex";
 import { UsersesionsModelService } from "../services/usersesions-model.service";
-import * as async from 'async';
 import * as R from 'remeda';
 
 @WebSocketGateway({ namespace: 'articles' })
@@ -35,6 +34,7 @@ export class NotificationsGateway  implements OnGatewayInit, OnGatewayConnection
 
     if(rooms.length > 1){
       socket.leave(rooms[0])
+      socket.leave(rooms[0]+'/'+socket.handshake.query.cedula)
     }
 
     socket.join(data)
@@ -49,6 +49,8 @@ export class NotificationsGateway  implements OnGatewayInit, OnGatewayConnection
        this.notificationsModel.getNotificationsByDate(lastConnection.logout, (new Date()).getTime(), data),
        this.notificationsModel.getNotificationsByDate(lastConnection.logout, (new Date()).getTime(), data+'/'+socket.handshake.query.cedula)
       ])      
+
+      console.log(result)
 
       return R.flatten(result)
 

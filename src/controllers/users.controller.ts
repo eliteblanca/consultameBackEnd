@@ -164,4 +164,13 @@ export class UsersController {
     ): any {
         return this.userNotificationsModel.deleteUserNotification(id, user.sub)
     }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Delete('me/notification')
+    deleteAllUserNotification(
+        @Query('pcrc') pcrc:string,
+        @User() user: U
+    ): any {
+        return this.userNotificationsModel.deleteAllUserNotification(user.sub, pcrc)
+    }
 }
