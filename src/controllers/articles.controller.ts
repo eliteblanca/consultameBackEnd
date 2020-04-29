@@ -4,6 +4,7 @@ import { User } from '../user.decorator';
 import { User as U } from '../entities/user';
 import { ArticlesModelService, articleDTO, SingleArticleDTO, articleViewsDTO } from '../services/articles-model.service';
 import { SearchModelService } from '../services/search-model.service';
+import { query } from 'express';
 
 @Controller('api/articles')
 export class ArticlesController {
@@ -17,12 +18,15 @@ export class ArticlesController {
     }
 
     @Get('prueba')
-    async getPrueba(): Promise<any> {
+    async getPrueba(
+        @Query('from') from,
+        @Query('to') to,
+        @Query('idarticulo') idarticulo
+    ): Promise<any> {
         try {
-            return this.articlesModel.prueba();
+            return this.articlesModel.prueba(from, to, idarticulo);
         } catch (error) {
             throw error;
-            
         }
     }
 

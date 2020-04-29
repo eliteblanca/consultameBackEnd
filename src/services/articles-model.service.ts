@@ -14,6 +14,7 @@ import { S3BucketService } from '../services/s3-bucket.service';
 import { ArticleEventsModelService } from "./articleEvents-model.service";
 import { ArticlesViewsIndex } from "../indices/articleViewsIndex";
 import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
+import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: 'debes proporcionar un id de articulo' })
@@ -155,6 +156,8 @@ export class ArticlesModelService {
     }
 
     public async createArticle(article: articleDTO, creator: string): Promise<Article & { id: string }> {
+
+        console.log(article)
 
         let pcrc: string = null
         let cliente: { id: number; cliente: string; }
@@ -844,19 +847,47 @@ export class ArticlesModelService {
         }
     }
 
-    public async prueba(): Promise<any> {
+    public async prueba(from , size, id): Promise<any> {
+
+        if(id){
+            var articuloaux = [ await this.articleIndex.getById(id) ]
+        } else {
+            var articuloaux =  await this.articleIndex.where({ state:'published' }, from, '1', { orderby: 'modificationDate', order: 'desc' });
+        }
+
+        let quillJsObj:any        
+        if(articuloaux.length > 0){
+            quillJsObj = JSON.parse(articuloaux[0].obj).ops    
+
+            var quillJsObjUpdate = await async.map(quillJsObj, async action => {
+                if(action.insert?.image){
+                    if(!action.insert.image.startsWith('/files/')){
+                        let imageResponse = await axios.get(action.insert?.image, {
+                          responseType: 'arraybuffer'
+                        })
         
-        return await this.articleChangesIndex.query({
-            query:{
-                "bool": {
-                    "must_not": {
-                        "exists": {
-                            "field": "pcrc"
-                        }
+                        let base64String = Buffer.from(imageResponse.data, 'binary').toString('base64')
+        
+                        let uploadResult = await this.S3BucketService.uploadImage(base64String, articuloaux[0].id)
+                        
+                        return { insert:{ image: `/files/${uploadResult.Key }` } }               
+    
+                    } else {
+                        return action
                     }
+    
+    
+                } else {
+                    return action
                 }
-            }
-        })
+            })
+    
+            let updateresult =await this.articleIndex.updatePartialDocument(articuloaux[0].id,{ obj:JSON.stringify({ ops: quillJsObjUpdate}) })
+
+            return updateresult
+
+        }
+
     }
 
     async updateArticleImages(articleId:string, quillJsObjString?:string) {
