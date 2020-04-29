@@ -4,7 +4,6 @@ import { User } from '../user.decorator';
 import { User as U } from '../entities/user';
 import { ArticlesModelService, articleDTO, SingleArticleDTO, articleViewsDTO } from '../services/articles-model.service';
 import { SearchModelService } from '../services/search-model.service';
-import { query } from 'express';
 
 @Controller('api/articles')
 export class ArticlesController {
