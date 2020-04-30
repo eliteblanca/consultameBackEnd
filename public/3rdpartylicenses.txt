@@ -23,6 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
+@angular/animations
+MIT
+
 @angular/cdk
 MIT
 The MIT License
@@ -538,13 +541,7 @@ MIT
 get-size
 MIT
 
-imagesloaded
-MIT
-
 masonry-layout
-MIT
-
-ng-masonry-grid
 MIT
 
 ng-recaptcha
@@ -616,6 +613,8 @@ ngx-scrollbar
 
 outlayer
 MIT
+
+undefined
 
 punycode
 MIT
@@ -954,8 +953,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-
-undefined
 
 rxjs
 Apache-2.0
