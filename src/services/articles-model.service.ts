@@ -862,7 +862,11 @@ export class ArticlesModelService {
             var quillJsObjUpdate = await async.map(quillJsObj, async action => {
                 if(action.insert?.image){
                     if(!action.insert.image.startsWith('/files/')){
-                        let imageResponse = await axios.get(action.insert?.image, {
+
+                        let imageUrl = action.insert.image.replace('http://multiconsultabanco.multienlace.com.co','172.20.1.34:80')
+                        imageUrl = action.insert.image.replace(imageUrl,'172.20.1.32')
+
+                        let imageResponse = await axios.get(imageUrl, {
                           responseType: 'arraybuffer'
                         })
         
