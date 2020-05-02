@@ -1,8 +1,11 @@
 import { ConflictException, forwardRef, HttpException, Inject, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import * as async from 'async';
-import { IsDate, IsNotEmpty, IsOptional, Length, MaxLength, MinLength } from 'class-validator';
+import axios from 'axios';
+import { IsNotEmpty, Length } from 'class-validator';
 import { Article, ArticleIndex } from '../indices/articleIndex';
+import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
 import { ArticleState, ArticleStateIndex } from "../indices/articleStatesIndex";
+import { ArticlesViewsIndex } from "../indices/articleViewsIndex";
 import { CategoriesIndex } from '../indices/categoriesIndex';
 import { FavoriteStatesIndex } from "../indices/favoriteStatesIndex";
 import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
@@ -12,9 +15,6 @@ import { CategoriesModelService } from '../services/categories-model.service';
 import { PcrcModelService } from "../services/pcrc-model.service";
 import { S3BucketService } from '../services/s3-bucket.service';
 import { ArticleEventsModelService } from "./articleEvents-model.service";
-import { ArticlesViewsIndex } from "../indices/articleViewsIndex";
-import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
-import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: 'debes proporcionar un id de articulo' })
