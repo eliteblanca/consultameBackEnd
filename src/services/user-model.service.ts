@@ -1,13 +1,12 @@
-import { ConflictException, Injectable, NotFoundException, HttpException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { IsByteLength, IsIn, IsNotEmpty } from "class-validator";
 import * as R from 'remeda';
-import { createQueryBuilder } from 'typeorm';
+import * as sqlstring from 'sqlstring';
+import { createQueryBuilder, getManager } from 'typeorm';
 import { Article, ArticleIndex } from "../indices/articleIndex";
 import { likeUser, LikeUserIndex } from "../indices/likeUserIndex";
 import { user, UserIndex } from "../indices/userIndex";
-import { Personal } from "../jarvisEntities/personal.entity";
 import { datosPersonales } from "../jarvisEntities/datosGenerales.entity";
-import { tsImportEqualsDeclaration } from '@babel/types';
 
 export class updateUserRolDTO {
 
@@ -114,12 +113,19 @@ export class UserModelService {
         return await this.articleIndex.where({ favorites:  userId, state:'published'  }, from, size, { orderby: 'publicationDate', order: 'desc' })
     }
 
-    public searchUsers = async (query: string) => {
-        let jarvisUsers: { documento: string, nombre: string }[] = await createQueryBuilder(datosPersonales, 'datos')
-            .select(['datos.documento as documento', 'datos.nombre_completo as nombre'])
-            .where("datos.documento LIKE :query", { query: '%' + query + '%' })
-            .orWhere("datos.nombre_completo LIKE :query", { query: '%' + query + '%' })
-            .getRawMany()
+    public searchUsers = async (query: string, pcrcId:string) => {
+        // let jarvisUsers: { documento: string, nombre: string }[] = await createQueryBuilder(datosPersonales, 'datos')
+        //     .select(['datos.documento as documento', 'datos.nombre_completo as nombre'])
+        //     .where("datos.documento LIKE :query", { query: '%' + query + '%' })
+        //     .orWhere("datos.nombre_completo LIKE :query", { query: '%' + query + '%' })
+        //     .getRawMany()
+
+        const entityManager = getManager();
+        
+        let jarvisUsers: { documento: string, nombre: string }[] = await entityManager.query(
+            sqlstring.format(`
+
+            `))
 
         let existingUsers = await this.userIndex.query({
             query: {
@@ -131,7 +137,7 @@ export class UserModelService {
 
         let newJarvisUsers = jarvisUsers.map(user => {
             let existingUser = existingUsers.find(existingUser => existingUser.cedula == user.documento)
-            0
+            
             if (existingUser) {
                 let { id, ...userSinId } = existingUser;
                 return userSinId
@@ -148,7 +154,5 @@ export class UserModelService {
         return newJarvisUsers
     }
 
-    async getUser(idUsuario: string) {
-        return await this.searchUsers(idUsuario)
-    }
+    
 }

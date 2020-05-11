@@ -86,35 +86,64 @@ export class PcrcModelService {
                 return this.sortBy([...pcrcsEnElastic, ...pcrcsPorDefecto], 'cliente')
 
             } else {
+                
                 return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')
             }
-
+            
         } else {
+            console.log('no existe usuario')
             return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')
         }
     }
 
-    private getDefaultsPcrc = async (cedula: string) => {
-        return await createQueryBuilder<cliente>('Clientes')
-            .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
-            .innerJoin(qb =>
-                qb.select(['Personal.cod_pcrc as cod_pcrc'])
-                    .from(Personal, 'Personal')
-                    .innerJoin(qb =>
-                        qb.select(['max(Personal.fecha_actual) as fecha', 'Personal.documento as documento'])
-                            .from(Personal, 'Personal')
-                            .groupBy('Personal.documento')
-                        , 'fechas'
-                        , 'Personal.fecha_actual = fechas.fecha and fechas.documento = Personal.documento'
-                    )
-                    .where('Personal.documento = :documento', { documento: cedula })
-                , 'accesos'
-                , 'accesos.cod_pcrc = pcrc.cod_pcrc'
-            )
-            .where('pcrc.estado = 1')
-            .andWhere('Clientes.estado = 1')
-            .select(['Clientes.id_dp_clientes', 'Clientes.cliente', 'pcrc.id_dp_pcrc', 'pcrc.cod_pcrc', 'pcrc.pcrc'])
-            .getMany()
+    private getDefaultsPcrc = async (cedula: string):Promise<cliente[]> => {
+
+        const entityManager = getManager();
+
+        let rows:{
+            id_dp_pcrc:number,
+            cod_pcrc:string,
+            pcrc:string,
+            id_dp_clientes:number,
+            cliente:string }[] = await entityManager.query(
+            sqlstring.format(`
+                select b.id_dp_pcrc, b.cod_pcrc, b.pcrc, c.id_dp_clientes, c.cliente from dp_distribucion_personal a
+                inner join dp_pcrc b
+                on a.cod_pcrc = b.cod_pcrc
+                inner join dp_clientes c
+                on c.id_dp_clientes = b.id_dp_clientes
+                where a.documento = '${cedula}'
+                and YEAR(a.fecha_actual) = YEAR(NOW())
+                and MONTH(a.fecha_actual) = MONTH(NOW())
+            `))
+
+        let clientes:cliente[] = []
+
+        rows.forEach(row => {
+            let clienteId = clientes.findIndex(cliente => cliente.id_dp_clientes == row.id_dp_clientes)
+
+            if(clienteId == -1){
+                clientes.push({
+                    cliente:row.cliente,
+                    id_dp_clientes:row.id_dp_clientes,
+                    pcrcs:[
+                        { 
+                            cod_pcrc:row.cod_pcrc,
+                            id_dp_pcrc:row.id_dp_pcrc,
+                            pcrc:row.pcrc
+                        }
+                    ]
+                })
+            } else {
+                clientes[clienteId].pcrcs.push({
+                    cod_pcrc:row.cod_pcrc,
+                    id_dp_pcrc:row.id_dp_pcrc,
+                    pcrc:row.pcrc
+                })
+            }
+        })
+
+        return clientes
     }
 
     postUserPcrc = async (cedula: string, idPcrc: string, cedulaUsuarioAdmin: string) => {
@@ -159,7 +188,7 @@ export class PcrcModelService {
 
         } else {
 
-            let existingUserPcrc = await this.getUserPcrc(cedula)
+            let existingUserPcrc = await this.getUserPcrc(cedula)            
 
             if (existingUserPcrc.some(cliente => cliente.pcrcs.some(pcrc => pcrc.id_dp_pcrc.toString() == idPcrc))) {
                 throw new ConflictException('el usuario ya tiene acceso a este pcrc')
@@ -177,9 +206,9 @@ export class PcrcModelService {
                 } else {
 
 
-                    let usuarioExiste = await this.userIndex.getById(cedula)
+                    let usuarioExiste = await this.userIndex.where({ cedula: cedula })
 
-                    if (!!usuarioExiste) {
+                    if (usuarioExiste.length > 0) {
 
                         let updateQuery = {
                             'source': 'ctx._source.pcrc.add(params.pcrc)',
@@ -253,17 +282,22 @@ export class PcrcModelService {
 
     getPcrcUsers = async (idPcrc: string) => {
 
-        let jarvisUsers: { documento: string, nombre: string }[] = await createQueryBuilder(Personal)
-            .innerJoin(qb =>
-                qb.select(['max(distri.fecha_actual) as fecha', 'distri.documento as documento'])
-                    .from(Personal, 'distri')
-                    .groupBy('distri.documento')
-                , 'fechas'
-                , 'Personal.fecha_actual = fechas.fecha and fechas.documento = Personal.documento'
-            ).innerJoinAndSelect('Pcrc', 'pcrc', 'pcrc.cod_pcrc = Personal.cod_pcrc and pcrc.estado = 1 and pcrc.id_dp_pcrc = :idPcrc', { idPcrc: idPcrc })
-            .innerJoinAndSelect('Personal.id_dp_datos_generales', 'datos')
-            .select(['Personal.documento as documento', 'datos.nombre_completo as nombre'])
-            .getRawMany()
+        const entityManager = getManager();
+
+        let jarvisUsers: { documento: string, nombre: string }[] = await entityManager.query(
+                    sqlstring.format(`
+                        select
+                        c.documento,
+                        c.nombre_completo as nombre
+                        from dp_pcrc a
+                        inner join dp_distribucion_personal b
+                        on a.cod_pcrc = b.cod_pcrc
+                        inner join dp_datos_generales c
+                        on b.documento = c.documento
+                        where a.id_dp_pcrc = '${idPcrc}'
+                        and YEAR(b.fecha_actual) = YEAR(NOW())
+                        and MONTH(b.fecha_actual) = MONTH(NOW())
+                    `))
 
         let existingUsers = await this.userIndex.query({
             query: {
@@ -296,7 +330,7 @@ export class PcrcModelService {
                     must: [
                         {
                             terms: {
-                                pcrc: [idPcrc, 'todos']
+                                pcrc: [ idPcrc, 'todos' ]
                             }
                         }
                     ]

@@ -17,22 +17,19 @@ export class UsersController {
     @UseGuards(AuthGuard('jwt'))
     @Get()
     getUsers(
-        @Query('query') query:string
+        @Query('query') query:string,
+        @Query('pcrcId') pcrcId:string
     ): any {
-        if(!!query) {
-            return this.userModel.searchUsers(query);
-        } else {
-            return this.userModel.getAllUsers();
-        }
+        return this.userModel.searchUsers(query, pcrcId);        
     }
 
-    @UseGuards(AuthGuard('jwt'))
-    @Get(':idUsuario')
-    getSingleUser(
-        @Param('idUsuario') idUsuario:string
-    ): any {
-        return this.userModel.getUser(idUsuario)
-    }
+    // @UseGuards(AuthGuard('jwt'))
+    // @Get(':idUsuario')
+    // getSingleUser(
+    //     @Param('idUsuario') idUsuario:string
+    // ): any {
+    //     return this.userModel.getUser(idUsuario)
+    // }
 
     @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
@@ -86,12 +83,16 @@ export class UsersController {
 
     @UseGuards(AuthGuard('jwt'))
     @Post(':cedula/pcrc')
-    postUserPcrc(
+    async postUserPcrc(
         @Param('cedula') cedula:string,
         @Body() body:postUserPcrcDTO,
         @User() user: U
-    ): any {
-        return this.pcrcModel.postUserPcrc(cedula, body.pcrc, user.sub)
+    ){
+        try{
+            return await this.pcrcModel.postUserPcrc(cedula, body.pcrc, user.sub)
+        }catch(error){
+            console.log(error)
+        }
     }
 
     @UseGuards(AuthGuard('jwt'))
