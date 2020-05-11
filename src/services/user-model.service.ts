@@ -114,18 +114,38 @@ export class UserModelService {
     }
 
     public searchUsers = async (query: string, pcrcId:string) => {
-        // let jarvisUsers: { documento: string, nombre: string }[] = await createQueryBuilder(datosPersonales, 'datos')
-        //     .select(['datos.documento as documento', 'datos.nombre_completo as nombre'])
-        //     .where("datos.documento LIKE :query", { query: '%' + query + '%' })
-        //     .orWhere("datos.nombre_completo LIKE :query", { query: '%' + query + '%' })
-        //     .getRawMany()
-
         const entityManager = getManager();
         
-        let jarvisUsers: { documento: string, nombre: string }[] = await entityManager.query(
-            sqlstring.format(`
+        let jarvisUsers: { documento: string, nombre: string }[] = []
 
-            `))
+        if(pcrcId){
+            jarvisUsers = await entityManager.query(
+                sqlstring.format(`
+                    select 
+                    a.documento,
+                    a.nombre_completo as nombre 
+                    from dp_datos_generales a
+                    inner join dp_distribucion_personal b
+                    on a.documento = b.documento
+                    inner join dp_pcrc c
+                    on b.cod_pcrc = c.cod_pcrc
+                    where lower(CONCAT(a.primer_nombre,' ',a.segundo_nombre, ' ', a.primer_apellido,' ', a.segundo_apellido))
+                    like(concat('%',lower('${query}'),'%'))
+                    and YEAR(b.fecha_actual) = YEAR(NOW())
+                    and MONTH(b.fecha_actual) = MONTH(NOW())
+                    and c.id_dp_pcrc = '${pcrcId}'
+                `))
+
+        } else {
+
+            jarvisUsers = await entityManager.query(
+                sqlstring.format(`
+                    select a.documento, a.nombre_completo as nombre from dp_datos_generales a
+                    where lower(CONCAT(a.primer_nombre,' ',a.segundo_nombre, ' ', a.primer_apellido,' ', a.segundo_apellido))
+                    like(concat('%',lower('${query}'),'%'))
+                `))
+        }
+
 
         let existingUsers = await this.userIndex.query({
             query: {
