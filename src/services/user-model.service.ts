@@ -138,6 +138,8 @@ export class UserModelService {
 
         } else {
 
+            console.log(query)
+
             jarvisUsers = await entityManager.query(
                 sqlstring.format(`
                     select a.documento, a.nombre_completo as nombre from dp_datos_generales a
