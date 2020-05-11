@@ -129,8 +129,8 @@ export class UserModelService {
                     on a.documento = b.documento
                     inner join dp_pcrc c
                     on b.cod_pcrc = c.cod_pcrc
-                    where lower(CONCAT(a.primer_nombre,' ',a.segundo_nombre, ' ', a.primer_apellido,' ', a.segundo_apellido))
-                    like(concat('%',lower('${query}'),'%'))
+                    where replace(lower(CONCAT(a.primer_nombre,' ',a.segundo_nombre, ' ', a.primer_apellido,' ', a.segundo_apellido)),' ','')
+                    like(concat('%',replace(lower('${query}'),' ',''),'%'))
                     and YEAR(b.fecha_actual) = YEAR(NOW())
                     and MONTH(b.fecha_actual) = MONTH(NOW())
                     and c.id_dp_pcrc = '${pcrcId}'
@@ -141,8 +141,8 @@ export class UserModelService {
             jarvisUsers = await entityManager.query(
                 sqlstring.format(`
                     select a.documento, a.nombre_completo as nombre from dp_datos_generales a
-                    where lower(CONCAT(a.primer_nombre,' ',a.segundo_nombre, ' ', a.primer_apellido,' ', a.segundo_apellido))
-                    like(concat('%',lower('${query}'),'%'))
+                    where replace(lower(CONCAT(a.primer_nombre,' ',a.segundo_nombre, ' ', a.primer_apellido,' ', a.segundo_apellido)),' ','')
+                    like(concat('%',replace(lower('${query}'),' ',''),'%'))
                 `))
         }
 
