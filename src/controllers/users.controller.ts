@@ -1,10 +1,9 @@
-import { Controller, UseGuards, Get, Query, Param, Body, Delete, Post, Put } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { UserModelService, deleteUserDTO, updateUserRolDTO } from "../services/user-model.service";
-import { User } from "../user.decorator";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { User as U } from "../entities/user";
+import { JwtGuard } from "../guards/jwt.guard";
 import { PcrcModelService, postUserPcrcDTO } from "../services/pcrc-model.service";
-
+import { deleteUserDTO, updateUserRolDTO, UserModelService } from "../services/user-model.service";
+import { User } from "../user.decorator";
 
 @Controller('api/users')
 export class UsersController {
@@ -14,7 +13,7 @@ export class UsersController {
         private pcrcModel:PcrcModelService
     ) { }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get()
     getUsers(
         @Query('query') query:string,
@@ -23,7 +22,7 @@ export class UsersController {
         return this.userModel.searchUsers(query, pcrcId);        
     }
 
-    // @UseGuards(AuthGuard('jwt'))
+    // @UseGuards(JwtGuard)
     // @Get(':idUsuario')
     // getSingleUser(
     //     @Param('idUsuario') idUsuario:string
@@ -31,7 +30,7 @@ export class UsersController {
     //     return this.userModel.getUser(idUsuario)
     // }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Delete(':id')
     deleteUser(
         @Param() params: deleteUserDTO
@@ -39,7 +38,7 @@ export class UsersController {
         return this.userModel.deleteUser(params.id);
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Put(':idUsuario')
     actualizarUsuario(
         @Body() newUser: updateUserRolDTO,
@@ -48,14 +47,14 @@ export class UsersController {
         return this.userModel.updateUserRol(idUsuario, newUser);
     }  
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get('me/likes')
     getSelfLikes(@User() user: U
     ): any {
         return this.userModel.getUserLikes(user.sub);
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get('me/dislikes')
     getSelfdisLikes(
         @User() user: U
@@ -63,7 +62,7 @@ export class UsersController {
         return this.userModel.getUserDisLikes(user.sub);
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get('me/favorites')
     getSelfFavorites(
         @User() user: U,
@@ -73,15 +72,17 @@ export class UsersController {
         return this.userModel.getUserFavorites(user.sub,from,size);
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':cedula/pcrc')
-    getUserPcrc(
+    getUserPcrc(        
+        @User() user: U,
         @Param('cedula') cedula:string
     ): any {
+        console.log(user)
         return this.pcrcModel.getUserPcrc(cedula)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post(':cedula/pcrc')
     async postUserPcrc(
         @Param('cedula') cedula:string,
@@ -95,7 +96,7 @@ export class UsersController {
         }
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Delete(':cedula/pcrc/:pcrc')
     deleteUserPcrc(
         @Param('cedula') cedula:string,

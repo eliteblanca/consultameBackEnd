@@ -27,6 +27,7 @@ import { ArticlesEventsIndex } from "./indices/articlesEventsIndex";
 import { ArticleStateIndex } from "./indices/articleStatesIndex";
 import { FavoriteStatesIndex } from "./indices/favoriteStatesIndex";
 import { ArticlesViewsIndex } from "./indices/articleViewsIndex";
+import { userjwtIndex } from "./indices/userjwtIndex";
 
 import { Clientes } from "./jarvisEntities/clientes.entity";
 import { datosPersonales } from "./jarvisEntities/datosGenerales.entity";
@@ -54,15 +55,12 @@ import { GerentesController } from './controllers/gerentes.controller';
 import { CoordinadoresController } from './controllers/coordinadores.controller';
 import { ArticleChangesIndex } from "./indices/articlesChangesIndex";
 
-
-const secretKey = "123";
-
 @Module({
   imports: [
     JwtModule.register({
-      secret:secretKey,
+      secret:process.env.JWT_PRIVATE_KEY,
       signOptions:{
-        expiresIn:'1y'
+        expiresIn:'300s'
       }
     }),
     TypeOrmModule.forRoot({
@@ -130,6 +128,7 @@ const secretKey = "123";
     FavoriteStatesIndex,
     ArticlesViewsIndex,
     ArticleChangesIndex,
+    userjwtIndex,
     {
       provide: APP_INTERCEPTOR,
       useClass: MorganInterceptor('tiny'),

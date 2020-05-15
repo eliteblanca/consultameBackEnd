@@ -1,5 +1,5 @@
-import { Controller, UseGuards, Post, Query, Param, Body, Delete, Put } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Body, Controller, Delete, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { JwtGuard } from "../guards/jwt.guard";
 import { EsClientService } from "../services/es-client.service";
 
 @Controller('es-client')
@@ -7,7 +7,7 @@ export class EsClientController {
 
     constructor(private esClientService: EsClientService) { }
 
-    // @UseGuards(AuthGuard('jwt'))
+    // @UseGuards(JwtGuard)
     @Post('index')
     createIndex(
         @Body() body: { index: string }
@@ -15,7 +15,7 @@ export class EsClientController {
         return this.esClientService.createIndex(body.index);
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Delete('index/:id')
     deleteIndex(
         @Param('id') indice
@@ -23,7 +23,7 @@ export class EsClientController {
         return this.esClientService.deleteIndex(indice);
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Put('index/:id/fields')
     addFieldToIndex(
         @Body() fieldData:{type:'text' | 'keyword' | 'integer', name:'string'},
@@ -32,7 +32,7 @@ export class EsClientController {
         return this.esClientService.addFieldToIndex(indice, fieldData.name, fieldData.type);
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post('status')
     checkStatus(): any {
         return this.esClientService.DDBB_status();

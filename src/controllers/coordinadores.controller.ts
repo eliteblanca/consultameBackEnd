@@ -3,13 +3,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { CargosModelService } from "../services/cargos-model.service";
 import { User } from '../user.decorator';
 import { User as U } from '../entities/user';
+import { JwtGuard } from "../guards/jwt.guard";
 
 @Controller('api/coordinadores')
 export class CoordinadoresController {
 
     constructor(private cargosModel:CargosModelService){  }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':idCoordinador/lideres')
     async getDirectorGerentes(
         @Param('idCoordinador') idCoordinador: string,

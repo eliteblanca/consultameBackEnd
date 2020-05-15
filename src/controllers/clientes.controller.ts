@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { CargosModelService } from "../services/cargos-model.service";
 import { User } from '../user.decorator';
 import { User as U } from '../entities/user';
+import { JwtGuard } from "../guards/jwt.guard";
 
 @Controller('api/clientes')
 export class ClientesController {
@@ -11,7 +12,7 @@ export class ClientesController {
         private cargosModel:CargosModelService
     ){  }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':idCliente/directors')
     async getClientDirectors(
         @Param('idCliente') idCliente: string,

@@ -1,8 +1,8 @@
-import { Controller, UseGuards, Get, Param, Query, HttpException, Body, Post } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { CargosModelService } from "../services/cargos-model.service";
-import { ArticleEventsModelService } from "../services/articleEvents-model.service";
+import { Body, Controller, Get, HttpException, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { JwtGuard } from "../guards/jwt.guard";
 import { isEvent } from "../indices/articlesEventsIndex";
+import { ArticleEventsModelService } from "../services/articleEvents-model.service";
+import { CargosModelService } from "../services/cargos-model.service";
 
 @Controller('api/reports')
 export class ReportsController {
@@ -12,7 +12,7 @@ export class ReportsController {
         private cargosModel:CargosModelService
     ){  }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post('events')
     async getArticles(
         @Query('fromdate')    fromdate:string,
@@ -29,7 +29,7 @@ export class ReportsController {
         }
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post('count')
     async getArticlesCount(
         @Query('date') date:string,
@@ -43,7 +43,7 @@ export class ReportsController {
         }
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post('views')
     async getViewsCount(
         @Query('date') date:string,
@@ -54,7 +54,7 @@ export class ReportsController {
         return this.articleEventsModel.getViewsCountBy(date, filters.filters, parseInt(minDuration), parseInt(maxDuration))
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post('comments')
     async getCommets(
         @Query('dateto') dateTo:number,
@@ -66,7 +66,7 @@ export class ReportsController {
         return this.articleEventsModel.getCommentsBy(filters.filters, dateFrom, dateTo, from, to)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post('changes')
     async getChanges(
         @Query('dateto') dateTo:number,
@@ -78,7 +78,7 @@ export class ReportsController {
         return this.articleEventsModel.getChangesBy(filters.filters, dateFrom, dateTo, from, to)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get('changes/:id')
     async getChange(
         @Param('id') idChange:string
@@ -86,7 +86,7 @@ export class ReportsController {
         return this.articleEventsModel.getChange(idChange)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post('fullreport')
     async getFullReport(
         @Query('date') date:string,

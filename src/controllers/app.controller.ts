@@ -1,9 +1,15 @@
-import { Controller, Get, Post, Request, UseGuards, Body } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Body, Res , Req} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Response, Request } from 'express';
 import { LdapService } from "../services/auth.service";
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 import * as https from "https";
 import * as qs from "querystring"
+import { RefreshJwtGuard } from "../guards/refreshjwt.guard";
+import { userjwtIndex } from "../indices/userjwtIndex";
+import { JwtGuard } from "../guards/jwt.guard";
+import { User } from '../user.decorator';
+import { User as U } from '../entities/user';
 class user {
     "sub": string
     "name": string
@@ -15,21 +21,75 @@ class user {
 
 @Controller('api')
 export class AppController {
-    constructor(private authService: LdapService) { }
+    constructor(
+        private authService: LdapService,
+        private userjwtIndex: userjwtIndex,
+    ) { }
 
     @UseGuards(AuthGuard('ldap'))
     @Post('authenticate')
-    login(@Request() req): Promise<{ tokem: string }> {
-        return this.authService.generateJwt(req.user);
+    async login(@Req() req, @Res() res:Response){
+
+        let tokens = {
+            token: this.authService.generateJwt(req.user),
+            refreshToken: this.authService.generateRefresh_token(req.user)
+        }
+
+        let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
+
+        res.cookie('refresh_token',tokens.refreshToken, {
+            httpOnly: true,
+            // secure: true,
+            domain: '127.0.0.1',
+            expires: new Date(decodedRefresh.exp * 1000)
+        })
+
+        await this.userjwtIndex.deleteWhere({ user: req.user.sub })
+
+        await this.userjwtIndex.create({ user: req.user.sub })
+
+        res.send(tokens)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
+    @Get('log_out')
+    async logOut(@User() user: U){
+        let deleted = await this.userjwtIndex.deleteWhere({ user: user.sub })
+        return { status:'logout' }
+    } 
+
+    @UseGuards(RefreshJwtGuard)
+    @Get('refresh_token')
+    refreshToken(@Req() req, @Res() res:Response){
+        let tokens = {
+            token: this.authService.generateJwt(req.user),
+            refreshToken: this.authService.generateRefresh_token(req.user)
+        }        
+
+        let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
+
+        res.clearCookie('refresh_token',{
+            httpOnly: true,
+            // secure: true,
+            domain: '127.0.0.1'
+        })
+
+        res.cookie('refresh_token',tokens.refreshToken, {
+            httpOnly: true,
+            // secure: true,
+            domain: '127.0.0.1',
+            expires: new Date(decodedRefresh.exp * 1000)
+        })
+
+        res.send(tokens)
+    }
+
+    @UseGuards(JwtGuard)
     @Get('me')
-    currentUser(@Request() req): Promise<user> {
+    currentUser(@Req() req): Promise<user> {
         return req.user
     }
 
-    @UseGuards()
     @Post('validateCaptcha')
     async validateCaptcha(
         @Body() body:{ token:string }

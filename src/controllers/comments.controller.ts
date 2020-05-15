@@ -3,13 +3,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { CommentsModelService, commentDTO } from "../services/comments-model.service";
 import { User } from '../user.decorator';
 import { User as U } from '../entities/user';
+import { JwtGuard } from "../guards/jwt.guard";
 
 @Controller('api')
 export class CommentsController {
 
     constructor(private commentsModel:CommentsModelService){  }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get('articles/:articleId/comments')
     async getComments(
         @Param('articleId') articleId:string,
@@ -19,7 +20,7 @@ export class CommentsController {
         return this.commentsModel.getComments(articleId, from, size)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get('comments/:commentId/replies')
     async getRepliesTo(
         @Param('commentId') commentId:string,
@@ -29,7 +30,7 @@ export class CommentsController {
         return this.commentsModel.getRepliesTo(commentId, from, size)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post('articles/:articleId/comments')
     async postComment(
         @Body() newComment:commentDTO,

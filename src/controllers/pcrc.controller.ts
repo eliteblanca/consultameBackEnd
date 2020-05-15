@@ -1,13 +1,13 @@
-import { Controller, UseGuards, Get, Param, Query, BadRequestException } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { PcrcModelService } from '../services/pcrc-model.service'
+import { BadRequestException, Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { User as U } from '../entities/user';
+import { JwtGuard } from "../guards/jwt.guard";
 import { CategoriesModelService } from "../services/categories-model.service";
-import { SearchModelService } from "./../services/search-model.service";
+import { PcrcModelService } from '../services/pcrc-model.service';
+import { User } from '../user.decorator';
 import { ArticlesModelService } from "./../services/articles-model.service";
 import { NewsModelService } from "./../services/news-model.service";
+import { SearchModelService } from "./../services/search-model.service";
 
-import { User } from '../user.decorator';
-import { User as U } from '../entities/user';
 
 @Controller('api/pcrc')
 export class PcrcController {
@@ -20,13 +20,13 @@ export class PcrcController {
         private newsModel: NewsModelService,
     ) { }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get()
     async getAllPcrc(): Promise<any> {
         return this.pcrcModel.getAllPcrc()
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':idPcrc/usuarios')
     async getUsuarios(
         @Param('idPcrc') idPcrc: string
@@ -34,7 +34,7 @@ export class PcrcController {
         return this.pcrcModel.getPcrcUsers(idPcrc)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':idPcrc/cliente')
     async getClienteOfPcrc(
         @Param('idPcrc') idPcrc: string
@@ -42,7 +42,7 @@ export class PcrcController {
         return this.pcrcModel.getClienteOfPcrc(idPcrc)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':idPcrc/categories')
     async getPcrcCategories(
         @Param('idPcrc') idPcrc: string
@@ -50,7 +50,7 @@ export class PcrcController {
         return this.categoriesModel.getCategories(idPcrc)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':idPcrc/articles')
     async getArticlesByQuery(
         @Param('idPcrc') idPcrc: string,
@@ -84,7 +84,7 @@ export class PcrcController {
         }
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':idPcrc/news')
     async getNews(
         @Param('idPcrc') idPcrc: string,        
@@ -102,7 +102,7 @@ export class PcrcController {
         }
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':idPcrc/suggestions')
     async getSuggestions(
         @Query('input') input: string,
@@ -117,7 +117,7 @@ export class PcrcController {
         }
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':idPcrc/didYouMean')
     async getDidYouMean(
         @Query('input') input: string,

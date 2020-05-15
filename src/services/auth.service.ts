@@ -1,23 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
+import * as jwt from "jsonwebtoken";
 import { ExtractJwt, Strategy as jwStrategy } from 'passport-jwt';
 import * as ldapStrategy from 'passport-ldapauth';
-import { user, UserIndex } from "../indices/userIndex";
-import { UserModelService } from "../services/user-model.service";
 import { User } from "../entities/user";
-import { PcrcModelService } from "../services/pcrc-model.service";
-import * as R from 'remeda';
+import { user, UserIndex } from "../indices/userIndex";
+import { userjwtIndex } from "../indices/userjwtIndex";
+import { UserModelService } from "../services/user-model.service";
 
-const secretKey: string = "123";
+
+export type token = {sub:string, name:string, rol:string, iat:number, exp:number }
 
 @Injectable()
 export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
     constructor(
         private userModel: UserModelService,
         private UserIndex: UserIndex,
-        private readonly jwtService: JwtService,
-        private pcrcModel: PcrcModelService
+        private userjwtIndex: userjwtIndex,
     ) {
         super({
             server: {
@@ -60,15 +59,41 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
         }
     }
 
-    async generateJwt(user: { sub: string, name: string, rol: user['rol'] }): Promise<{ tokem: string }> {
-        if (user.sub == '1036673423') {
-            let newUser = { ...user };
-            newUser.rol = 'admin';
+    generateJwt(user: { sub: string, name: string, rol: user['rol'] }) {
+        return jwt.sign(
+            user
+            , process.env.JWT_PRIVATE_KEY,
+            {
+                expiresIn:'5m'
+            }
+        )
+    }
 
-            return { tokem: this.jwtService.sign(newUser) }
+    generateRefresh_token(user: { sub: string, name: string, rol: user['rol'] }){   
+        return jwt.sign(
+            user
+            , process.env.REFRESH_JWT_PRIVATE_KEY,
+            {
+                expiresIn:'10h'
+            }
+        )
+    }
 
-        }
-        return { tokem: this.jwtService.sign(user) }
+    validateJwt(token:string){
+        return jwt.verify(token, process.env.JWT_PRIVATE_KEY) as token
+    }
+
+    validateRefreshJwt(token:string){
+        return jwt.verify(token, process.env.REFRESH_JWT_PRIVATE_KEY) as token
+    }
+
+    decodeToken(token):token{
+        let tokens = jwt.decode(token) as token
+        return tokens
+    }
+
+    async invalidateRefreshJwt(userid){
+        await this.userjwtIndex.deleteWhere({ user: userid })
     }
 
 }
@@ -79,7 +104,7 @@ export class JwtValidator extends PassportStrategy(jwStrategy) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: secretKey,
+            secretOrKey: process.env.JWT_PRIVATE_KEY
         });
     }
 

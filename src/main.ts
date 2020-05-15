@@ -1,6 +1,7 @@
-import * as fs from 'fs';
 import * as compression from 'compression';
 import * as dotenv from 'dotenv';
+import * as cookieParser from 'cookie-parser';
+
 dotenv.config() //! no cambiar esta linea de orden
 
 import { NestFactory } from '@nestjs/core';
@@ -15,10 +16,11 @@ async function bootstrap() {
 
   var app = await NestFactory.create<NestExpressApplication>(AppModule);
   
+  app.use(json({ limit: '50mb'  }))
 
   app.use(compression());
 
-  app.use(json({ limit: '50mb'  }))
+  app.use(cookieParser());
 
   app.enableCors();
 

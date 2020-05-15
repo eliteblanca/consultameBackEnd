@@ -1,15 +1,15 @@
-import { Controller, UseGuards, Post, Get, Query, Param, Body, Delete, Put } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { User as U } from '../entities/user';
+import { JwtGuard } from "../guards/jwt.guard";
 import { NewsModelService, postNewsDTO, updateNewsDTO } from "../services/news-model.service";
 import { User } from '../user.decorator';
-import { User as U } from '../entities/user';
 
 @Controller('api/news')
 export class NewsController {
 
     constructor(private newsModel:NewsModelService){  }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':id')
     async getSingleNews(
         @Param('id') idNews:string
@@ -17,7 +17,7 @@ export class NewsController {
         return this.newsModel.getSingleNews(idNews);
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post()
     async postNews(
         @Body() news: postNewsDTO,
@@ -26,7 +26,7 @@ export class NewsController {
         return this.newsModel.postNews(news,user.sub)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Put(':id')
     async updateNews(
         @Body() news: updateNewsDTO,
@@ -36,7 +36,7 @@ export class NewsController {
         return this.newsModel.updateNews(idArticulo,news,user.sub)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Delete(':id')
     async deleteNews(
         @Param('id') idArticulo:string
