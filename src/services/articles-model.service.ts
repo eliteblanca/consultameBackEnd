@@ -130,6 +130,14 @@ export class ArticlesModelService {
         return result
     }
 
+    public getArticlesByUpdate = async (pcrcId: string, from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> => {
+        return await this.articleIndex.where({ pcrc: pcrcId, state: 'published' }, from, size, { orderby: 'modificationDate', order: 'desc' })
+    }
+
+    public getArticlesByView = async (pcrcId: string, from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> => {
+        return await this.articleIndex.where({ pcrc: pcrcId, state: 'published' }, from, size, { orderby: 'views', order: 'desc' })
+    }
+
     public getAllArticles = async (): Promise<(Article & { id: string; })[]> => {        
         return await this.articleIndex.all();
     }

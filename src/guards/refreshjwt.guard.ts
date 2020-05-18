@@ -17,36 +17,44 @@ export class RefreshJwtGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
 
     let validator = async () => {
-
-      let ctx = context.switchToHttp()
-  
-      let req = ctx.getRequest<Request>()
-  
-      let token = req.cookies.refresh_token
       
-      if(!!!token){
+      if( process.env.NODE_ENV == 'development' ){
         return false
-      }
-  
-      try {
-        var tokenPayLoad = this.ldapService.validateRefreshJwt(token)
-      } catch(err){
-        return false
-      }
-  
-      req.user = {
-        "sub":tokenPayLoad.sub,
-        "name":tokenPayLoad.name,
-        "rol":tokenPayLoad.rol
-      }
+      } if( process.env.NODE_ENV == 'production' ) {
 
-      let tokens = await this.userjwtIndex.where({ user:tokenPayLoad.sub })
-
-      if(tokens.length == 0){
-        return false
+        let ctx = context.switchToHttp()  
+        let req = ctx.getRequest<Request>()
+    
+        let token = req.cookies.refresh_token
+        
+        if(!!!token){
+          return false
+        }
+    
+        try {
+          var tokenPayLoad = this.ldapService.validateRefreshJwt(token)
+        } catch(err){
+          return false
+        }
+    
+        req.user = {
+          "sub":tokenPayLoad.sub,
+          "name":tokenPayLoad.name,
+          "rol":tokenPayLoad.rol
+        }
+  
+        let tokens = await this.userjwtIndex.where({ user:tokenPayLoad.sub })
+  
+        if(tokens.length == 0){
+          return false
+        } else {
+          return true        
+        }
+        
       } else {
-        return true        
+        return false
       }
+
     }
 
     return validator() 

@@ -55,10 +55,11 @@ export class PcrcController {
     async getArticlesByQuery(
         @Param('idPcrc') idPcrc: string,
         @Query('query') query: string,
+        @Query('orderby') orderby: string,
+        @Query('tag') tag: string,
         @Query('from') from: string,
         @Query('size') size: string,
         @Query('state') state: string,
-        @Query('tag') tag: string,
         @User() user: U
     ): Promise<any> {
         if (query) {
@@ -77,11 +78,22 @@ export class PcrcController {
 
             return result
 
-        } else if (tag) {
-            return this.articlesModel.getArticlesByTag({ subline: idPcrc, tag: tag, from: from, size: size })
-        } else {
-            throw new BadRequestException('falta el parametro query o tag');
         }
+
+        if (tag) {
+            return this.articlesModel.getArticlesByTag({ subline: idPcrc, tag: tag, from: from, size: size })
+        } 
+
+        if(orderby == 'views'){
+            return this.articlesModel.getArticlesByView(idPcrc, from, size)
+        }
+
+        if(orderby == 'update'){
+            return this.articlesModel.getArticlesByUpdate(idPcrc, from, size)
+        }
+
+        throw new BadRequestException('falta el parametro query o tag');
+
     }
 
     @UseGuards(JwtGuard)
