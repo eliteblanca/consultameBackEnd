@@ -28,6 +28,9 @@ import { ArticleStateIndex } from "./indices/articleStatesIndex";
 import { FavoriteStatesIndex } from "./indices/favoriteStatesIndex";
 import { ArticlesViewsIndex } from "./indices/articleViewsIndex";
 import { userjwtIndex } from "./indices/userjwtIndex";
+import { NotificationsIndex } from "./indices/notificationsIndex";
+import { UsersesionsIndex } from "./indices/usersesionsIndex";
+import { UsernotificationsIndex } from "./indices/userNotificationsIndex";
 
 import { Clientes } from "./jarvisEntities/clientes.entity";
 import { datosPersonales } from "./jarvisEntities/datosGenerales.entity";
@@ -129,11 +132,18 @@ import { ArticleChangesIndex } from "./indices/articlesChangesIndex";
     ArticlesViewsIndex,
     ArticleChangesIndex,
     userjwtIndex,
+    NotificationsIndex,
     {
       provide: APP_INTERCEPTOR,
       useClass: MorganInterceptor('tiny'),
     },
-    ReportsModelService
+    ReportsModelService,
+    NotificationsGateway,
+    NotificationsModelService,
+    UsersesionsModelService,
+    UsersesionsIndex,
+    UsernotificationsIndex,
+    UserNotificationsModelService,
   ],
 })
 export class AppModule {  }

@@ -1251,6 +1251,8 @@ export class Esindex<T> {
 
         } catch (error) {
 
+            console.log(error.meta.body.error)
+
             let errorCode = '10';
 
             if (error instanceof errors.ResponseError) {/* 01 */

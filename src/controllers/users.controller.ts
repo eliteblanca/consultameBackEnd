@@ -4,13 +4,17 @@ import { JwtGuard } from "../guards/jwt.guard";
 import { PcrcModelService, postUserPcrcDTO } from "../services/pcrc-model.service";
 import { deleteUserDTO, updateUserRolDTO, UserModelService } from "../services/user-model.service";
 import { User } from "../user.decorator";
+import { UsersesionsModelService, sesionDTO, updateSesionDTO } from "../services/usersesions-model.service";
+import { UserNotificationsModelService, userNotificationDTO } from "../services/userNotifications-model.service";
 
 @Controller('api/users')
 export class UsersController {
 
     constructor(
         private userModel: UserModelService,
-        private pcrcModel:PcrcModelService
+        private pcrcModel:PcrcModelService,
+        private usersesionsModel:UsersesionsModelService,
+        private userNotificationsModel:UserNotificationsModelService,
     ) { }
 
     @UseGuards(JwtGuard)
@@ -45,7 +49,7 @@ export class UsersController {
         @Param('idUsuario') idUsuario: string
     ): Promise<any> {
         return this.userModel.updateUserRol(idUsuario, newUser);
-    }  
+    }
 
     @UseGuards(JwtGuard)
     @Get('me/likes')
@@ -100,9 +104,76 @@ export class UsersController {
     @Delete(':cedula/pcrc/:pcrc')
     deleteUserPcrc(
         @Param('cedula') cedula:string,
-        @Param('pcrc') pcrc:string,        
+        @Param('pcrc') pcrc:string,
         @User() user: U
     ): any {
         return this.pcrcModel.deleteUserPcrc(cedula, pcrc, user.sub)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('me/sesion')
+    postUserSesion(
+        @Body() body:sesionDTO,
+        @User() user: U
+    ): any {
+        return this.usersesionsModel.postUserSesion(user.sub, body)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Put('me/sesion/:id')
+    updateUserSesion(
+        @Param('id') id:string,
+        @Body() body:updateSesionDTO,
+        @User() user: U
+    ): any {
+        return this.usersesionsModel.udpateUserSesion(id, body)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get(':id/sesion')
+    getUserSessions(
+        @Param('id') id:string,
+        @Query('from') from:string,
+        @Query('size') size:string,
+        @Query('pcrc') pcrc:string,
+        @User() user: U
+    ): any {
+        return this.usersesionsModel.getUserSesions(id, pcrc, from, size)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('me/notification')
+    postUserNotification(
+        @Body() body:userNotificationDTO,
+        @User() user: U
+    ): any {
+        return this.userNotificationsModel.postUserNotification(body, user.sub)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('me/notification')
+    getUserNotification(
+        @Query('pcrc') pcrc:string,
+        @User() user: U
+    ): any {
+        return this.userNotificationsModel.getUserNotifications(user.sub, pcrc)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Delete('me/notification/:id')
+    deleteUserNotification(        
+        @Param('id') id:string,
+        @User() user: U
+    ): any {
+        return this.userNotificationsModel.deleteUserNotification(id, user.sub)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Delete('me/notification')
+    deleteAllUserNotification(
+        @Query('pcrc') pcrc:string,
+        @User() user: U
+    ): any {
+        return this.userNotificationsModel.deleteAllUserNotification(user.sub, pcrc)
     }
 }

@@ -15,6 +15,7 @@ import { CategoriesModelService } from '../services/categories-model.service';
 import { PcrcModelService } from "../services/pcrc-model.service";
 import { S3BucketService } from '../services/s3-bucket.service';
 import { ArticleEventsModelService } from "./articleEvents-model.service";
+import { UsersesionsIndex } from "../indices/usersesionsIndex";
 
 export class SingleArticleDTO {
     @IsNotEmpty({ message: 'debes proporcionar un id de articulo' })
@@ -68,6 +69,7 @@ export class ArticlesModelService {
         private favoriteStatesIndex:FavoriteStatesIndex,
         private articlesViewsIndex:ArticlesViewsIndex,
         private articleChangesIndex:ArticleChangesIndex,
+        private UsersesionsIndex:UsersesionsIndex,
 
     ) { }
 
