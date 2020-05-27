@@ -17,16 +17,13 @@ export class RefreshJwtGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
 
     let validator = async () => {
-      
-      if( process.env.NODE_ENV == 'development' ){
-        return false
-      } if( process.env.NODE_ENV == 'production' ) {
+      if( process.env.NODE_ENV == 'production' ){
 
         let ctx = context.switchToHttp()  
         let req = ctx.getRequest<Request>()
     
-        let token = req.cookies.refresh_token
-        
+        let token = req.cookies.refresh_token      
+  
         if(!!!token){
           return false
         }
@@ -50,9 +47,21 @@ export class RefreshJwtGuard implements CanActivate {
         } else {
           return true        
         }
-        
       } else {
-        return false
+
+        let ctx = context.switchToHttp()  
+        let req = ctx.getRequest<Request>()
+    
+        req.user = { name:"julian andres vargas", rol:'admin', sub:"1036673423" }
+  
+        let tokens = await this.userjwtIndex.where({ user:"1036673423" })
+  
+        if(tokens.length == 0){
+          return false
+        } else {
+          return true        
+        }
+
       }
 
     }

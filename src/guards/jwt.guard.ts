@@ -55,7 +55,6 @@ export class JwtGuard implements CanActivate {
       let tokens = await this.userjwtIndex.where({ user:tokenPayLoad.sub })
 
       if(tokens.length == 0){
-        console.log('tokens.length == 0')
         return false
       } else {
         return true        

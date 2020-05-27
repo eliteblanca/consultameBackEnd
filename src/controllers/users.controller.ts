@@ -110,7 +110,7 @@ export class UsersController {
         return this.pcrcModel.deleteUserPcrc(cedula, pcrc, user.sub)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post('me/sesion')
     postUserSesion(
         @Body() body:sesionDTO,
@@ -119,7 +119,7 @@ export class UsersController {
         return this.usersesionsModel.postUserSesion(user.sub, body)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Put('me/sesion/:id')
     updateUserSesion(
         @Param('id') id:string,
@@ -129,7 +129,7 @@ export class UsersController {
         return this.usersesionsModel.udpateUserSesion(id, body)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get(':id/sesion')
     getUserSessions(
         @Param('id') id:string,
@@ -141,7 +141,7 @@ export class UsersController {
         return this.usersesionsModel.getUserSesions(id, pcrc, from, size)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Post('me/notification')
     postUserNotification(
         @Body() body:userNotificationDTO,
@@ -150,7 +150,7 @@ export class UsersController {
         return this.userNotificationsModel.postUserNotification(body, user.sub)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Get('me/notification')
     getUserNotification(
         @Query('pcrc') pcrc:string,
@@ -159,7 +159,7 @@ export class UsersController {
         return this.userNotificationsModel.getUserNotifications(user.sub, pcrc)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Delete('me/notification/:id')
     deleteUserNotification(        
         @Param('id') id:string,
@@ -168,7 +168,7 @@ export class UsersController {
         return this.userNotificationsModel.deleteUserNotification(id, user.sub)
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(JwtGuard)
     @Delete('me/notification')
     deleteAllUserNotification(
         @Query('pcrc') pcrc:string,

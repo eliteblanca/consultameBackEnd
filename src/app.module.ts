@@ -47,9 +47,13 @@ import { PcrcModelService } from "./services/pcrc-model.service";
 import { S3BucketService } from './services/s3-bucket.service';
 import { SearchModelService } from './services/search-model.service';
 import { UserModelService } from './services/user-model.service';
+import { UserNotificationsModelService } from "./services/userNotifications-model.service";
+import { ArticleEventsModelService } from "./services/articleEvents-model.service";
+import { UsersesionsModelService } from "./services/usersesions-model.service";
+import { NotificationsModelService } from "./services/notifications-model.service";
+
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ReportsController } from './controllers/reports.controller';
-import { ArticleEventsModelService } from "./services/articleEvents-model.service";
 import { CargosModelService } from "./services/cargos-model.service";
 import { ReportsModelService } from './services/reports-model.service';
 import { ClientesController } from './controllers/clientes.controller';
@@ -57,6 +61,7 @@ import { DirectoresController } from './controllers/directores.controller';
 import { GerentesController } from './controllers/gerentes.controller';
 import { CoordinadoresController } from './controllers/coordinadores.controller';
 import { ArticleChangesIndex } from "./indices/articlesChangesIndex";
+import { NotificationsGateway } from "./webSockets/notifications.gateway";
 
 @Module({
   imports: [

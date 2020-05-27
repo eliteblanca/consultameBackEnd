@@ -66,7 +66,7 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
             user
             , process.env.JWT_PRIVATE_KEY,
             {
-                expiresIn:'5m'
+                expiresIn:'15s'
             }
         )
     }
@@ -76,7 +76,7 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
             user
             , process.env.REFRESH_JWT_PRIVATE_KEY,
             {
-                expiresIn:'10h'
+                expiresIn:'30s'
             }
         )
     }

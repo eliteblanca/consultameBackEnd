@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards, Body, Res , Req} from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Body, Res, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response, Request } from 'express';
 import { LdapService } from "../services/auth.service";
@@ -28,57 +28,72 @@ export class AppController {
 
     @UseGuards(AuthGuard('ldap'))
     @Post('authenticate')
-    async login(@Req() req, @Res() res:Response){
+    async login(@Req() req, @Res() res: Response) {
 
-        let tokens = {
+        if(process.env.NODE_ENV == 'production'){
+            let tokens = {
+                token: this.authService.generateJwt(req.user),
+                refreshToken: this.authService.generateRefresh_token(req.user)
+            }
+
+            let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
+
+            res.cookie('refresh_token', tokens.refreshToken, {
+                httpOnly: true,
+                expires: new Date(decodedRefresh.exp * 1000)
+            })
+
+            await this.userjwtIndex.deleteWhere({ user: req.user.sub })
+
+            await this.userjwtIndex.create({ user: req.user.sub })
+
+            res.send(tokens)
+        } else {
+
+            let tokens = {
+                token: this.authService.generateJwt({ name:"julian andres vargas", rol:'admin', sub:"1036673423" }),
+                refreshToken: this.authService.generateRefresh_token({ name:"julian andres vargas", rol:'admin', sub:"1036673423" })
+            }
+
+            let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
+
+            res.cookie('refresh_token', tokens.refreshToken, {
+                httpOnly: true,
+                expires: new Date(decodedRefresh.exp * 1000)
+            })
+
+            await this.userjwtIndex.deleteWhere({ user: "1036673423" })
+
+            await this.userjwtIndex.create({ user: "1036673423" })
+
+            res.send(tokens)
+        }
+    }
+
+    @UseGuards(JwtGuard)
+    @Get('log_out')
+    async logOut(@User() user: U) {
+        let deleted = await this.userjwtIndex.deleteWhere({ user: user.sub })
+        return { status: 'logout' }
+    }
+
+    @UseGuards(RefreshJwtGuard)
+    @Get('refresh_token')
+    refreshToken(@Req() req, @Res() res: Response) {
+        var tokens = {
             token: this.authService.generateJwt(req.user),
             refreshToken: this.authService.generateRefresh_token(req.user)
         }
 
         let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
 
-        res.cookie('refresh_token',tokens.refreshToken, {
+        res.clearCookie('refresh_token', {
             httpOnly: true,
-            // secure: true,
-            domain: '127.0.0.1',
-            expires: new Date(decodedRefresh.exp * 1000)
         })
 
-        await this.userjwtIndex.deleteWhere({ user: req.user.sub })
-
-        await this.userjwtIndex.create({ user: req.user.sub })
-
-        res.send(tokens)
-    }
-
-    @UseGuards(JwtGuard)
-    @Get('log_out')
-    async logOut(@User() user: U){
-        let deleted = await this.userjwtIndex.deleteWhere({ user: user.sub })
-        return { status:'logout' }
-    } 
-
-    @UseGuards(RefreshJwtGuard)
-    @Get('refresh_token')
-    refreshToken(@Req() req, @Res() res:Response){
-        let tokens = {
-            token: this.authService.generateJwt(req.user),
-            refreshToken: this.authService.generateRefresh_token(req.user)
-        }        
-
-        let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
-
-        res.clearCookie('refresh_token',{
+        res.cookie('refresh_token', tokens.refreshToken, {
             httpOnly: true,
-            // secure: true,
-            domain: '127.0.0.1'
-        })
-
-        res.cookie('refresh_token',tokens.refreshToken, {
-            httpOnly: true,
-            // secure: true,
-            domain: '127.0.0.1',
-            expires: new Date(decodedRefresh.exp * 1000)
+            expires: new Date(decodedRefresh.exp * 1000)            
         })
 
         res.send(tokens)
@@ -92,23 +107,23 @@ export class AppController {
 
     @Post('validateCaptcha')
     async validateCaptcha(
-        @Body() body:{ token:string }
+        @Body() body: { token: string }
     ) {
 
-        var RECAPTCHA_KEY = process.env.RECAPTCHA_KEY        
-        
+        var RECAPTCHA_KEY = process.env.RECAPTCHA_KEY
+
 
         const axiosInstance = axios.create({
-            httpsAgent: new https.Agent({  
-              rejectUnauthorized: false
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
             })
-          });
+        });
 
 
-        let googleResponse = await axiosInstance.post('https://www.google.com/recaptcha/api/siteverify', 
+        let googleResponse = await axiosInstance.post('https://www.google.com/recaptcha/api/siteverify',
             qs.stringify({
-                secret:RECAPTCHA_KEY,
-                response:body.token
+                secret: RECAPTCHA_KEY,
+                response: body.token
             })
         )
 
