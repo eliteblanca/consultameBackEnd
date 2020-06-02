@@ -26,14 +26,6 @@ export class UsersController {
         return this.userModel.searchUsers(query, pcrcId);        
     }
 
-    // @UseGuards(JwtGuard)
-    // @Get(':idUsuario')
-    // getSingleUser(
-    //     @Param('idUsuario') idUsuario:string
-    // ): any {
-    //     return this.userModel.getUser(idUsuario)
-    // }
-
     @UseGuards(JwtGuard)
     @Delete(':id')
     deleteUser(
@@ -93,9 +85,9 @@ export class UsersController {
         @Body() body:postUserPcrcDTO,
         @User() user: U
     ){
-        try{
+        try {
             return await this.pcrcModel.postUserPcrc(cedula, body.pcrc, user.sub)
-        }catch(error){
+        } catch(error) {
             console.log(error)
         }
     }

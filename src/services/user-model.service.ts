@@ -33,15 +33,7 @@ export class UserModelService {
     ) { }
 
     public async createUser(newUser: user): Promise<user & { id: string; }> {
-        let existingUser = await this.userIndex.getById(newUser.cedula);
-
-        if (!!existingUser) {
-            throw new HttpException({
-                "message": `ya existe un usuario con esta cedula`
-            }, 400)
-        } else {
-            return this.userIndex.create(newUser, newUser.cedula)
-        }
+        return this.userIndex.create(newUser, newUser.cedula)
     }
 
     public getJarvisUser = async (cedula: string) => {

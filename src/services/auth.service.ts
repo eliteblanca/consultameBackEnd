@@ -31,10 +31,6 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
 
     async validate(ldapUserInfo) {
 
-        var user = await this.UserIndex.getById(ldapUserInfo.postOfficeBox)
-
-        console.log(user)
-
         if (!!user) {
 
             return {
@@ -57,7 +53,6 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
                 "name": ldapUserInfo.name,
                 "rol": user.rol
             }
-
         }
     }
 
@@ -66,7 +61,7 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
             user
             , process.env.JWT_PRIVATE_KEY,
             {
-                expiresIn:'15s'
+                expiresIn:'5m'
             }
         )
     }
@@ -76,7 +71,7 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
             user
             , process.env.REFRESH_JWT_PRIVATE_KEY,
             {
-                expiresIn:'30s'
+                expiresIn:'10h'
             }
         )
     }

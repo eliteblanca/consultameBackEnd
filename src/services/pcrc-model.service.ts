@@ -73,17 +73,21 @@ export class PcrcModelService {
             if (user[0].pcrc.includes('todos')) {
                 return await this.getAllPcrc()
             } else if (user[0].pcrc.length) {
-                let pcrcsEnElastic = await createQueryBuilder<cliente>('Clientes')
+                let pcrcsPorDefecto = await this.getDefaultsPcrc(cedula)
+
+                let idsPcrcsPorDefecto = R.flatten(pcrcsPorDefecto.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+
+                let idsPcrcsDeUsuario = [...new Set(idsPcrcsPorDefecto.concat(user[0].pcrc))]// quitar duplicadps [1,1,2,2] = [1,2]
+
+                let pcrcsConCliente = await createQueryBuilder<cliente>('Clientes')
                     .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
                     .where('pcrc.estado = 1')
                     .andWhere('Clientes.estado = 1')
-                    .andWhere('pcrc.id_dp_pcrc IN (:...idsPcrc)', { idsPcrc: user[0].pcrc })
+                    .andWhere('pcrc.id_dp_pcrc IN (:...idsPcrc)', { idsPcrc: idsPcrcsDeUsuario })
                     .select(['Clientes.id_dp_clientes', 'Clientes.cliente', 'pcrc.id_dp_pcrc', 'pcrc.cod_pcrc', 'pcrc.pcrc'])
                     .getMany()
 
-                let pcrcsPorDefecto = await this.getDefaultsPcrc(cedula)
-
-                return this.sortBy([...pcrcsEnElastic, ...pcrcsPorDefecto], 'cliente')
+                return this.sortBy([...pcrcsConCliente], 'cliente')
 
             } else {
                 
@@ -91,7 +95,6 @@ export class PcrcModelService {
             }
             
         } else {
-            console.log('no existe usuario')
             return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')
         }
     }
@@ -380,5 +383,3 @@ export class PcrcModelService {
     }
 
 }
-
-

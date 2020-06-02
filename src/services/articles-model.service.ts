@@ -79,8 +79,6 @@ export class ArticlesModelService {
 
     public async getArticlesByQuery(query: string, group: group, state: string = 'published', from: string = '0', size: string = '10'): Promise<(Article & { id: string, highlight: string })[]> {
 
-        
-
             let q = {
                 query: {
                     function_score: {
@@ -133,6 +131,7 @@ export class ArticlesModelService {
     }
 
     public getArticlesByUpdate = async (pcrcId: string, from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> => {
+
         return await this.articleIndex.where({ pcrc: pcrcId, state: 'published' }, from, size, { orderby: 'modificationDate', order: 'desc' })
     }
 
