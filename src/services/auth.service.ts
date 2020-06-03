@@ -30,27 +30,29 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
     }
 
     async validate(ldapUserInfo) {
+        var user = await this.UserIndex.where( { cedula: ldapUserInfo.postOfficeBox })
 
         var user = 
 
         if (!!user) {
 
             return {
-                "sub": user.id,
+                "sub": user[0].id,
                 "name": ldapUserInfo.name,
             }
 
         } else {
 
-            var user = await this.userModel.createUser({
+            var newuser = await this.userModel.createUser({
                 cedula: ldapUserInfo.postOfficeBox,
                 nombre: ldapUserInfo.name,
             })
 
             return {
-                "sub": user.id,
+                "sub": newuser.id,
                 "name": ldapUserInfo.name,
             }
+
         }
     }
 
