@@ -73,7 +73,7 @@ import { NotificationsGateway } from "./webSockets/notifications.gateway";
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: '172.102.180.196',
+      host: '172.102.180.194',
       port: 3306,
       username: process.env.JARVIS_USER,
       password: process.env.JARVIS_PASS,
