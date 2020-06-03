@@ -8,14 +8,14 @@ import { JwtGuard } from "../guards/jwt.guard";
 @Controller('api/coordinadores')
 export class CoordinadoresController {
 
-    constructor(private cargosModel:CargosModelService){  }
+    // constructor(private cargosModel:CargosModelService){  }
 
-    @UseGuards(JwtGuard)
-    @Get(':idCoordinador/lideres')
-    async getDirectorGerentes(
-        @Param('idCoordinador') idCoordinador: string,
-        @User() user: U
-    ): Promise<any> {
-        return this.cargosModel.getCoordinadorLideres(idCoordinador, user.sub)
-    }
+    // @UseGuards(JwtGuard)
+    // @Get(':idCoordinador/lideres')
+    // async getDirectorGerentes(
+    //     @Param('idCoordinador') idCoordinador: string,
+    //     @User() user: U
+    // ): Promise<any> {
+    //     return this.cargosModel.getCoordinadorLideres(idCoordinador, user.sub)
+    // }
 }

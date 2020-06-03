@@ -38,7 +38,7 @@ import { Pcrc } from "./jarvisEntities/pcrc.entity";
 import { Personal } from "./jarvisEntities/personal.entity";
 import { CentrosCostos } from "./jarvisEntities/centrosCostos.entity";
 import { ArticlesModelService } from './services/articles-model.service';
-import { JwtValidator, LdapService } from './services/auth.service';
+import { LdapService } from './services/auth.service';
 import { CategoriesModelService } from './services/categories-model.service';
 import { CommentsModelService } from './services/comments-model.service';
 import { EsClientService } from './services/es-client.service';
@@ -62,15 +62,11 @@ import { GerentesController } from './controllers/gerentes.controller';
 import { CoordinadoresController } from './controllers/coordinadores.controller';
 import { ArticleChangesIndex } from "./indices/articlesChangesIndex";
 import { NotificationsGateway } from "./webSockets/notifications.gateway";
+import { DbService } from './services/db.service';
+import * as mysql from "mysql2/promise";
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret:process.env.JWT_PRIVATE_KEY,
-      signOptions:{
-        expiresIn:'300s'
-      }
-    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: '172.102.180.196',
@@ -107,7 +103,6 @@ import { NotificationsGateway } from "./webSockets/notifications.gateway";
     CoordinadoresController
   ],
   providers: [  
-    JwtValidator,    
     LdapService,
     EsClientService,
     ArticlesModelService,
@@ -149,6 +144,18 @@ import { NotificationsGateway } from "./webSockets/notifications.gateway";
     UsersesionsIndex,
     UsernotificationsIndex,
     UserNotificationsModelService,
+    {
+      provide: 'NIK_DB',
+      useFactory: () => {
+        return mysql.createPool({
+          host     : process.env.NIK_DB_HOST,
+          user     : process.env.NIK_DB_USER,
+          password : process.env.NIK_DB_PASS,
+          database : 'nik'
+        })
+      },
+    },
+    DbService,
   ],
 })
 export class AppModule {  }

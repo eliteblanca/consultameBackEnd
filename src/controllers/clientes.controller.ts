@@ -8,16 +8,16 @@ import { JwtGuard } from "../guards/jwt.guard";
 @Controller('api/clientes')
 export class ClientesController {
 
-    constructor(
-        private cargosModel:CargosModelService
-    ){  }
+    // constructor(
+    //     private cargosModel:CargosModelService
+    // ){  }
 
-    @UseGuards(JwtGuard)
-    @Get(':idCliente/directors')
-    async getClientDirectors(
-        @Param('idCliente') idCliente: string,
-        @User() user: U
-    ): Promise<any> {
-        return this.cargosModel.getClientDirectors(idCliente, user.sub)
-    }    
+    // @UseGuards(JwtGuard)
+    // @Get(':idCliente/directors')
+    // async getClientDirectors(
+    //     @Param('idCliente') idCliente: string,
+    //     @User() user: U
+    // ): Promise<any> {
+    //     return this.cargosModel.getClientDirectors(idCliente, user.sub)
+    // }    
 }

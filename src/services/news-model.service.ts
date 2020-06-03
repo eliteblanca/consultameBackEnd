@@ -42,328 +42,328 @@ export class updateNewsDTO {
 @Injectable()
 export class NewsModelService {
 
-    constructor(
-        private newsIndex: NewsIndex,
-        private articleIndex: ArticleIndex,
-        private pcrcModel: PcrcModelService,
-        private articlesModel: ArticlesModelService,
-        private articleChangesIndex: ArticleChangesIndex,
-        private articleEventsModelService: ArticleEventsModelService,
-    ) { }
+    // constructor(
+    //     private newsIndex: NewsIndex,
+    //     private articleIndex: ArticleIndex,
+    //     private pcrcModel: PcrcModelService,
+    //     private articlesModel: ArticlesModelService,
+    //     private articleChangesIndex: ArticleChangesIndex,
+    //     private articleEventsModelService: ArticleEventsModelService,
+    // ) { }
 
-    getNews = async (pcrcId: string, from = '0', size = '20', date = (new Date).getTime().toString(), query?: string): Promise<(Article & { id: string; })[]> => {
-        try {
+    // getNews = async (pcrcId: string, from = '0', size = '20', date = (new Date).getTime().toString(), query?: string): Promise<(Article & { id: string; })[]> => {
+    //     try {
 
-            let esQuery: any;
+    //         let esQuery: any;
 
-            if (typeof query == 'undefined') {
-                esQuery = {
-                    query: {
-                        bool: {
-                            filter: [
-                                { term: { type: 'news' } },
-                                { term: { pcrc: pcrcId } },
-                                { term: { state: 'published' } },
-                                { range: { publicationDate: { lt: date } } }
-                            ]
-                        }
-                    },
-                    from: parseInt(from),
-                    size: parseInt(size),
-                    sort: [
-                        { publicationDate: { order: "desc" } }
-                    ],
-                }
+    //         if (typeof query == 'undefined') {
+    //             esQuery = {
+    //                 query: {
+    //                     bool: {
+    //                         filter: [
+    //                             { term: { type: 'news' } },
+    //                             { term: { pcrc: pcrcId } },
+    //                             { term: { state: 'published' } },
+    //                             { range: { publicationDate: { lt: date } } }
+    //                         ]
+    //                     }
+    //                 },
+    //                 from: parseInt(from),
+    //                 size: parseInt(size),
+    //                 sort: [
+    //                     { publicationDate: { order: "desc" } }
+    //                 ],
+    //             }
 
-            } else {
+    //         } else {
 
-                esQuery = {
-                    query: {
-                        bool: {
-                            must: [
-                                {
-                                    multi_match: {
-                                        'query': query,
-                                        'fields': ['title^3', 'content^2']
-                                    }
-                                }
-                            ],
-                            filter: [
-                                { term: { type: 'news' } },
-                                { term: { pcrc: pcrcId } },
-                                { term: { state: 'published' } },
-                                { range: { publicationDate: { lt: date } } }
-                            ]
-                        }
-                    },
-                    from: parseInt(from),
-                    size: parseInt(size),
-                    sort: [
-                        { publicationDate: { order: "desc" } }
-                    ],
-                }
-            }
+    //             esQuery = {
+    //                 query: {
+    //                     bool: {
+    //                         must: [
+    //                             {
+    //                                 multi_match: {
+    //                                     'query': query,
+    //                                     'fields': ['title^3', 'content^2']
+    //                                 }
+    //                             }
+    //                         ],
+    //                         filter: [
+    //                             { term: { type: 'news' } },
+    //                             { term: { pcrc: pcrcId } },
+    //                             { term: { state: 'published' } },
+    //                             { range: { publicationDate: { lt: date } } }
+    //                         ]
+    //                     }
+    //                 },
+    //                 from: parseInt(from),
+    //                 size: parseInt(size),
+    //                 sort: [
+    //                     { publicationDate: { order: "desc" } }
+    //                 ],
+    //             }
+    //         }
 
-            return await this.articleIndex.query(esQuery)
+    //         return await this.articleIndex.query(esQuery)
 
-        } catch (error) {
-            console.log(error.meta.body.error)
-        }
-    }
+    //     } catch (error) {
+    //         console.log(error.meta.body.error)
+    //     }
+    // }
 
-    getSingleNews = async (newsId: string): Promise<(Article & { id: string; })> => {
+    // getSingleNews = async (newsId: string): Promise<(Article & { id: string; })> => {
 
-        let news = await this.articleIndex.getById(newsId)
+    //     let news = await this.articleIndex.getById(newsId)
 
-        if (!!news) {
-            let result = await this.articleIndex.updateScript(newsId, {
-                'source': 'ctx._source.views += 1',
-                'lang': 'painless'
-            });
+    //     if (!!news) {
+    //         let result = await this.articleIndex.updateScript(newsId, {
+    //             'source': 'ctx._source.views += 1',
+    //             'lang': 'painless'
+    //         });
 
-            return news
+    //         return news
 
-        } else {
-            throw new HttpException({
-                "message": `Noticia no encontrada`
-            }, 404)
-        }
-    }
+    //     } else {
+    //         throw new HttpException({
+    //             "message": `Noticia no encontrada`
+    //         }, 404)
+    //     }
+    // }
 
-    postNews = async (news: postNewsDTO, userId: string): Promise<(Article & { id: string; })> => {
+    // postNews = async (news: postNewsDTO, userId: string): Promise<(Article & { id: string; })> => {
             
-            let cliente: { id: number; cliente: string; }    
+    //         let cliente: { id: number; cliente: string; }    
     
-            try {
-                cliente = await this.pcrcModel.getClienteOfPcrc(news.pcrc);
-            } catch (error) {
-                if (error.meta.statusCode == 404) {
-                    throw new NotFoundException('error al guardar la noticia');
-                }
+    //         try {
+    //             cliente = await this.pcrcModel.getClienteOfPcrc(news.pcrc);
+    //         } catch (error) {
+    //             if (error.meta.statusCode == 404) {
+    //                 throw new NotFoundException('error al guardar la noticia');
+    //             }
 
-                throw error;
-            }
+    //             throw error;
+    //         }
     
-            let articleExtras = {
-                likes: [],
-                disLikes: [],
-                favorites: [],
-                pcrc: news.pcrc,
-                cliente: cliente.id.toString(),
-                creator: userId,
-                modificationUser: userId,
-                publicationDate: (new Date).getTime(),
-                modificationDate: (new Date).getTime(),
-                views: 0,
-                category: null,
-                type: 'news'
-            }
+    //         let articleExtras = {
+    //             likes: [],
+    //             disLikes: [],
+    //             favorites: [],
+    //             pcrc: news.pcrc,
+    //             cliente: cliente.id.toString(),
+    //             creator: userId,
+    //             modificationUser: userId,
+    //             publicationDate: (new Date).getTime(),
+    //             modificationDate: (new Date).getTime(),
+    //             views: 0,
+    //             category: null,
+    //             type: 'news'
+    //         }
     
-            let newArticle: Article = { ...articleExtras, ...news }
+    //         let newArticle: Article = { ...articleExtras, ...news }
     
-            let creationResult = await this.articleIndex.create(newArticle)
+    //         let creationResult = await this.articleIndex.create(newArticle)
     
-            let newQuillJsObj = await this.articlesModel.updateArticleImages(creationResult.id, creationResult.obj)
+    //         let newQuillJsObj = await this.articlesModel.updateArticleImages(creationResult.id, creationResult.obj)
     
-            await this.articleIndex.updatePartialDocument(creationResult.id, { obj: newQuillJsObj})   
+    //         await this.articleIndex.updatePartialDocument(creationResult.id, { obj: newQuillJsObj})   
             
 
-            await this.articlesModel.updateArticleState({
-                    articulo:creationResult.id,
-                    categoria:creationResult.category,
-                    cliente:creationResult.cliente,
-                    pcrc:creationResult.pcrc
-                },
-                creationResult.state,
-                userId
-            )
+    //         await this.articlesModel.updateArticleState({
+    //                 articulo:creationResult.id,
+    //                 categoria:creationResult.category,
+    //                 cliente:creationResult.cliente,
+    //                 pcrc:creationResult.pcrc
+    //             },
+    //             creationResult.state,
+    //             userId
+    //         )
     
-            let previousState = ''
+    //         let previousState = ''
     
-            let articleEvent = ''
+    //         let articleEvent = ''
     
-            if(news.state == 'published'){
-                articleEvent = 'articulo creado'
-            } else {
-                articleEvent = 'borrador creado'
-            }
+    //         if(news.state == 'published'){
+    //             articleEvent = 'articulo creado'
+    //         } else {
+    //             articleEvent = 'borrador creado'
+    //         }
 
-            console.log({
-                articulo: creationResult.id,
-                articlecontent: news.obj,
-                categoria: newArticle.category,
-                cliente: newArticle.cliente,
-                pcrc: newArticle.pcrc,
-                event: articleEvent,
-                eventDate: (new Date()).getTime(),
-                previoustate: previousState,
-                user: userId,
-                articlestate: news.state
-            })
+    //         console.log({
+    //             articulo: creationResult.id,
+    //             articlecontent: news.obj,
+    //             categoria: newArticle.category,
+    //             cliente: newArticle.cliente,
+    //             pcrc: newArticle.pcrc,
+    //             event: articleEvent,
+    //             eventDate: (new Date()).getTime(),
+    //             previoustate: previousState,
+    //             user: userId,
+    //             articlestate: news.state
+    //         })
 
-            if(!!news.obj){
-                await this.articleChangesIndex.create({
-                    articulo: creationResult.id,
-                    articlecontent: news.obj,
-                    categoria: newArticle.category,
-                    cliente: newArticle.cliente,
-                    pcrc: newArticle.pcrc,
-                    event: articleEvent,
-                    eventDate: (new Date()).getTime(),
-                    previoustate: previousState,
-                    user: userId,
-                    articlestate: news.state
-                })
-            }
+    //         if(!!news.obj){
+    //             await this.articleChangesIndex.create({
+    //                 articulo: creationResult.id,
+    //                 articlecontent: news.obj,
+    //                 categoria: newArticle.category,
+    //                 cliente: newArticle.cliente,
+    //                 pcrc: newArticle.pcrc,
+    //                 event: articleEvent,
+    //                 eventDate: (new Date()).getTime(),
+    //                 previoustate: previousState,
+    //                 user: userId,
+    //                 articlestate: news.state
+    //             })
+    //         }
     
-            return creationResult
+    //         return creationResult
         
-    }
+    // }
 
-    updateNews = async (id: string, article: Partial<updateNewsDTO>, modificationUser: string): Promise<any> => {
+    // updateNews = async (id: string, article: Partial<updateNewsDTO>, modificationUser: string): Promise<any> => {
 
-        let { pcrc, cliente } = await this.articleIndex.getById(id)
+    //     let { pcrc, cliente } = await this.articleIndex.getById(id)
 
-        let articleExtas: Partial<Article>
+    //     let articleExtas: Partial<Article>
 
-        articleExtas = {
-            modificationUser: modificationUser,
-            modificationDate: (new Date).getTime(),
-            cliente:cliente,
-            pcrc:pcrc,
-            category:null
-        }
+    //     articleExtas = {
+    //         modificationUser: modificationUser,
+    //         modificationDate: (new Date).getTime(),
+    //         cliente:cliente,
+    //         pcrc:pcrc,
+    //         category:null
+    //     }
 
-        let newArticle: Partial<Article> = { ...articleExtas, ...article };
+    //     let newArticle: Partial<Article> = { ...articleExtas, ...article };
 
-        await this.articlesModel.updateArticleState({
-            articulo: id,
-            categoria: null,
-            cliente: cliente, 
-            pcrc: pcrc
-        },
-        newArticle.state,
-        modificationUser)
+    //     await this.articlesModel.updateArticleState({
+    //         articulo: id,
+    //         categoria: null,
+    //         cliente: cliente, 
+    //         pcrc: pcrc
+    //     },
+    //     newArticle.state,
+    //     modificationUser)
 
-        let prevState = await this.articleEventsModelService.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
+    //     let prevState = await this.articleEventsModelService.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
 
-        let previousState = ''
+    //     let previousState = ''
 
-        var articleEvent = ''
+    //     var articleEvent = ''
 
-        if(prevState.items.length){
-            previousState = prevState.items[0].id
+    //     if(prevState.items.length){
+    //         previousState = prevState.items[0].id
 
-            if(article.state){
+    //         if(article.state){
 
-                var articleEvent = 'articulo actualizado'
+    //             var articleEvent = 'articulo actualizado'
                 
-                if(prevState.items[0].articlestate == 'published' && article.state != 'published'){
-                    var articleEvent = 'articulo archivado'
-                }
+    //             if(prevState.items[0].articlestate == 'published' && article.state != 'published'){
+    //                 var articleEvent = 'articulo archivado'
+    //             }
 
-                if(prevState.items[0].articlestate != 'published' && article.state == 'published'){
-                    var articleEvent = 'articulo publicado'
-                }
-            }
-        }
+    //             if(prevState.items[0].articlestate != 'published' && article.state == 'published'){
+    //                 var articleEvent = 'articulo publicado'
+    //             }
+    //         }
+    //     }
 
-        if(!!article.obj){
-            await this.articleChangesIndex.create({
-                articulo: id,
-                articlecontent: article.obj,
-                categoria: newArticle.category,
-                cliente: newArticle.cliente,
-                pcrc: newArticle.pcrc,
-                event: articleEvent,
-                eventDate: (new Date()).getTime(),
-                previoustate: previousState,
-                user: modificationUser,
-                articlestate: article.state
-            })
-        }
+    //     if(!!article.obj){
+    //         await this.articleChangesIndex.create({
+    //             articulo: id,
+    //             articlecontent: article.obj,
+    //             categoria: newArticle.category,
+    //             cliente: newArticle.cliente,
+    //             pcrc: newArticle.pcrc,
+    //             event: articleEvent,
+    //             eventDate: (new Date()).getTime(),
+    //             previoustate: previousState,
+    //             user: modificationUser,
+    //             articlestate: article.state
+    //         })
+    //     }
 
-        let objWithoutImages = await this.articlesModel.updateArticleImages(id, newArticle.obj)
+    //     let objWithoutImages = await this.articlesModel.updateArticleImages(id, newArticle.obj)
 
-        newArticle.obj = objWithoutImages
+    //     newArticle.obj = objWithoutImages
 
-        await this.articlesModel.compareDeletedImages( id, objWithoutImages)
+    //     await this.articlesModel.compareDeletedImages( id, objWithoutImages)
 
-        await this.articleIndex.updatePartialDocument(id, newArticle);
+    //     await this.articleIndex.updatePartialDocument(id, newArticle);
 
 
-        // let newsExtras = {
-        //     modificationDate: Date.now(),
-        //     modificationUser: idUsuario
-        // }
+    //     // let newsExtras = {
+    //     //     modificationDate: Date.now(),
+    //     //     modificationUser: idUsuario
+    //     // }
 
-        // return await this.articleIndex.updatePartialDocument(idArticulo, { ...news, ...newsExtras })
-    }
+    //     // return await this.articleIndex.updatePartialDocument(idArticulo, { ...news, ...newsExtras })
+    // }
 
-    deleteNews = async (idArticulo: string): Promise<any> => {
-        try {
-            return await this.articleIndex.delete(idArticulo)
-        } catch (error) {
-            console.log(error)
-        }
-    }
+    // deleteNews = async (idArticulo: string): Promise<any> => {
+    //     try {
+    //         return await this.articleIndex.delete(idArticulo)
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
 
-    getDrafts = async (idPcrc: string, from = '0', size = '20', query?: string): Promise<(Article & { id: string; })[]> => {
-        try {
+    // getDrafts = async (idPcrc: string, from = '0', size = '20', query?: string): Promise<(Article & { id: string; })[]> => {
+    //     try {
 
-            let esQuery: any;
+    //         let esQuery: any;
 
-            if (typeof query == 'undefined') {
-                esQuery = {
-                    query: {
-                        bool: {
-                            filter: [
-                                { term: { pcrc: idPcrc } },
-                                { term: { type: 'news' } },
-                                { term: { state: 'archived' } }
-                            ]
-                        }
-                    },
-                    from: parseInt(from),
-                    size: parseInt(size),
-                    sort: [
-                        { publicationDate: { order: "desc" } }
-                    ],
-                }
+    //         if (typeof query == 'undefined') {
+    //             esQuery = {
+    //                 query: {
+    //                     bool: {
+    //                         filter: [
+    //                             { term: { pcrc: idPcrc } },
+    //                             { term: { type: 'news' } },
+    //                             { term: { state: 'archived' } }
+    //                         ]
+    //                     }
+    //                 },
+    //                 from: parseInt(from),
+    //                 size: parseInt(size),
+    //                 sort: [
+    //                     { publicationDate: { order: "desc" } }
+    //                 ],
+    //             }
 
-            } else {
+    //         } else {
 
-                esQuery = {
-                    query: {
-                        bool: {
-                            must: [
-                                {
-                                    multi_match: {
-                                        'query': query,
-                                        'fields': ['title^3', 'content^2']
-                                    }
-                                }
-                            ],
-                            filter: [
-                                { term: { pcrc: idPcrc } },
-                                { term: { type: 'news' } },
-                                { term: { state: 'archived' } }
-                            ]
-                        }
-                    },
-                    from: parseInt(from),
-                    size: parseInt(size),
-                    sort: [
-                        { publicationDate: { order: "desc" } }
-                    ],
-                }
-            }
+    //             esQuery = {
+    //                 query: {
+    //                     bool: {
+    //                         must: [
+    //                             {
+    //                                 multi_match: {
+    //                                     'query': query,
+    //                                     'fields': ['title^3', 'content^2']
+    //                                 }
+    //                             }
+    //                         ],
+    //                         filter: [
+    //                             { term: { pcrc: idPcrc } },
+    //                             { term: { type: 'news' } },
+    //                             { term: { state: 'archived' } }
+    //                         ]
+    //                     }
+    //                 },
+    //                 from: parseInt(from),
+    //                 size: parseInt(size),
+    //                 sort: [
+    //                     { publicationDate: { order: "desc" } }
+    //                 ],
+    //             }
+    //         }
 
-            return await this.articleIndex.query(esQuery)
+    //         return await this.articleIndex.query(esQuery)
 
-        } catch (error) {
-            console.log(error.meta.body.error)
-        }
-    }
+    //     } catch (error) {
+    //         console.log(error.meta.body.error)
+    //     }
+    // }
 
 }

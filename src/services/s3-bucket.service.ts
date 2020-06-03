@@ -6,110 +6,110 @@ import * as S3 from 'aws-sdk/clients/s3';
 @Injectable()
 export class S3BucketService {
 
-    constructor( 
-        @Inject(forwardRef(() => ArticlesModelService))
-        private articlesModel:ArticlesModelService,
-    ){ }
+    // constructor( 
+    //     @Inject(forwardRef(() => ArticlesModelService))
+    //     private articlesModel:ArticlesModelService,
+    // ){ }
 
-    s3Client = new S3({
-        accessKeyId: process.env.ACCESS_KEY_ID,
-        secretAccessKey: process.env.ACCESS_KEY,
-        region: 'us-west-1',
-        sslEnabled:false
-    });
+    // s3Client = new S3({
+    //     accessKeyId: process.env.ACCESS_KEY_ID,
+    //     secretAccessKey: process.env.ACCESS_KEY,
+    //     region: 'us-west-1',
+    //     sslEnabled:false
+    // });
 
-    async uploadFile(idArticle: string, file: any) {
-        let params = { 
-            Bucket: process.env.BUCKET_NAME,
-            Key: `${idArticle}/${file.originalname}`,
-            Body: file.buffer,
-            ContentType: file.mimetype
-        };
+    // async uploadFile(idArticle: string, file: any) {
+    //     let params = { 
+    //         Bucket: process.env.BUCKET_NAME,
+    //         Key: `${idArticle}/${file.originalname}`,
+    //         Body: file.buffer,
+    //         ContentType: file.mimetype
+    //     };
 
-        try {
+    //     try {
             
-            let uploadResul = await this.s3Client.upload(params).promise()
+    //         let uploadResul = await this.s3Client.upload(params).promise()
 
-            let articlefileUploadResul = await this.articlesModel.addArticleFile(idArticle, file.originalname)
+    //         let articlefileUploadResul = await this.articlesModel.addArticleFile(idArticle, file.originalname)
 
-        } catch(err) {
-            console.log(err)
-            throw new InternalServerErrorException('error al guardar el archivo');
-        }
-    }
+    //     } catch(err) {
+    //         console.log(err)
+    //         throw new InternalServerErrorException('error al guardar el archivo');
+    //     }
+    // }
 
-    base64MimeType(encoded) {
-        var result = null;
+    // base64MimeType(encoded) {
+    //     var result = null;
       
-        if (typeof encoded !== 'string') {
-          return result;
-        }
+    //     if (typeof encoded !== 'string') {
+    //       return result;
+    //     }
       
-        var mime = encoded.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
+    //     var mime = encoded.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
       
-        if (mime && mime.length) {
-          result = mime[1];
-        }
+    //     if (mime && mime.length) {
+    //       result = mime[1];
+    //     }
       
-        return result;
-    }
+    //     return result;
+    // }
     
-    async uploadImage(base64String:string, idArticle:string){
+    // async uploadImage(base64String:string, idArticle:string){
 
         
-        var mimeType = this.base64MimeType(base64String)
+    //     var mimeType = this.base64MimeType(base64String)
 
-        // buf = new Buffer(req.body.imageBinary.replace(/^data:image\/\w+;base64,/, ""),'base64')
-        let buf = new Buffer(base64String.replace(/^data:image\/\w+;base64,/, "") ,'base64')
+    //     // buf = new Buffer(req.body.imageBinary.replace(/^data:image\/\w+;base64,/, ""),'base64')
+    //     let buf = new Buffer(base64String.replace(/^data:image\/\w+;base64,/, "") ,'base64')
 
-        let params = { 
-            Bucket: process.env.BUCKET_NAME,
-            Key: `${idArticle}/${idArticle}${(new Date()).getTime()}`,
-            Body: buf,
-            ContentType: mimeType
-        };
+    //     let params = { 
+    //         Bucket: process.env.BUCKET_NAME,
+    //         Key: `${idArticle}/${idArticle}${(new Date()).getTime()}`,
+    //         Body: buf,
+    //         ContentType: mimeType
+    //     };
 
-        try {
+    //     try {
 
-            let uploadResul = await this.s3Client.upload(params).promise()
+    //         let uploadResul = await this.s3Client.upload(params).promise()
 
-            return uploadResul
+    //         return uploadResul
 
-        } catch(err) {
-            console.log(err)
-            throw new InternalServerErrorException('error al guardar el archivo');
-        }
+    //     } catch(err) {
+    //         console.log(err)
+    //         throw new InternalServerErrorException('error al guardar el archivo');
+    //     }
 
-    }
+    // }
 
-    getFile(idArticle:string, fileName:string){
-        let params = { Bucket: process.env.BUCKET_NAME, Key: `${idArticle}/${fileName}` };
+    // getFile(idArticle:string, fileName:string){
+    //     let params = { Bucket: process.env.BUCKET_NAME, Key: `${idArticle}/${fileName}` };
 
-        return this.s3Client.getObject(params).createReadStream();
-    }
+    //     return this.s3Client.getObject(params).createReadStream();
+    // }
 
-    deleteFile = async (idArticle:string, fileName:any) => {
+    // deleteFile = async (idArticle:string, fileName:any) => {
 
-        let params = { Bucket: process.env.BUCKET_NAME, Key: `${idArticle}/${fileName}` };
+    //     let params = { Bucket: process.env.BUCKET_NAME, Key: `${idArticle}/${fileName}` };
 
-        let deleteResult = await this.s3Client.deleteObject(params).promise();
+    //     let deleteResult = await this.s3Client.deleteObject(params).promise();
 
-        let articleDeleteResult = await this.articlesModel.deleteArticleFile(idArticle,fileName)
+    //     let articleDeleteResult = await this.articlesModel.deleteArticleFile(idArticle,fileName)
 
-        return {status: 'deleted'}
+    //     return {status: 'deleted'}
         
-    }
+    // }
 
-    deleteImage = async (key:any) => {
+    // deleteImage = async (key:any) => {
 
-        console.log(key)
+    //     console.log(key)
 
-        let params = { Bucket: process.env.BUCKET_NAME, Key: `${key}` };
+    //     let params = { Bucket: process.env.BUCKET_NAME, Key: `${key}` };
 
-        let deleteResult = await this.s3Client.deleteObject(params).promise();
+    //     let deleteResult = await this.s3Client.deleteObject(params).promise();
 
-        console.log(deleteResult)
+    //     console.log(deleteResult)
 
-        return deleteResult
-    }
+    //     return deleteResult
+    // }
 }

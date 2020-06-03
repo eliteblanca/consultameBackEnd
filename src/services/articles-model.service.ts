@@ -54,939 +54,939 @@ type group = { category: string } | { pcrc: string } | { cliente: string };
 @Injectable()
 export class ArticlesModelService {
 
-    constructor(
-        @Inject(forwardRef(() => CategoriesModelService))
-        private categoriesModel: CategoriesModelService,
-        private articleIndex: ArticleIndex,
-        private categoriesIndex: CategoriesIndex,
-        private likeUserIndex: LikeUserIndex,
-        private favoriteUserIndex: FavoriteUserIndex,
-        private S3BucketService: S3BucketService,
-        private pcrcModel: PcrcModelService,
-        private ArticleEventsModel: ArticleEventsModelService,
-        private cargosModel:CargosModelService,
-        private articleStateIndex:ArticleStateIndex,
-        private favoriteStatesIndex:FavoriteStatesIndex,
-        private articlesViewsIndex:ArticlesViewsIndex,
-        private articleChangesIndex:ArticleChangesIndex,
-        private UsersesionsIndex:UsersesionsIndex,
-
-    ) { }
-
-    public async getArticlesByCategory(category: string, state: string = 'published', from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> {
-        return await this.articleIndex.where({ category: category, state: state }, from, size, { orderby: 'modificationDate', order: 'desc' });
-    }
-
-    public async getArticlesByQuery(query: string, group: group, state: string = 'published', from: string = '0', size: string = '10'): Promise<(Article & { id: string, highlight: string })[]> {
-
-            let q = {
-                query: {
-                    function_score: {
-                        query: {                        
-                            bool: {
-                                must: [
-                                    {
-                                        multi_match: {
-                                            'query': query,
-                                            'fields': ['title^3', 'content^2', 'tags'],
-                                            'tie_breaker' : 0.7,
-                                            'fuzziness' : 2,
-                                            'prefix_length': 3
-                                        }
-                                    }
-                                ],
-                                filter: [
-                                    { 'term': group },
-                                    { 'term': { 'state': state } }
-                                ]
-                            }
-                        },
-                        exp: { 
-                            modificationDate: {
-                                scale: "60d",
-                                offset: "30d",
-                                decay: 0.8
-                            }
-                        }
-                    }
-                },    
-                from: parseInt(from),
-                size: parseInt(size),
-                highlight: {
-                    fields: {
-                        "content": { "type": "plain" }
-                    }
-                }
-            };
-
-            let result = await this.articleIndex.query(q);
-
-            return result
-
-    }
-
-    public async getArticlesByTag(options: { tag: string; subline: string; from?: string; size?: string }): Promise<(Article & { id: string })[]> {
-        let result = await this.articleIndex.where({ tags: options.tag, pcrc: options.subline, state: 'published' }, options.from, options.size, { orderby: 'publicationDate', order: 'desc' })
-        return result
-    }
-
-    public getArticlesByUpdate = async (pcrcId: string, from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> => {
-
-        return await this.articleIndex.where({ pcrc: pcrcId, state: 'published' }, from, size, { orderby: 'modificationDate', order: 'desc' })
-    }
-
-    public getArticlesByView = async (pcrcId: string, from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> => {
-        return await this.articleIndex.where({ pcrc: pcrcId, state: 'published' }, from, size, { orderby: 'views', order: 'desc' })
-    }
-
-    public getAllArticles = async (): Promise<(Article & { id: string; })[]> => {        
-        return await this.articleIndex.all();
-    }
-
-    public async getArticle(articleId: string, userId: string): Promise<Article & { id: string; }> {
-
-        let article = await this.articleIndex.getById(articleId);
-
-        if (article) {
-
-            let result = await this.articleIndex.updateScript(articleId, {
-                'source': 'ctx._source.views += 1',
-                'lang': 'painless'
-            });
-
-            return article
-
-        } else {
-            throw new HttpException({
-                "message": "articulo no encontrado"
-            }, 404)
-        }
-
-    }
-
-    public async createArticle(article: articleDTO, creator: string): Promise<Article & { id: string }> {
-
-        console.log(article)
-
-        let pcrc: string = null
-        let cliente: { id: number; cliente: string; }
-
-        var category = await this.categoriesIndex.getById(article.category)
-
-        if (!!!category) {
-            throw new HttpException({
-                "message": `la categoria '${article.category}' no existe`
-            }, 400)
-        }
-
-        try {
-            var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
-        } catch (error) {
-            console.log(error);
-        }
-
-        if (!isLeaft) {
-            throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias');
-        }
-
-        pcrc = category.pcrc;
-
-        try {
-            cliente = await this.pcrcModel.getClienteOfPcrc(pcrc);
-        } catch (error) {
-            if (error.meta.statusCode == 404) {
-                throw new NotFoundException('error al guardar el articulo');
-            }
-            throw error;
-        }
-
-        let articleExtras = {
-            likes: [],
-            disLikes: [],
-            favorites: [],
-            pcrc: pcrc,
-            cliente: cliente.id.toString(),
-            creator: creator,
-            modificationUser: creator,
-            publicationDate: (new Date).getTime(),
-            modificationDate: (new Date).getTime(),
-            views: 0
-        }
-
-        let newArticle: Article = { ...articleExtras, ...article }
-
-        let creationResult = await this.articleIndex.create(newArticle)
+    // constructor(
+    //     @Inject(forwardRef(() => CategoriesModelService))
+    //     private categoriesModel: CategoriesModelService,
+    //     private articleIndex: ArticleIndex,
+    //     private categoriesIndex: CategoriesIndex,
+    //     private likeUserIndex: LikeUserIndex,
+    //     private favoriteUserIndex: FavoriteUserIndex,
+    //     private S3BucketService: S3BucketService,
+    //     private pcrcModel: PcrcModelService,
+    //     private ArticleEventsModel: ArticleEventsModelService,
+    //     private cargosModel:CargosModelService,
+    //     private articleStateIndex:ArticleStateIndex,
+    //     private favoriteStatesIndex:FavoriteStatesIndex,
+    //     private articlesViewsIndex:ArticlesViewsIndex,
+    //     private articleChangesIndex:ArticleChangesIndex,
+    //     private UsersesionsIndex:UsersesionsIndex,
+
+    // ) { }
+
+    // public async getArticlesByCategory(category: string, state: string = 'published', from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> {
+    //     return await this.articleIndex.where({ category: category, state: state }, from, size, { orderby: 'modificationDate', order: 'desc' });
+    // }
+
+    // public async getArticlesByQuery(query: string, group: group, state: string = 'published', from: string = '0', size: string = '10'): Promise<(Article & { id: string, highlight: string })[]> {
+
+    //         let q = {
+    //             query: {
+    //                 function_score: {
+    //                     query: {                        
+    //                         bool: {
+    //                             must: [
+    //                                 {
+    //                                     multi_match: {
+    //                                         'query': query,
+    //                                         'fields': ['title^3', 'content^2', 'tags'],
+    //                                         'tie_breaker' : 0.7,
+    //                                         'fuzziness' : 2,
+    //                                         'prefix_length': 3
+    //                                     }
+    //                                 }
+    //                             ],
+    //                             filter: [
+    //                                 { 'term': group },
+    //                                 { 'term': { 'state': state } }
+    //                             ]
+    //                         }
+    //                     },
+    //                     exp: { 
+    //                         modificationDate: {
+    //                             scale: "60d",
+    //                             offset: "30d",
+    //                             decay: 0.8
+    //                         }
+    //                     }
+    //                 }
+    //             },    
+    //             from: parseInt(from),
+    //             size: parseInt(size),
+    //             highlight: {
+    //                 fields: {
+    //                     "content": { "type": "plain" }
+    //                 }
+    //             }
+    //         };
+
+    //         let result = await this.articleIndex.query(q);
+
+    //         return result
+
+    // }
+
+    // public async getArticlesByTag(options: { tag: string; subline: string; from?: string; size?: string }): Promise<(Article & { id: string })[]> {
+    //     let result = await this.articleIndex.where({ tags: options.tag, pcrc: options.subline, state: 'published' }, options.from, options.size, { orderby: 'publicationDate', order: 'desc' })
+    //     return result
+    // }
+
+    // public getArticlesByUpdate = async (pcrcId: string, from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> => {
+
+    //     return await this.articleIndex.where({ pcrc: pcrcId, state: 'published' }, from, size, { orderby: 'modificationDate', order: 'desc' })
+    // }
+
+    // public getArticlesByView = async (pcrcId: string, from: string = '0', size: string = '10'): Promise<(Article & { id: string; })[]> => {
+    //     return await this.articleIndex.where({ pcrc: pcrcId, state: 'published' }, from, size, { orderby: 'views', order: 'desc' })
+    // }
+
+    // public getAllArticles = async (): Promise<(Article & { id: string; })[]> => {        
+    //     return await this.articleIndex.all();
+    // }
+
+    // public async getArticle(articleId: string, userId: string): Promise<Article & { id: string; }> {
+
+    //     let article = await this.articleIndex.getById(articleId);
+
+    //     if (article) {
+
+    //         let result = await this.articleIndex.updateScript(articleId, {
+    //             'source': 'ctx._source.views += 1',
+    //             'lang': 'painless'
+    //         });
+
+    //         return article
+
+    //     } else {
+    //         throw new HttpException({
+    //             "message": "articulo no encontrado"
+    //         }, 404)
+    //     }
+
+    // }
+
+    // public async createArticle(article: articleDTO, creator: string): Promise<Article & { id: string }> {
+
+    //     console.log(article)
+
+    //     let pcrc: string = null
+    //     let cliente: { id: number; cliente: string; }
+
+    //     var category = await this.categoriesIndex.getById(article.category)
+
+    //     if (!!!category) {
+    //         throw new HttpException({
+    //             "message": `la categoria '${article.category}' no existe`
+    //         }, 400)
+    //     }
+
+    //     try {
+    //         var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+
+    //     if (!isLeaft) {
+    //         throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias');
+    //     }
+
+    //     pcrc = category.pcrc;
+
+    //     try {
+    //         cliente = await this.pcrcModel.getClienteOfPcrc(pcrc);
+    //     } catch (error) {
+    //         if (error.meta.statusCode == 404) {
+    //             throw new NotFoundException('error al guardar el articulo');
+    //         }
+    //         throw error;
+    //     }
+
+    //     let articleExtras = {
+    //         likes: [],
+    //         disLikes: [],
+    //         favorites: [],
+    //         pcrc: pcrc,
+    //         cliente: cliente.id.toString(),
+    //         creator: creator,
+    //         modificationUser: creator,
+    //         publicationDate: (new Date).getTime(),
+    //         modificationDate: (new Date).getTime(),
+    //         views: 0
+    //     }
+
+    //     let newArticle: Article = { ...articleExtras, ...article }
+
+    //     let creationResult = await this.articleIndex.create(newArticle)
 
-        let newQuillJsObj = await this.updateArticleImages(creationResult.id, creationResult.obj)
+    //     let newQuillJsObj = await this.updateArticleImages(creationResult.id, creationResult.obj)
 
-        await this.articleIndex.updatePartialDocument(creationResult.id, { obj: newQuillJsObj})
+    //     await this.articleIndex.updatePartialDocument(creationResult.id, { obj: newQuillJsObj})
 
-        await this.updateArticleState({
-                articulo:creationResult.id,
-                categoria:creationResult.category,
-                cliente:creationResult.cliente,
-                pcrc:creationResult.pcrc
-            },
-            creationResult.state,
-            creator
-        )
+    //     await this.updateArticleState({
+    //             articulo:creationResult.id,
+    //             categoria:creationResult.category,
+    //             cliente:creationResult.cliente,
+    //             pcrc:creationResult.pcrc
+    //         },
+    //         creationResult.state,
+    //         creator
+    //     )
 
-        let previousState = ''
+    //     let previousState = ''
 
-        let articleEvent = ''
+    //     let articleEvent = ''
 
-        if(article.state == 'published'){
-            articleEvent = 'articulo creado'
-        } else {
-            articleEvent = 'borrador creado'
-        }
+    //     if(article.state == 'published'){
+    //         articleEvent = 'articulo creado'
+    //     } else {
+    //         articleEvent = 'borrador creado'
+    //     }
 
-        if(!!article.obj){
-            await this.articleChangesIndex.create({
-                articulo: creationResult.id,
-                articlecontent: article.obj,
-                categoria: newArticle.category,
-                cliente: newArticle.cliente,
-                pcrc: newArticle.pcrc,
-                event: articleEvent,
-                eventDate: (new Date()).getTime(),
-                previoustate: previousState,
-                user: creator,
-                articlestate: article.state
-            })
-        }
+    //     if(!!article.obj){
+    //         await this.articleChangesIndex.create({
+    //             articulo: creationResult.id,
+    //             articlecontent: article.obj,
+    //             categoria: newArticle.category,
+    //             cliente: newArticle.cliente,
+    //             pcrc: newArticle.pcrc,
+    //             event: articleEvent,
+    //             eventDate: (new Date()).getTime(),
+    //             previoustate: previousState,
+    //             user: creator,
+    //             articlestate: article.state
+    //         })
+    //     }
 
-        return creationResult
-    }
+    //     return creationResult
+    // }
 
-    public async addLike(articleId: string, id_usuario: string): Promise<any> {
+    // public async addLike(articleId: string, id_usuario: string): Promise<any> {
 
-        let article = await this.articleIndex.getById(articleId)
+    //     let article = await this.articleIndex.getById(articleId)
 
-        if(!!!article){
-            throw new HttpException({
-                "message": "articulo no encontrado"
-            }, 404)
-        }
+    //     if(!!!article){
+    //         throw new HttpException({
+    //             "message": "articulo no encontrado"
+    //         }, 404)
+    //     }
 
-        await this.removeDisLike(articleId, id_usuario);                
+    //     await this.removeDisLike(articleId, id_usuario);                
 
-        let existinglikes = await this.likeUserIndex.where({ type: 'like', article: articleId, user: id_usuario });
+    //     let existinglikes = await this.likeUserIndex.where({ type: 'like', article: articleId, user: id_usuario });
 
-        if (!existinglikes.length) {
-            await this.likeUserIndex.create({ article: articleId, type: 'like', user: id_usuario });
+    //     if (!existinglikes.length) {
+    //         await this.likeUserIndex.create({ article: articleId, type: 'like', user: id_usuario });
 
-            let updateQuery = {
-                'source': 'ctx._source.likes.add(params.user)',
-                'lang': 'painless',
-                'params': {
-                    'user': id_usuario
-                }
-            };
+    //         let updateQuery = {
+    //             'source': 'ctx._source.likes.add(params.user)',
+    //             'lang': 'painless',
+    //             'params': {
+    //                 'user': id_usuario
+    //             }
+    //         };
 
-            await this.articleIndex.updateScript(articleId, updateQuery);
+    //         await this.articleIndex.updateScript(articleId, updateQuery);
 
-            await this.updateVotesState({
-                articleId: articleId,
-                category: article.category,
-                cliente: article.cliente,
-                pcrc: article.pcrc
-            }, id_usuario, 'add', 'like')
+    //         await this.updateVotesState({
+    //             articleId: articleId,
+    //             category: article.category,
+    //             cliente: article.cliente,
+    //             pcrc: article.pcrc
+    //         }, id_usuario, 'add', 'like')
 
-            await this.ArticleEventsModel.createEvent(articleId, id_usuario, 'like')
+    //         await this.ArticleEventsModel.createEvent(articleId, id_usuario, 'like')
 
-        } else {
-            return new ConflictException('ya has dado like en este articulo');
-        }
+    //     } else {
+    //         return new ConflictException('ya has dado like en este articulo');
+    //     }
 
-        return { status: "updated" };
+    //     return { status: "updated" };
 
-    }
+    // }
 
-    public async addDisLike(articleId: string, id_usuario: string): Promise<any> {
+    // public async addDisLike(articleId: string, id_usuario: string): Promise<any> {
 
-        let article = await this.articleIndex.getById(articleId)
+    //     let article = await this.articleIndex.getById(articleId)
 
-        if(!!!article){
-            throw new HttpException({
-                "message": "articulo no encontrado"
-            }, 404)
-        }
+    //     if(!!!article){
+    //         throw new HttpException({
+    //             "message": "articulo no encontrado"
+    //         }, 404)
+    //     }
 
-        await this.removeLike(articleId, id_usuario);
+    //     await this.removeLike(articleId, id_usuario);
 
 
-        let existingDislikes = await this.likeUserIndex.where({ type: 'dislike', article: articleId, user: id_usuario });
+    //     let existingDislikes = await this.likeUserIndex.where({ type: 'dislike', article: articleId, user: id_usuario });
 
-        if (!existingDislikes.length) {
-            await this.likeUserIndex.create({ article: articleId, type: 'dislike', user: id_usuario })
+    //     if (!existingDislikes.length) {
+    //         await this.likeUserIndex.create({ article: articleId, type: 'dislike', user: id_usuario })
 
-            let updateQuery = {
-                'source': 'ctx._source.disLikes.add(params.user)',
-                'lang': 'painless',
-                'params': {
-                    'user': id_usuario
-                }
-            }
+    //         let updateQuery = {
+    //             'source': 'ctx._source.disLikes.add(params.user)',
+    //             'lang': 'painless',
+    //             'params': {
+    //                 'user': id_usuario
+    //             }
+    //         }
 
-            await this.articleIndex.updateScript(articleId, updateQuery)
+    //         await this.articleIndex.updateScript(articleId, updateQuery)
 
-            await this.ArticleEventsModel.createEvent(articleId, id_usuario, 'dislike')
+    //         await this.ArticleEventsModel.createEvent(articleId, id_usuario, 'dislike')
 
-            await this.updateVotesState({
-                articleId: articleId,
-                category: article.category,
-                cliente: article.cliente,
-                pcrc: article.pcrc
-            }, id_usuario, 'add', 'dislike')
+    //         await this.updateVotesState({
+    //             articleId: articleId,
+    //             category: article.category,
+    //             cliente: article.cliente,
+    //             pcrc: article.pcrc
+    //         }, id_usuario, 'add', 'dislike')
 
-        } else {
-            return new ConflictException('ya has dado like en este articulo');
-        }
+    //     } else {
+    //         return new ConflictException('ya has dado like en este articulo');
+    //     }
 
-        return true;
+    //     return true;
 
-    }
+    // }
 
-    public async removeDisLike(articleId: string, id_usuario: string): Promise<any> {
+    // public async removeDisLike(articleId: string, id_usuario: string): Promise<any> {
 
-        var article = await this.articleIndex.getById(articleId)
+    //     var article = await this.articleIndex.getById(articleId)
 
-        if(!!!article){
-            throw new HttpException({
-                "message": `articulo no encontrado`
-            }, 404)
-        }
+    //     if(!!!article){
+    //         throw new HttpException({
+    //             "message": `articulo no encontrado`
+    //         }, 404)
+    //     }
 
-        let result = await this.likeUserIndex.deleteWhere({ article: articleId, user: id_usuario, type: 'dislike' })
+    //     let result = await this.likeUserIndex.deleteWhere({ article: articleId, user: id_usuario, type: 'dislike' })
 
-        if (result.deleted) {
+    //     if (result.deleted) {
 
-            let index = article.disLikes.findIndex(userId => userId == id_usuario)
+    //         let index = article.disLikes.findIndex(userId => userId == id_usuario)
 
-            if (index >= 0) {
+    //         if (index >= 0) {
 
-                let updateQuery = {
-                    'source': 'ctx._source.disLikes.remove(' + index + ')',
-                    'lang': 'painless'
-                }
+    //             let updateQuery = {
+    //                 'source': 'ctx._source.disLikes.remove(' + index + ')',
+    //                 'lang': 'painless'
+    //             }
 
-                await this.articleIndex.updateScript(articleId, updateQuery)
+    //             await this.articleIndex.updateScript(articleId, updateQuery)
 
-                await this.updateVotesState({
-                    articleId: articleId,
-                    category: article.category,
-                    cliente: article.cliente,
-                    pcrc: article.pcrc
-                }, id_usuario, 'delete', 'dislike')
+    //             await this.updateVotesState({
+    //                 articleId: articleId,
+    //                 category: article.category,
+    //                 cliente: article.cliente,
+    //                 pcrc: article.pcrc
+    //             }, id_usuario, 'delete', 'dislike')
 
-            }
-        }
-    }
+    //         }
+    //     }
+    // }
 
-    public async removeLike(articleId: string, id_usuario: string): Promise<any> {
+    // public async removeLike(articleId: string, id_usuario: string): Promise<any> {
 
-        let result = await this.likeUserIndex.deleteWhere({ article: articleId, user: id_usuario, type: 'like' });
+    //     let result = await this.likeUserIndex.deleteWhere({ article: articleId, user: id_usuario, type: 'like' });
 
 
-        if (result.deleted) {
-            var article = await this.articleIndex.getById(articleId)
+    //     if (result.deleted) {
+    //         var article = await this.articleIndex.getById(articleId)
 
-            if(!!!article){
-                throw new HttpException({
-                    "message": `articulo no encontrado`
-                }, 404)
-            }
+    //         if(!!!article){
+    //             throw new HttpException({
+    //                 "message": `articulo no encontrado`
+    //             }, 404)
+    //         }
 
-            let index = article.likes.findIndex(userId => userId == id_usuario);
+    //         let index = article.likes.findIndex(userId => userId == id_usuario);
 
-            if (index >= 0) {
+    //         if (index >= 0) {
 
-                let updateQuery = {
-                    'source': 'ctx._source.likes.remove(' + index + ')',
-                    'lang': 'painless'
-                };
+    //             let updateQuery = {
+    //                 'source': 'ctx._source.likes.remove(' + index + ')',
+    //                 'lang': 'painless'
+    //             };
 
-                await this.articleIndex.updateScript(articleId, updateQuery);
+    //             await this.articleIndex.updateScript(articleId, updateQuery);
 
-                await this.updateVotesState({
-                    articleId: articleId,
-                    category: article.category,
-                    cliente: article.cliente,
-                    pcrc: article.pcrc
-                }, id_usuario, 'delete', 'like')
-            }
-        }
-    }
+    //             await this.updateVotesState({
+    //                 articleId: articleId,
+    //                 category: article.category,
+    //                 cliente: article.cliente,
+    //                 pcrc: article.pcrc
+    //             }, id_usuario, 'delete', 'like')
+    //         }
+    //     }
+    // }
 
-    public async addFavorite(articleId: string, id_usuario: string): Promise<any> {
+    // public async addFavorite(articleId: string, id_usuario: string): Promise<any> {
 
-        let existingFavorites = await this.favoriteUserIndex.where({ article: articleId, user: id_usuario });
+    //     let existingFavorites = await this.favoriteUserIndex.where({ article: articleId, user: id_usuario });
 
-        if (!existingFavorites.length) {
-            await this.favoriteUserIndex.create({ article: articleId, user: id_usuario });
+    //     if (!existingFavorites.length) {
+    //         await this.favoriteUserIndex.create({ article: articleId, user: id_usuario });
 
-            let updateQuery = {
-                'source': 'ctx._source.favorites.add(params.user)',
-                'lang': 'painless',
-                'params': {
-                    'user': id_usuario
-                }
-            };
+    //         let updateQuery = {
+    //             'source': 'ctx._source.favorites.add(params.user)',
+    //             'lang': 'painless',
+    //             'params': {
+    //                 'user': id_usuario
+    //             }
+    //         };
             
-            await this.articleIndex.updateScript(articleId, updateQuery);
+    //         await this.articleIndex.updateScript(articleId, updateQuery);
             
-            await this.ArticleEventsModel.createEvent(articleId, id_usuario, 'fav');
+    //         await this.ArticleEventsModel.createEvent(articleId, id_usuario, 'fav');
 
-            let article = await this.articleIndex.getById(articleId)
+    //         let article = await this.articleIndex.getById(articleId)
 
-            await this.updateVotesState({
-                articleId:article.id,
-                category:article.category,
-                cliente:article.cliente,
-                pcrc:article.pcrc
-            },
-            id_usuario, 'add','favorite')
+    //         await this.updateVotesState({
+    //             articleId:article.id,
+    //             category:article.category,
+    //             cliente:article.cliente,
+    //             pcrc:article.pcrc
+    //         },
+    //         id_usuario, 'add','favorite')
 
-        } else {
-            return new ConflictException('ya has agregado este articulo a tus favoritos');
-        }
+    //     } else {
+    //         return new ConflictException('ya has agregado este articulo a tus favoritos');
+    //     }
 
-        return { status: 'updated' };
-    }
+    //     return { status: 'updated' };
+    // }
 
-    public async removeFavorite(articleId: string, id_usuario: string): Promise<any> {
+    // public async removeFavorite(articleId: string, id_usuario: string): Promise<any> {
 
-        let result = await this.favoriteUserIndex.deleteWhere({ article: articleId, user: id_usuario });
+    //     let result = await this.favoriteUserIndex.deleteWhere({ article: articleId, user: id_usuario });
 
-        if (result.deleted) {
-            var article = await this.articleIndex.getById(articleId)
+    //     if (result.deleted) {
+    //         var article = await this.articleIndex.getById(articleId)
 
-            if(!!!article){
-                throw new HttpException({
-                    "message": `articulo no encontrado`
-                }, 404)
-            }
+    //         if(!!!article){
+    //             throw new HttpException({
+    //                 "message": `articulo no encontrado`
+    //             }, 404)
+    //         }
 
-            let index = article.favorites.findIndex(userId => userId == id_usuario);
+    //         let index = article.favorites.findIndex(userId => userId == id_usuario);
 
-            if (index >= 0) {
-                let updateQuery = {
-                    'source': 'ctx._source.favorites.remove(' + index + ')',
-                    'lang': 'painless'
-                };
+    //         if (index >= 0) {
+    //             let updateQuery = {
+    //                 'source': 'ctx._source.favorites.remove(' + index + ')',
+    //                 'lang': 'painless'
+    //             };
 
-                await this.articleIndex.updateScript(articleId, updateQuery);
+    //             await this.articleIndex.updateScript(articleId, updateQuery);
 
-                await this.updateVotesState({
-                    articleId: articleId,
-                    category: article.category,
-                    cliente: article.cliente,
-                    pcrc: article.pcrc
-                }, id_usuario, 'delete','favorite')                
-            }
-        }
-    }
+    //             await this.updateVotesState({
+    //                 articleId: articleId,
+    //                 category: article.category,
+    //                 cliente: article.cliente,
+    //                 pcrc: article.pcrc
+    //             }, id_usuario, 'delete','favorite')                
+    //         }
+    //     }
+    // }
 
-    public deleteArticle = async (id: string, userId:string): Promise<any> => {
+    // public deleteArticle = async (id: string, userId:string): Promise<any> => {
 
-        var article = await this.articleIndex.getById(id)
+    //     var article = await this.articleIndex.getById(id)
 
-        if (!!!article) {
-            throw new HttpException({
-                "message": `articulo no encontrado`
-            }, 404)
-        }
+    //     if (!!!article) {
+    //         throw new HttpException({
+    //             "message": `articulo no encontrado`
+    //         }, 404)
+    //     }
 
-        await async.each(article.attached, async (fileName) => {
-            await this.S3BucketService.deleteFile(id, fileName)
-        })
+    //     await async.each(article.attached, async (fileName) => {
+    //         await this.S3BucketService.deleteFile(id, fileName)
+    //     })
 
-        await this.articleIndex.updatePartialDocument(id, { state:'deleted' })
+    //     await this.articleIndex.updatePartialDocument(id, { state:'deleted' })
 
-        await this.favoriteUserIndex.deleteWhere({ article: id })
+    //     await this.favoriteUserIndex.deleteWhere({ article: id })
 
-        await this.likeUserIndex.deleteWhere({ article: id })
+    //     await this.likeUserIndex.deleteWhere({ article: id })
 
-        await this.updateArticleState({
-                articulo:id,
-                categoria:article.category,
-                cliente: article.cliente,
-                pcrc:article.pcrc
-            },
-            'deleted',
-            userId
-        )
+    //     await this.updateArticleState({
+    //             articulo:id,
+    //             categoria:article.category,
+    //             cliente: article.cliente,
+    //             pcrc:article.pcrc
+    //         },
+    //         'deleted',
+    //         userId
+    //     )
 
-        let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
+    //     let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
 
-        let previousState = ''
+    //     let previousState = ''
 
-        if(prevState.items.length){
-            previousState = prevState.items[0].id
-        }
+    //     if(prevState.items.length){
+    //         previousState = prevState.items[0].id
+    //     }
 
-        let articleEvent = ''
+    //     let articleEvent = ''
 
-        if(article.state == 'published'){
-            articleEvent = 'articulo eliminado'
-        } else {
-            articleEvent = 'borrador eliminado'
-        }
+    //     if(article.state == 'published'){
+    //         articleEvent = 'articulo eliminado'
+    //     } else {
+    //         articleEvent = 'borrador eliminado'
+    //     }
 
-        if(!!article.obj){
-            await this.articleChangesIndex.create({
-                articulo: id,
-                articlecontent: '',
-                categoria: article.category,
-                cliente: article.cliente,
-                pcrc: article.pcrc,
-                event: articleEvent,
-                eventDate: (new Date()).getTime(),
-                previoustate: previousState,
-                user: userId,
-                articlestate: article.state
-            })
-        }
+    //     if(!!article.obj){
+    //         await this.articleChangesIndex.create({
+    //             articulo: id,
+    //             articlecontent: '',
+    //             categoria: article.category,
+    //             cliente: article.cliente,
+    //             pcrc: article.pcrc,
+    //             event: articleEvent,
+    //             eventDate: (new Date()).getTime(),
+    //             previoustate: previousState,
+    //             user: userId,
+    //             articlestate: article.state
+    //         })
+    //     }
 
-    }
+    // }
 
-    public updateArticle = async (id: string, article: Partial<articleDTO>, modificationUser: string): Promise<any> => {
+    // public updateArticle = async (id: string, article: Partial<articleDTO>, modificationUser: string): Promise<any> => {
 
-        let pcrc: string = null
-        let cliente: { id: number; cliente: string; }
-        let articleExtas: Partial<Article>
+    //     let pcrc: string = null
+    //     let cliente: { id: number; cliente: string; }
+    //     let articleExtas: Partial<Article>
 
-        if (!!article.category) {
+    //     if (!!article.category) {
 
-            var category = await this.categoriesIndex.getById(article.category);
+    //         var category = await this.categoriesIndex.getById(article.category);
 
-            if (!!!category) {
-                throw new HttpException({
-                    "message": `la categoria '${article.category}' no existe`
-                }, 400)
-            }
+    //         if (!!!category) {
+    //             throw new HttpException({
+    //                 "message": `la categoria '${article.category}' no existe`
+    //             }, 400)
+    //         }
 
-            try {
-                var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
-            } catch (error) {
-                console.log(error)
-            }
+    //         try {
+    //             var isLeaft = await this.categoriesModel.isLeaftCategory(article.category);
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
 
-            if (isLeaft) {
-                pcrc = category.pcrc;
-            } else {
-                throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias')
-            }
+    //         if (isLeaft) {
+    //             pcrc = category.pcrc;
+    //         } else {
+    //             throw new NotAcceptableException('no puedes agregar un articulo a una categoria que contenga subcategorias')
+    //         }
 
-            try {
-                cliente = await this.pcrcModel.getClienteOfPcrc(pcrc)
-            } catch (error) {
-                if (error.meta.statusCode == 404) {
-                    throw new NotFoundException('error al guardar el articulo');
-                }
-                throw error
-            }
+    //         try {
+    //             cliente = await this.pcrcModel.getClienteOfPcrc(pcrc)
+    //         } catch (error) {
+    //             if (error.meta.statusCode == 404) {
+    //                 throw new NotFoundException('error al guardar el articulo');
+    //             }
+    //             throw error
+    //         }
 
-            articleExtas = {
-                pcrc: pcrc,
-                cliente: cliente.id.toString(),
-                modificationUser: modificationUser,
-                modificationDate: (new Date).getTime()
-            }
+    //         articleExtas = {
+    //             pcrc: pcrc,
+    //             cliente: cliente.id.toString(),
+    //             modificationUser: modificationUser,
+    //             modificationDate: (new Date).getTime()
+    //         }
 
-        } else {
+    //     } else {
 
-            articleExtas = {
-                modificationUser: modificationUser,
-                modificationDate: (new Date).getTime()
-            }
+    //         articleExtas = {
+    //             modificationUser: modificationUser,
+    //             modificationDate: (new Date).getTime()
+    //         }
 
-        }
+    //     }
 
-        let newArticle: Partial<Article> = { ...articleExtas, ...article };
+    //     let newArticle: Partial<Article> = { ...articleExtas, ...article };
             
-        await this.updateArticleState({
-            articulo: id,
-            categoria: newArticle.category,
-            cliente: newArticle.cliente, 
-            pcrc: newArticle.pcrc
-        },
-        newArticle.state,
-        modificationUser)
+    //     await this.updateArticleState({
+    //         articulo: id,
+    //         categoria: newArticle.category,
+    //         cliente: newArticle.cliente, 
+    //         pcrc: newArticle.pcrc
+    //     },
+    //     newArticle.state,
+    //     modificationUser)
     
-        let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
+    //     let prevState = await this.ArticleEventsModel.getChangesBy([{filter:'articulo', value:id}], 949784794968, (new Date()).getTime(),0 , 1)
 
-        let previousState = ''
+    //     let previousState = ''
 
-        var articleEvent = ''
+    //     var articleEvent = ''
 
-        if(prevState.items.length){
-            previousState = prevState.items[0].id
+    //     if(prevState.items.length){
+    //         previousState = prevState.items[0].id
 
-            if(article.state){
+    //         if(article.state){
 
-                var articleEvent = 'articulo actualizado'
+    //             var articleEvent = 'articulo actualizado'
                 
-                if(prevState.items[0].articlestate == 'published' && article.state != 'published'){
-                    var articleEvent = 'articulo archivado'
-                }
+    //             if(prevState.items[0].articlestate == 'published' && article.state != 'published'){
+    //                 var articleEvent = 'articulo archivado'
+    //             }
 
-                if(prevState.items[0].articlestate != 'published' && article.state == 'published'){
-                    var articleEvent = 'articulo publicado'
-                }
-            }
-        }
+    //             if(prevState.items[0].articlestate != 'published' && article.state == 'published'){
+    //                 var articleEvent = 'articulo publicado'
+    //             }
+    //         }
+    //     }
 
-        if(!!article.obj){
-            await this.articleChangesIndex.create({
-                articulo: id,
-                articlecontent: article.obj,
-                categoria: newArticle.category,
-                cliente: newArticle.cliente,
-                pcrc: newArticle.pcrc,
-                event: articleEvent,
-                eventDate: (new Date()).getTime(),
-                previoustate: previousState,
-                user: modificationUser,
-                articlestate: article.state
-            })
-        }
+    //     if(!!article.obj){
+    //         await this.articleChangesIndex.create({
+    //             articulo: id,
+    //             articlecontent: article.obj,
+    //             categoria: newArticle.category,
+    //             cliente: newArticle.cliente,
+    //             pcrc: newArticle.pcrc,
+    //             event: articleEvent,
+    //             eventDate: (new Date()).getTime(),
+    //             previoustate: previousState,
+    //             user: modificationUser,
+    //             articlestate: article.state
+    //         })
+    //     }
 
-        let objWithoutImages = await this.updateArticleImages(id, newArticle.obj)
+    //     let objWithoutImages = await this.updateArticleImages(id, newArticle.obj)
 
-        newArticle.obj = objWithoutImages
+    //     newArticle.obj = objWithoutImages
 
-        await this.compareDeletedImages( id, objWithoutImages)
+    //     await this.compareDeletedImages( id, objWithoutImages)
 
-        await this.articleIndex.updatePartialDocument(id, newArticle);
+    //     await this.articleIndex.updatePartialDocument(id, newArticle);
 
-    }
+    // }
 
-    public async compareDeletedImages(articleId:string, newQuillsObj:string){
-        let oldQuillObj = (await this.articleIndex.getById(articleId)).obj
+    // public async compareDeletedImages(articleId:string, newQuillsObj:string){
+    //     let oldQuillObj = (await this.articleIndex.getById(articleId)).obj
 
-        let oldQuillObjImages = JSON.parse(oldQuillObj).ops.map((action, index) => {
-            if(action?.insert?.image){
-                if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
-                    return action.insert.image
-                }
-            }
+    //     let oldQuillObjImages = JSON.parse(oldQuillObj).ops.map((action, index) => {
+    //         if(action?.insert?.image){
+    //             if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
+    //                 return action.insert.image
+    //             }
+    //         }
 
-            return null
+    //         return null
 
-        }).filter( data => data )
+    //     }).filter( data => data )
 
-        let newQuillsObjImages = JSON.parse(newQuillsObj).ops.map((action, index) => {
-            if(action?.insert?.image){
-                if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
-                    return action.insert.image
-                }
-            }
+    //     let newQuillsObjImages = JSON.parse(newQuillsObj).ops.map((action, index) => {
+    //         if(action?.insert?.image){
+    //             if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
+    //                 return action.insert.image
+    //             }
+    //         }
 
-            return null
+    //         return null
 
-        }).filter( data => data )
+    //     }).filter( data => data )
 
-        //http://localhost:3001/files/WtNf1XAB7zOoFg7QvT75/WtNf1XAB7zOoFg7QvT751584127786529
-        var imagesTodelete = oldQuillObjImages.filter( key => {
-            return !newQuillsObjImages.includes(key)
-        })
+    //     //http://localhost:3001/files/WtNf1XAB7zOoFg7QvT75/WtNf1XAB7zOoFg7QvT751584127786529
+    //     var imagesTodelete = oldQuillObjImages.filter( key => {
+    //         return !newQuillsObjImages.includes(key)
+    //     })
 
-        let imageDeletePromises = imagesTodelete.map((s3Key:string) =>{
-            return async () => {
-                return await this.S3BucketService.deleteImage(s3Key)
-            }
-        })
+    //     let imageDeletePromises = imagesTodelete.map((s3Key:string) =>{
+    //         return async () => {
+    //             return await this.S3BucketService.deleteImage(s3Key)
+    //         }
+    //     })
 
-        let result = await async.parallel(imageDeletePromises)
+    //     let result = await async.parallel(imageDeletePromises)
 
-    }
+    // }
 
-    public updateArticleState = async (articleInfo:  Omit<ArticleState, 'initialDate'|'finalDate'|'initialDateUser'|'finalDateUser'|'state'>, newState:string, userId:string) => {
-        let currentArticleStates = await this.articleStateIndex.where({ articulo: articleInfo.articulo })
+    // public updateArticleState = async (articleInfo:  Omit<ArticleState, 'initialDate'|'finalDate'|'initialDateUser'|'finalDateUser'|'state'>, newState:string, userId:string) => {
+    //     let currentArticleStates = await this.articleStateIndex.where({ articulo: articleInfo.articulo })
 
-        if(!!currentArticleStates.length){
-            let estadoActual = currentArticleStates.find(state => {
-                return  (new Date(state.finalDate)).getFullYear() == 9999
-            })
+    //     if(!!currentArticleStates.length){
+    //         let estadoActual = currentArticleStates.find(state => {
+    //             return  (new Date(state.finalDate)).getFullYear() == 9999
+    //         })
 
-            await this.articleStateIndex.updatePartialDocument(estadoActual.id, { finalDate:(new Date).getTime(), finalDateUser:userId })
-        }
+    //         await this.articleStateIndex.updatePartialDocument(estadoActual.id, { finalDate:(new Date).getTime(), finalDateUser:userId })
+    //     }
 
-        await this.articleStateIndex.create({
-            articulo: articleInfo.articulo,
-            categoria: articleInfo.categoria,
-            cliente: articleInfo.cliente,
-            initialDate: (new Date).getTime(),
-            initialDateUser: userId,
-            finalDate: (new Date).setFullYear(9999),
-            finalDateUser: userId,
-            pcrc: articleInfo.pcrc,
-            state: newState
-        })
-    }
+    //     await this.articleStateIndex.create({
+    //         articulo: articleInfo.articulo,
+    //         categoria: articleInfo.categoria,
+    //         cliente: articleInfo.cliente,
+    //         initialDate: (new Date).getTime(),
+    //         initialDateUser: userId,
+    //         finalDate: (new Date).setFullYear(9999),
+    //         finalDateUser: userId,
+    //         pcrc: articleInfo.pcrc,
+    //         state: newState
+    //     })
+    // }
 
-    private updateVotesState = async (articleInfo:{ articleId:string, category:string, cliente: string, pcrc:string }, userId:string, operation:'add' | 'delete', state:'favorite' | 'like' | 'dislike') => {
+    // private updateVotesState = async (articleInfo:{ articleId:string, category:string, cliente: string, pcrc:string }, userId:string, operation:'add' | 'delete', state:'favorite' | 'like' | 'dislike') => {
 
-        if(operation == 'add'){
+    //     if(operation == 'add'){
 
-            let userBoss = await this.cargosModel.getAllBoss(userId)
+    //         let userBoss = await this.cargosModel.getAllBoss(userId)
 
 
-            await this.favoriteStatesIndex.create({
-                articulo:articleInfo.articleId,
-                categoria:articleInfo.category,
-                cliente:articleInfo.cliente,
-                coordinador:userBoss.coordinador,
-                director:userBoss.director,
-                gerente:userBoss.gerente,
-                lider:userBoss.lider,
-                pcrc:articleInfo.pcrc,
-                user:userId,
-                initialDate:(new Date()).getTime(),
-                finalDate: (new Date).setFullYear(9999),
-                state:state
-            })
+    //         await this.favoriteStatesIndex.create({
+    //             articulo:articleInfo.articleId,
+    //             categoria:articleInfo.category,
+    //             cliente:articleInfo.cliente,
+    //             coordinador:userBoss.coordinador,
+    //             director:userBoss.director,
+    //             gerente:userBoss.gerente,
+    //             lider:userBoss.lider,
+    //             pcrc:articleInfo.pcrc,
+    //             user:userId,
+    //             initialDate:(new Date()).getTime(),
+    //             finalDate: (new Date).setFullYear(9999),
+    //             state:state
+    //         })
 
-        } else {
+    //     } else {
 
-            let query = {
-                query: {
-                    bool: {
-                        filter: [
-                            { term: { articleId: articleInfo.articleId } },
-                            { term: { user: userId } },
-                            { range: { initialDate: { lt: (new Date()).getTime() } } },
-                            { range: { finalDate: { gt: (new Date()).getTime() } } }
-                        ]
-                    }
-                }
-            }
+    //         let query = {
+    //             query: {
+    //                 bool: {
+    //                     filter: [
+    //                         { term: { articleId: articleInfo.articleId } },
+    //                         { term: { user: userId } },
+    //                         { range: { initialDate: { lt: (new Date()).getTime() } } },
+    //                         { range: { finalDate: { gt: (new Date()).getTime() } } }
+    //                     ]
+    //                 }
+    //             }
+    //         }
 
-            let estadoActual = await this.favoriteStatesIndex.query(query)
+    //         let estadoActual = await this.favoriteStatesIndex.query(query)
 
-            if( !!estadoActual.length ){
-                if( (new Date( estadoActual[0].finalDate)).getFullYear() == 9999 ){
-                    await this.favoriteStatesIndex.updatePartialDocument(estadoActual[0].id, { finalDate: (new Date()).getTime() })
-                }
-            }
-        }
-    }
+    //         if( !!estadoActual.length ){
+    //             if( (new Date( estadoActual[0].finalDate)).getFullYear() == 9999 ){
+    //                 await this.favoriteStatesIndex.updatePartialDocument(estadoActual[0].id, { finalDate: (new Date()).getTime() })
+    //             }
+    //         }
+    //     }
+    // }
 
-    public deleteArticleFile = async (articleId:string, filename:string):Promise<any> => {
-        var article = await this.articleIndex.getById(articleId)
+    // public deleteArticleFile = async (articleId:string, filename:string):Promise<any> => {
+    //     var article = await this.articleIndex.getById(articleId)
 
-        if(!!!article){
-            throw new HttpException({
-                "message": `articulo no encontrado`
-            }, 404)
-        }
+    //     if(!!!article){
+    //         throw new HttpException({
+    //             "message": `articulo no encontrado`
+    //         }, 404)
+    //     }
 
-        let index = article.attached.findIndex(fileName => fileName == filename)
+    //     let index = article.attached.findIndex(fileName => fileName == filename)
 
-        if (index >= 0) {
-            let updateQuery = {
-                'source': 'ctx._source.attached.remove(' + index + ')',
-                'lang': 'painless'
-            };
+    //     if (index >= 0) {
+    //         let updateQuery = {
+    //             'source': 'ctx._source.attached.remove(' + index + ')',
+    //             'lang': 'painless'
+    //         };
 
-            try {
-                await this.articleIndex.updateScript(articleId, updateQuery);
-            } catch (error) {
-                console.log(error.meta.body.error);
-            }
-        }
-    }
+    //         try {
+    //             await this.articleIndex.updateScript(articleId, updateQuery);
+    //         } catch (error) {
+    //             console.log(error.meta.body.error);
+    //         }
+    //     }
+    // }
 
-    public async addArticleFile(articleId: string, filename: string): Promise<any> {
+    // public async addArticleFile(articleId: string, filename: string): Promise<any> {
 
-        let updateQuery = {
-            'source': 'ctx._source.attached.add(params.file)',
-            'lang': 'painless',
-            'params': {
-                'file': filename
-            }
-        };
+    //     let updateQuery = {
+    //         'source': 'ctx._source.attached.add(params.file)',
+    //         'lang': 'painless',
+    //         'params': {
+    //             'file': filename
+    //         }
+    //     };
 
-        await this.articleIndex.updateScript(articleId, updateQuery);
+    //     await this.articleIndex.updateScript(articleId, updateQuery);
 
-        return { status: 'updated' };
-    }
+    //     return { status: 'updated' };
+    // }
 
-    public getArticleHistory = async (articleId:string) => {
+    // public getArticleHistory = async (articleId:string) => {
 
-        let history = await this.articleStateIndex.where({ articulo: articleId })
+    //     let history = await this.articleStateIndex.where({ articulo: articleId })
 
-        return history
-    }
+    //     return history
+    // }
 
-    public addArticleView = async (articleId:string, initialDate:number, finalDate:number, userId:string) => {
+    // public addArticleView = async (articleId:string, initialDate:number, finalDate:number, userId:string) => {
 
-        var article = await this.articleIndex.getById(articleId)        
+    //     var article = await this.articleIndex.getById(articleId)        
 
-        if (!!!article) {
-            throw new HttpException({
-                "message": `articulo no encontrado`
-            }, 404)
-        }
+    //     if (!!!article) {
+    //         throw new HttpException({
+    //             "message": `articulo no encontrado`
+    //         }, 404)
+    //     }
 
-        let allboss = await this.cargosModel.getAllBoss(userId)        
+    //     let allboss = await this.cargosModel.getAllBoss(userId)        
 
-        let result = await Promise.all([
-            await this.articlesViewsIndex.create({
-                articulo: articleId,
-                categoria: article.category,
-                cliente: article.cliente,
-                pcrc: article.pcrc,
-                coordinador: allboss.coordinador,
-                director: allboss.director,
-                gerente: allboss.gerente,
-                lider: allboss.lider,
-                user: userId,
-                initialDate: initialDate,
-                finalDate: finalDate,
-                duration: finalDate - initialDate
-            }),
-            await this.ArticleEventsModel.createEvent(article, userId, 'view')
-        ])
+    //     let result = await Promise.all([
+    //         await this.articlesViewsIndex.create({
+    //             articulo: articleId,
+    //             categoria: article.category,
+    //             cliente: article.cliente,
+    //             pcrc: article.pcrc,
+    //             coordinador: allboss.coordinador,
+    //             director: allboss.director,
+    //             gerente: allboss.gerente,
+    //             lider: allboss.lider,
+    //             user: userId,
+    //             initialDate: initialDate,
+    //             finalDate: finalDate,
+    //             duration: finalDate - initialDate
+    //         }),
+    //         await this.ArticleEventsModel.createEvent(article, userId, 'view')
+    //     ])
 
-        return {
-            status:'created'
-        }
-    }
+    //     return {
+    //         status:'created'
+    //     }
+    // }
 
-    public async prueba(from , size, id): Promise<any> {
+    // public async prueba(from , size, id): Promise<any> {
 
-        if(id){
-            var articuloaux = [ await this.articleIndex.getById(id) ]
-        } else {
-            var articuloaux =  await this.articleIndex.where({ state:'published' }, from, '1', { orderby: 'modificationDate', order: 'desc' });
-        }
+    //     if(id){
+    //         var articuloaux = [ await this.articleIndex.getById(id) ]
+    //     } else {
+    //         var articuloaux =  await this.articleIndex.where({ state:'published' }, from, '1', { orderby: 'modificationDate', order: 'desc' });
+    //     }
 
-        let quillJsObj:any        
-        if(articuloaux.length > 0){
-            quillJsObj = JSON.parse(articuloaux[0].obj).ops    
+    //     let quillJsObj:any        
+    //     if(articuloaux.length > 0){
+    //         quillJsObj = JSON.parse(articuloaux[0].obj).ops    
 
-            var quillJsObjUpdate = await async.map(quillJsObj, async action => {
-                if(action.insert?.image){
-                    if(!action.insert.image.startsWith('/files/')){
+    //         var quillJsObjUpdate = await async.map(quillJsObj, async action => {
+    //             if(action.insert?.image){
+    //                 if(!action.insert.image.startsWith('/files/')){
 
-                        let imageUrl = action.insert.image.replace('http://multiconsultabanco.multienlace.com.co','172.20.1.34:80')
-                        imageUrl = action.insert.image.replace(imageUrl,'172.20.1.32')
+    //                     let imageUrl = action.insert.image.replace('http://multiconsultabanco.multienlace.com.co','172.20.1.34:80')
+    //                     imageUrl = action.insert.image.replace(imageUrl,'172.20.1.32')
 
-                        let imageResponse = await axios.get(imageUrl, {
-                          responseType: 'arraybuffer'
-                        })
+    //                     let imageResponse = await axios.get(imageUrl, {
+    //                       responseType: 'arraybuffer'
+    //                     })
         
-                        let base64String = Buffer.from(imageResponse.data, 'binary').toString('base64')
+    //                     let base64String = Buffer.from(imageResponse.data, 'binary').toString('base64')
         
-                        let uploadResult = await this.S3BucketService.uploadImage(base64String, articuloaux[0].id)
+    //                     let uploadResult = await this.S3BucketService.uploadImage(base64String, articuloaux[0].id)
                         
-                        return { insert:{ image: `/files/${uploadResult.Key }` } }               
+    //                     return { insert:{ image: `/files/${uploadResult.Key }` } }               
     
-                    } else {
-                        return action
-                    }
+    //                 } else {
+    //                     return action
+    //                 }
     
     
-                } else {
-                    return action
-                }
-            })
+    //             } else {
+    //                 return action
+    //             }
+    //         })
     
-            let updateresult =await this.articleIndex.updatePartialDocument(articuloaux[0].id,{ obj:JSON.stringify({ ops: quillJsObjUpdate}) })
+    //         let updateresult =await this.articleIndex.updatePartialDocument(articuloaux[0].id,{ obj:JSON.stringify({ ops: quillJsObjUpdate}) })
 
-            return updateresult
+    //         return updateresult
 
-        }
+    //     }
 
-    }
+    // }
 
-    async updateArticleImages(articleId:string, quillJsObjString?:string) {
+    // async updateArticleImages(articleId:string, quillJsObjString?:string) {
         
-        let quillJsObj:any
+    //     let quillJsObj:any
         
-        if(!quillJsObjString){
+    //     if(!quillJsObjString){
 
-            let article = await this.articleIndex.getById(articleId)
+    //         let article = await this.articleIndex.getById(articleId)
             
-            quillJsObj = JSON.parse(article.obj).ops
+    //         quillJsObj = JSON.parse(article.obj).ops
 
-        } else {
+    //     } else {
 
-            quillJsObj = JSON.parse(quillJsObjString).ops
+    //         quillJsObj = JSON.parse(quillJsObjString).ops
 
-        }
+    //     }
 
-        var base64Strings = quillJsObj.map((action, index) => {
+    //     var base64Strings = quillJsObj.map((action, index) => {
 
-            if(action?.insert?.image){
-                if((action.insert.image as string).startsWith('data:image/',0) ){
-                    return { originalIndex:index, base64string: action.insert.image }
-                }
-            }
+    //         if(action?.insert?.image){
+    //             if((action.insert.image as string).startsWith('data:image/',0) ){
+    //                 return { originalIndex:index, base64string: action.insert.image }
+    //             }
+    //         }
 
-            return null
+    //         return null
 
-        }).filter( data => data )
+    //     }).filter( data => data )
 
-        let result = await async.map(base64Strings, async stringData => {
+    //     let result = await async.map(base64Strings, async stringData => {
 
-            let uploadResult = await this.S3BucketService.uploadImage(stringData.base64string, articleId)
+    //         let uploadResult = await this.S3BucketService.uploadImage(stringData.base64string, articleId)
 
-            return { ...stringData, uploadResult: uploadResult }
+    //         return { ...stringData, uploadResult: uploadResult }
 
-        })
+    //     })
 
-        result.forEach(element => {
-            quillJsObj[element.originalIndex] = { insert:{ image: `/files/` + element.uploadResult.Key } }
-        });
+    //     result.forEach(element => {
+    //         quillJsObj[element.originalIndex] = { insert:{ image: `/files/` + element.uploadResult.Key } }
+    //     });
 
         
-        if(quillJsObjString){
+    //     if(quillJsObjString){
             
-            return JSON.stringify({ ops: quillJsObj })
+    //         return JSON.stringify({ ops: quillJsObj })
             
-        } else {            
+    //     } else {            
 
-            let updateArticleResult = await this.articleIndex.updatePartialDocument(articleId,{ obj: JSON.stringify({ ops: quillJsObj }) })
+    //         let updateArticleResult = await this.articleIndex.updatePartialDocument(articleId,{ obj: JSON.stringify({ ops: quillJsObj }) })
     
-            return updateArticleResult
-        }
+    //         return updateArticleResult
+    //     }
 
 
-    }
+    // }
 
-    async deleteArticleImagenes(articleId:string) {
+    // async deleteArticleImagenes(articleId:string) {
 
-        let article = await this.articleIndex.getById(articleId)
+    //     let article = await this.articleIndex.getById(articleId)
 
-        let quillJsObj = JSON.parse(article.obj).ops
+    //     let quillJsObj = JSON.parse(article.obj).ops
 
 
-        var base64Strings = quillJsObj.map((action, index) => {
+    //     var base64Strings = quillJsObj.map((action, index) => {
 
-            if(action?.insert?.image){
-                if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
-                    return action.insert.image
-                }
-            }
+    //         if(action?.insert?.image){
+    //             if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
+    //                 return action.insert.image
+    //             }
+    //         }
 
-            return null
+    //         return null
 
-        }).filter( data => data )        
+    //     }).filter( data => data )        
 
-        let imageDeletePromises = base64Strings.map((s3Key:string) =>{
-            return async () => {
-                return await this.S3BucketService.deleteImage(s3Key)
-            }
-        })
+    //     let imageDeletePromises = base64Strings.map((s3Key:string) =>{
+    //         return async () => {
+    //             return await this.S3BucketService.deleteImage(s3Key)
+    //         }
+    //     })
         
-        let result = await async.parallel(imageDeletePromises)
+    //     let result = await async.parallel(imageDeletePromises)
 
-        return result
+    //     return result
 
-    }
+    // }
 
 }

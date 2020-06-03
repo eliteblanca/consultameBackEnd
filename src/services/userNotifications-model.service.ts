@@ -14,45 +14,45 @@ export class userNotificationDTO {
 @Injectable()
 export class UserNotificationsModelService {
 
-    constructor(
-        private usernotificationsIndex:UsernotificationsIndex,
-    ){  }
+    // constructor(
+    //     private usernotificationsIndex:UsernotificationsIndex,
+    // ){  }
 
-    postUserNotification = async (data:userNotificationDTO, userId:string) => {
-        return await this.usernotificationsIndex.create({
-            data:data.data,
-            date:parseInt(data.date),
-            event:data.event,
-            notificationId:data.notificationId,
-            room:data.room,
-            userid:userId
-        })
-    }
+    // postUserNotification = async (data:userNotificationDTO, userId:string) => {
+    //     return await this.usernotificationsIndex.create({
+    //         data:data.data,
+    //         date:parseInt(data.date),
+    //         event:data.event,
+    //         notificationId:data.notificationId,
+    //         room:data.room,
+    //         userid:userId
+    //     })
+    // }
 
-    getUserNotifications = async (userId:string, room:string) => {
-        let result = await Promise.all([
-            this.usernotificationsIndex.where({ userid:userId, room:room }),
-            this.usernotificationsIndex.where({ userid:userId, room:room+'/'+userId })
-        ])
+    // getUserNotifications = async (userId:string, room:string) => {
+    //     let result = await Promise.all([
+    //         this.usernotificationsIndex.where({ userid:userId, room:room }),
+    //         this.usernotificationsIndex.where({ userid:userId, room:room+'/'+userId })
+    //     ])
 
-        return  R.flatten(result)
-    }
+    //     return  R.flatten(result)
+    // }
 
-    deleteUserNotification = async (notificationId, userId) => {
-        let result = await this.usernotificationsIndex.deleteWhere({ notificationId: notificationId, userid:userId })
-        return result
-    }
+    // deleteUserNotification = async (notificationId, userId) => {
+    //     let result = await this.usernotificationsIndex.deleteWhere({ notificationId: notificationId, userid:userId })
+    //     return result
+    // }
 
-    deleteAllUserNotification = async (userId:string, room:string) => {
+    // deleteAllUserNotification = async (userId:string, room:string) => {
 
         
 
-        let result = await Promise.all([
-            this.usernotificationsIndex.deleteWhere({ room:room, userid:userId }),
-            this.usernotificationsIndex.deleteWhere({ room:room+'/'+userId })
-        ])
+    //     let result = await Promise.all([
+    //         this.usernotificationsIndex.deleteWhere({ room:room, userid:userId }),
+    //         this.usernotificationsIndex.deleteWhere({ room:room+'/'+userId })
+    //     ])
 
-        return result
-    }
+    //     return result
+    // }
 
 }

@@ -3,9 +3,7 @@ import { Injectable } from "@nestjs/common";
 
 export interface user {
     cedula:string;
-    nombre:string;
-    rol: 'admin' | 'user' | 'publicador';
-    pcrc:string[];
+    nombre:string;    
 }
 
 @Injectable()

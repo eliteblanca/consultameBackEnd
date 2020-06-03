@@ -49,132 +49,132 @@ export class udpateCategoryDTO {
 
 @Injectable()
 export class CategoriesModelService {
-    constructor(
-        private categoriesIndex: CategoriesIndex,
-        private articleIndex: ArticleIndex,
-        @Inject(forwardRef(() => ArticlesModelService))
-        private articlesModel: ArticlesModelService
-    ) { }
+    // constructor(
+    //     private categoriesIndex: CategoriesIndex,
+    //     private articleIndex: ArticleIndex,
+    //     @Inject(forwardRef(() => ArticlesModelService))
+    //     private articlesModel: ArticlesModelService
+    // ) { }
 
-    private sortBy = (obj, key) => {
-        return obj.sort(function(a, b) {
-            var textA = a[key];
-            var textB = b[key];
-            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-        })
-    }
+    // private sortBy = (obj, key) => {
+    //     return obj.sort(function(a, b) {
+    //         var textA = a[key];
+    //         var textB = b[key];
+    //         return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+    //     })
+    // }
 
-    public async isLeaftCategory(categoryId: string): Promise<boolean> {
-        try {
-            let result = await this.categoriesIndex.where({ group: categoryId })
+    // public async isLeaftCategory(categoryId: string): Promise<boolean> {
+    //     try {
+    //         let result = await this.categoriesIndex.where({ group: categoryId })
 
-            if (result.length) {
-                return false
-            } else {
-                return true
-            }
+    //         if (result.length) {
+    //             return false
+    //         } else {
+    //             return true
+    //         }
 
-        } catch (error) {
-            console.log(error)
-        }
-    }
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
 
-    public async getCategory(categoryId: string): Promise<category & { id: string; }> {
-        return await this.categoriesIndex.getById(categoryId)
-    }
+    // public async getCategory(categoryId: string): Promise<category & { id: string; }> {
+    //     return await this.categoriesIndex.getById(categoryId)
+    // }
 
-    public async createCategory(newCategory: newCategoryDTO): Promise<category & { id: string; }> {
-        try {
-            // --> comprueba si la linea existe
-            // let subline = await this.sublinesIndex.getById(newCategory.sublinea)
-        } catch (error) {
-            if (error.meta.statusCode == 404) {
-                throw new NotAcceptableException('el pcrc no existe');
-            } else {
-                console.log(error)
-            }
-        }
+    // public async createCategory(newCategory: newCategoryDTO): Promise<category & { id: string; }> {
+    //     try {
+    //         // --> comprueba si la linea existe
+    //         // let subline = await this.sublinesIndex.getById(newCategory.sublinea)
+    //     } catch (error) {
+    //         if (error.meta.statusCode == 404) {
+    //             throw new NotAcceptableException('el pcrc no existe');
+    //         } else {
+    //             console.log(error)
+    //         }
+    //     }
 
-        try {
-            // --> comprueba si la categoria padre existe
-            if (newCategory.group) {
-                let group = await this.getCategory(newCategory.group)
-            }
-        } catch (error) {
-            if (error.meta.statusCode == 404) {
-                throw new NotAcceptableException('la categoria no existe');
-            } else {
-                console.log(error)
-            }
-        }
+    //     try {
+    //         // --> comprueba si la categoria padre existe
+    //         if (newCategory.group) {
+    //             let group = await this.getCategory(newCategory.group)
+    //         }
+    //     } catch (error) {
+    //         if (error.meta.statusCode == 404) {
+    //             throw new NotAcceptableException('la categoria no existe');
+    //         } else {
+    //             console.log(error)
+    //         }
+    //     }
 
-        let result = await this.categoriesIndex.create(newCategory)
+    //     let result = await this.categoriesIndex.create(newCategory)
 
-        return result
+    //     return result
 
-    }
+    // }
 
-    public async getCategories(pcrcId: string): Promise<(category & { id: string; })[]> {
-        try {
-            return this.sortBy(await this.categoriesIndex.where({ pcrc: pcrcId }),'name')
-        } catch (error) {
-            if (error && error.meta && error.meta.body && error.meta.statusCode == 404) {
-                throw new NotFoundException('pcrc no encontrado')
-            } else {
-                console.log(error)
-            }
-        }
-    }
+    // public async getCategories(pcrcId: string): Promise<(category & { id: string; })[]> {
+    //     try {
+    //         return this.sortBy(await this.categoriesIndex.where({ pcrc: pcrcId }),'name')
+    //     } catch (error) {
+    //         if (error && error.meta && error.meta.body && error.meta.statusCode == 404) {
+    //             throw new NotFoundException('pcrc no encontrado')
+    //         } else {
+    //             console.log(error)
+    //         }
+    //     }
+    // }
 
-    private async getCategoriesByGroup(categoryId): Promise<(category & { id: string; })[]> {
-        return await this.categoriesIndex.where({ group: categoryId })
-    }
+    // private async getCategoriesByGroup(categoryId): Promise<(category & { id: string; })[]> {
+    //     return await this.categoriesIndex.where({ group: categoryId })
+    // }
 
-    private async getTree(groupId): Promise<string[]> {
+    // private async getTree(groupId): Promise<string[]> {
 
-        let isLeaftCategory = await this.isLeaftCategory(groupId)
+    //     let isLeaftCategory = await this.isLeaftCategory(groupId)
 
-        if (isLeaftCategory) {
-            return [groupId]
-        } else {
-            let nodes = await this.getCategoriesByGroup(groupId)
-            let result = [groupId]
-            for (var i = 0; i < nodes.length; i++) {
-                let newNodes = await this.getTree(nodes[i].id)
-                result = result.concat(newNodes)
-            }
-            return result
-        }
-    }
+    //     if (isLeaftCategory) {
+    //         return [groupId]
+    //     } else {
+    //         let nodes = await this.getCategoriesByGroup(groupId)
+    //         let result = [groupId]
+    //         for (var i = 0; i < nodes.length; i++) {
+    //             let newNodes = await this.getTree(nodes[i].id)
+    //             result = result.concat(newNodes)
+    //         }
+    //         return result
+    //     }
+    // }
 
-    public deleteCategory = async (categoryId): Promise<any> => {
+    // public deleteCategory = async (categoryId): Promise<any> => {
 
-        let listOfCategories = await this.getTree(categoryId);
+    //     let listOfCategories = await this.getTree(categoryId);
 
-        let articulosPorBorrar: any[] = await async.map(listOfCategories, async (catId) => this.articleIndex.where({ category: catId }))
+    //     let articulosPorBorrar: any[] = await async.map(listOfCategories, async (catId) => this.articleIndex.where({ category: catId }))
 
-        let result = await async.each(R.flatten(articulosPorBorrar).map(article => article.id), this.articlesModel.deleteArticle);
+    //     let result = await async.each(R.flatten(articulosPorBorrar).map(article => article.id), this.articlesModel.deleteArticle);
 
-        let deleteCategoriesQuery = {
-            "query": {
-                "bool": {
-                    "filter": {
-                        "terms": {
-                            "_id": listOfCategories
-                        }
-                    }
-                }
-            }
-        }
+    //     let deleteCategoriesQuery = {
+    //         "query": {
+    //             "bool": {
+    //                 "filter": {
+    //                     "terms": {
+    //                         "_id": listOfCategories
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        return await this.categoriesIndex.deleteByQuery(deleteCategoriesQuery)
-    }
+    //     return await this.categoriesIndex.deleteByQuery(deleteCategoriesQuery)
+    // }
 
-    public updateCategory = async (id, newCategory: udpateCategoryDTO): Promise<any> => {
-        return await this.categoriesIndex.updatePartialDocument(id, newCategory)
-    }
+    // public updateCategory = async (id, newCategory: udpateCategoryDTO): Promise<any> => {
+    //     return await this.categoriesIndex.updatePartialDocument(id, newCategory)
+    // }
 
-    public getAllCategories = async () => {
-        return await this.categoriesIndex.all()
-    }
+    // public getAllCategories = async () => {
+    //     return await this.categoriesIndex.all()
+    // }
 }

@@ -31,81 +31,64 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
 
     async validate(ldapUserInfo) {
 
+        var user = 
+
         if (!!user) {
 
             return {
                 "sub": user.id,
                 "name": ldapUserInfo.name,
-                "rol": user.rol
             }
 
         } else {
 
             var user = await this.userModel.createUser({
                 cedula: ldapUserInfo.postOfficeBox,
-                rol: "user",
                 nombre: ldapUserInfo.name,
-                pcrc: []
             })
 
             return {
                 "sub": user.id,
                 "name": ldapUserInfo.name,
-                "rol": user.rol
             }
         }
     }
 
-    generateJwt(user: { sub: string, name: string, rol: user['rol'] }) {
-        return jwt.sign(
-            user
-            , process.env.JWT_PRIVATE_KEY,
-            {
-                expiresIn:'5m'
-            }
-        )
-    }
+    // generateJwt(user: { sub: string, name: string }) {
+    //     return jwt.sign(
+    //         user
+    //         , process.env.JWT_PRIVATE_KEY,
+    //         {
+    //             expiresIn:'5m'
+    //         }
+    //     )
+    // }
 
-    generateRefresh_token(user: { sub: string, name: string, rol: user['rol'] }){   
-        return jwt.sign(
-            user
-            , process.env.REFRESH_JWT_PRIVATE_KEY,
-            {
-                expiresIn:'10h'
-            }
-        )
-    }
+    // generateRefresh_token(user: { sub: string, name: string }){   
+    //     return jwt.sign(
+    //         user
+    //         , process.env.REFRESH_JWT_PRIVATE_KEY,
+    //         {
+    //             expiresIn:'10h'
+    //         }
+    //     )
+    // }
 
-    validateJwt(token:string){
-        return jwt.verify(token, process.env.JWT_PRIVATE_KEY) as token
-    }
+    // validateJwt(token:string){
+    //     return jwt.verify(token, process.env.JWT_PRIVATE_KEY) as token
+    // }
 
-    validateRefreshJwt(token:string){
-        return jwt.verify(token, process.env.REFRESH_JWT_PRIVATE_KEY) as token
-    }
+    // validateRefreshJwt(token:string){
+    //     return jwt.verify(token, process.env.REFRESH_JWT_PRIVATE_KEY) as token
+    // }
 
-    decodeToken(token):token{
-        let tokens = jwt.decode(token) as token
-        return tokens
-    }
+    // decodeToken(token):token{
+    //     let tokens = jwt.decode(token) as token
+    //     return tokens
+    // }
 
-    async invalidateRefreshJwt(userid){
-        await this.userjwtIndex.deleteWhere({ user: userid })
-    }
+    // async invalidateRefreshJwt(userid){
+    //     await this.userjwtIndex.deleteWhere({ user: userid })
+    // }
 
-}
-
-@Injectable()
-export class JwtValidator extends PassportStrategy(jwStrategy) {
-    constructor() {
-        super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            ignoreExpiration: false,
-            secretOrKey: process.env.JWT_PRIVATE_KEY
-        });
-    }
-
-    async validate(user: User): Promise<User> {
-        return user
-    }
 }
