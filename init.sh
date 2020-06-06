@@ -3,17 +3,11 @@ nvm install node
 nvm use node
 sudo yum upgrade
 sudo yum install git
-git clone https://github.com/eliteblanca/consultameFrontEnd.git
 git clone https://github.com/eliteblanca/consultameBackEnd.git
-cd consultameBackEnd/
+cd nikBack
 npm install
 npm run build
-cd ../consultameFrontEnd
-npm install
-npm run buildprod
 sudo yum install nginx
-sudo yum install vim    
-cd ../consultameBackEnd/
 sudo mv ngxapp.conf /etc/nginx/conf.d/
 sudo restorecon  /etc/nginx/conf.d/
 sudo restorecon  /etc/nginx/conf.d/*
