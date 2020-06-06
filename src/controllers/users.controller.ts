@@ -10,12 +10,12 @@ import { UserNotificationsModelService, userNotificationDTO } from "../services/
 @Controller('api/users')
 export class UsersController {
 
-    // constructor(
-    //     private userModel: UserModelService,
-    //     private pcrcModel:PcrcModelService,
-    //     private usersesionsModel:UsersesionsModelService,
-    //     private userNotificationsModel:UserNotificationsModelService,
-    // ) { }
+    constructor(
+        private userModel: UserModelService,
+        private pcrcModel:PcrcModelService,
+        private usersesionsModel:UsersesionsModelService,
+        private userNotificationsModel:UserNotificationsModelService,
+    ) { }
 
     // @UseGuards(JwtGuard)
     // @Get()
@@ -25,6 +25,14 @@ export class UsersController {
     // ): any {
     //     return this.userModel.searchUsers(query, pcrcId);        
     // }
+
+    // @UseGuards(JwtGuard)
+    @Get(':id')
+    async getSingleUser(
+        @Param('id') documento: string
+    ) {
+        return await this.userModel.getUserByDocumento(documento);        
+    }
 
     // @UseGuards(JwtGuard)
     // @Delete(':id')

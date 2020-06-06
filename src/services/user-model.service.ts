@@ -9,6 +9,7 @@ import { user, UserIndex } from "../indices/userIndex";
 import { datosPersonales } from "../jarvisEntities/datosGenerales.entity";
 import { DbService } from "../services/db.service"
 import { from } from 'rxjs';
+import { userRaw } from "../entities";
  export class updateUserRolDTO {
 
     @IsNotEmpty({ message: "Debes proporcionar un rol" })
@@ -34,21 +35,13 @@ export class UserModelService {
         private db:DbService
     ) { }
 
-    public async createUser(newUser: user): Promise<user & { id: string; }> {
-        await this.db.NIK(`
-            INSERT INTO usuario
-            (
-                user_name,
-                documento
-            )
-            VALUES
-            (?, ?)        
-        `,[newUser.nombre, newUser.cedula])
-        return this.userIndex.create(newUser, newUser.cedula)
+    public async createUser(nombre:string, documento:string): Promise<user & { id: string; }> {
+        console.log(nombre, documento)
+        return await this.db.NIK(`call crear_usuario(?,?)`,[nombre, documento])
     }
 
-    getUser(username:string){
-        
+    public async getUserByDocumento(documento:string):Promise<userRaw[]>{
+        return await this.db.NIK('call get_usuario(?)',[documento])
     }
 
     // public getJarvisUser = async (cedula: string) => {

@@ -8,12 +8,14 @@ export class DbService {
 
     public NIK = async (sql:string, values?:string[]) => {
         try {
-            if(values){
-                return await this.nikDb.execute(sql,values)  
-            } else {
-                return await this.nikDb.execute(sql)  
-            }
+            var result = values ? await this.nikDb.query<RowDataPacket[]>(sql,values)  : await this.nikDb.query<RowDataPacket[]>(sql) 
 
+
+            if(result[0][0]){
+                return JSON.parse(JSON.stringify(result[0][0]))            
+            } else {
+                return []
+            }
 
         } catch(err) {
             console.log(err)

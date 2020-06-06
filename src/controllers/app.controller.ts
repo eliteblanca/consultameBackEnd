@@ -1,7 +1,8 @@
-import { Controller, Get, Post, UseGuards, Body, Res, Req } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Body, Res, Req, HttpCode } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response, Request } from 'express';
 import { LdapService } from "../services/auth.service";
+import { UserjwtModelService } from "../services/userjwt.service";
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 import * as https from "https";
 import * as qs from "querystring"
@@ -23,111 +24,119 @@ class user {
 export class AppController {
     constructor(
         private authService: LdapService,
-        private userjwtIndex: userjwtIndex,
+        private userjwtModel:UserjwtModelService
     ) { }
 
     @UseGuards(AuthGuard('ldap'))
     @Post('authenticate')
+    @HttpCode(200)
     async login(@Req() req, @Res() res: Response) {
 
-        // if(process.env.NODE_ENV == 'production'){
-        //     let tokens = {
-        //         token: this.authService.generateJwt(req.user),
-        //         refreshToken: this.authService.generateRefresh_token(req.user)
-        //     }
+        if(process.env.NODE_ENV == 'production'){
+            let tokens = {
+                token: this.authService.generateJwt(req.user),
+                refreshToken: this.authService.generateRefresh_token(req.user)
+            }
 
-        //     let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
+            let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
 
-        //     res.cookie('refresh_token', tokens.refreshToken, {
-        //         httpOnly: true,
-        //         expires: new Date(decodedRefresh.exp * 1000)
-        //     })
+            res.cookie('refresh_token', tokens.refreshToken, {
+                httpOnly: true,
+                expires: new Date(decodedRefresh.exp * 1000)
+            })
 
-        //     await this.userjwtIndex.deleteWhere({ user: req.user.sub })
+            await this.userjwtModel.borrarJWT(req.user.sub)
 
-        //     await this.userjwtIndex.create({ user: req.user.sub })
+            await this.userjwtModel.crearJWT(req.user.sub)
 
-        //     res.send(tokens)
-        // } else {
+            res.send(tokens)
+        } else {
 
-        //     let tokens = {
-        //         token: this.authService.generateJwt({ name:"julian andres vargas", sub:"1036673423" }),
-        //         refreshToken: this.authService.generateRefresh_token({ name:"julian andres vargas", sub:"1036673423" })
-        //     }
+            let tokens = {
+                token: this.authService.generateJwt({ name:"julian andres vargas", sub:"7" }),
+                refreshToken: this.authService.generateRefresh_token({ name:"julian andres vargas", sub:"7" })
+            }
 
-        //     let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
+            let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
 
-        //     res.cookie('refresh_token', tokens.refreshToken, {
-        //         httpOnly: true,
-        //         expires: new Date(decodedRefresh.exp * 1000)
-        //     })
+            res.cookie('refresh_token', tokens.refreshToken, {
+                httpOnly: true,
+                expires: new Date(decodedRefresh.exp * 1000)
+            })
 
-        //     await this.userjwtIndex.deleteWhere({ user: "1036673423" })
+            await this.userjwtModel.borrarJWT("7")
 
-        //     await this.userjwtIndex.create({ user: "1036673423" })
+            await this.userjwtModel.crearJWT("7")
 
-        //     res.send(tokens)
-        // }
+            res.send(tokens)
+        }
     }
 
-    // @UseGuards(JwtGuard)
-    // @Get('log_out')
-    // async logOut(@User() user: U) {
-    //     let deleted = await this.userjwtIndex.deleteWhere({ user: user.sub })
-    //     return { status: 'logout' }
-    // }
+    @UseGuards(JwtGuard)
+    @Get('log_out')
+    async logOut(@Req() req, @Res() res: Response) {
 
-    // @UseGuards(RefreshJwtGuard)
-    // @Get('refresh_token')
-    // refreshToken(@Req() req, @Res() res: Response) {
-    //     var tokens = {
-    //         token: this.authService.generateJwt(req.user),
-    //         refreshToken: this.authService.generateRefresh_token(req.user)
-    //     }
+        res.clearCookie('refresh_token', {
+            httpOnly: true,
+        })
 
-    //     let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
+        let deleted = await this.userjwtModel.borrarJWT(req.user.sub)
 
-    //     res.clearCookie('refresh_token', {
-    //         httpOnly: true,
-    //     })
+        res.send({ status: 'logout' })
 
-    //     res.cookie('refresh_token', tokens.refreshToken, {
-    //         httpOnly: true,
-    //         expires: new Date(decodedRefresh.exp * 1000)            
-    //     })
+    }
 
-    //     res.send(tokens)
-    // }
+    @UseGuards(RefreshJwtGuard)
+    @Get('refresh_token')
+    refreshToken(@Req() req, @Res() res: Response) {
+        var tokens = {
+            token: this.authService.generateJwt(req.user),
+            refreshToken: this.authService.generateRefresh_token(req.user)
+        }
 
-    // @UseGuards(JwtGuard)
-    // @Get('me')
-    // currentUser(@Req() req): Promise<user> {
-    //     return req.user
-    // }
+        let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
 
-    // @Post('validateCaptcha')
-    // async validateCaptcha(
-    //     @Body() body: { token: string }
-    // ) {
+        res.clearCookie('refresh_token', {
+            httpOnly: true,
+        })
 
-    //     var RECAPTCHA_KEY = process.env.RECAPTCHA_KEY
+        res.cookie('refresh_token', tokens.refreshToken, {
+            httpOnly: true,
+            expires: new Date(decodedRefresh.exp * 1000)            
+        })
+
+        res.send(tokens)
+    }
+
+    @UseGuards(JwtGuard)
+    @Get('me')
+    currentUser(@Req() req): Promise<user> {
+        return req.user
+    }
+
+    @Post('validateCaptcha')
+    async validateCaptcha(
+        @Body() body: { token: string }
+    ) {
+
+        var RECAPTCHA_KEY = process.env.RECAPTCHA_KEY
 
 
-    //     const axiosInstance = axios.create({
-    //         httpsAgent: new https.Agent({
-    //             rejectUnauthorized: false
-    //         })
-    //     });
+        const axiosInstance = axios.create({
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false
+            })
+        });
 
 
-    //     let googleResponse = await axiosInstance.post('https://www.google.com/recaptcha/api/siteverify',
-    //         qs.stringify({
-    //             secret: RECAPTCHA_KEY,
-    //             response: body.token
-    //         })
-    //     )
+        let googleResponse = await axiosInstance.post('https://www.google.com/recaptcha/api/siteverify',
+            qs.stringify({
+                secret: RECAPTCHA_KEY,
+                response: body.token
+            })
+        )
 
-    //     return googleResponse.data
+        return googleResponse.data
 
-    // }
+    }
 }

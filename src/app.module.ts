@@ -63,6 +63,7 @@ import { CoordinadoresController } from './controllers/coordinadores.controller'
 import { ArticleChangesIndex } from "./indices/articlesChangesIndex";
 import { NotificationsGateway } from "./webSockets/notifications.gateway";
 import { DbService } from './services/db.service';
+import { UserjwtModelService } from './services/userjwt.service';
 import * as mysql from "mysql2/promise";
 
 @Module({
@@ -150,12 +151,12 @@ import * as mysql from "mysql2/promise";
         return mysql.createPool({
           host     : process.env.NIK_DB_HOST,
           user     : process.env.NIK_DB_USER,
-          password : process.env.NIK_DB_PASS,
           database : 'nik'
         })
       },
     },
     DbService,
+    UserjwtModelService,
   ],
 })
 export class AppModule {  }

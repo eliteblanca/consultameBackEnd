@@ -30,11 +30,10 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
     }
 
     async validate(ldapUserInfo) {
-        var user = await this.UserIndex.where( { cedula: ldapUserInfo.postOfficeBox })
 
-        var user = 
+        var user = await this.userModel.getUserByDocumento(ldapUserInfo.postOfficeBox)
 
-        if (!!user) {
+        if (await user.length > 0) {
 
             return {
                 "sub": user[0].id,
@@ -43,54 +42,49 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
 
         } else {
 
-            var newuser = await this.userModel.createUser({
-                cedula: ldapUserInfo.postOfficeBox,
-                nombre: ldapUserInfo.name,
-            })
+            var newuser = await this.userModel.createUser(
+                ldapUserInfo.name,
+                ldapUserInfo.postOfficeBox,
+            )
 
             return {
                 "sub": newuser.id,
                 "name": ldapUserInfo.name,
             }
-
         }
     }
 
-    // generateJwt(user: { sub: string, name: string }) {
-    //     return jwt.sign(
-    //         user
-    //         , process.env.JWT_PRIVATE_KEY,
-    //         {
-    //             expiresIn:'5m'
-    //         }
-    //     )
-    // }
+    generateJwt(user: { sub: string, name: string }) {
+        return jwt.sign(
+            user
+            , process.env.JWT_PRIVATE_KEY,
+            {
+                expiresIn:'5m'
+            }
+        )
+    }
 
-    // generateRefresh_token(user: { sub: string, name: string }){   
-    //     return jwt.sign(
-    //         user
-    //         , process.env.REFRESH_JWT_PRIVATE_KEY,
-    //         {
-    //             expiresIn:'10h'
-    //         }
-    //     )
-    // }
+    generateRefresh_token(user: { sub: string, name: string }){   
+        return jwt.sign(
+            user
+            , process.env.REFRESH_JWT_PRIVATE_KEY,
+            {
+                expiresIn:'10h'
+            }
+        )
+    }
 
-    // validateJwt(token:string){
-    //     return jwt.verify(token, process.env.JWT_PRIVATE_KEY) as token
-    // }
+    validateJwt(token:string){
+        return jwt.verify(token, process.env.JWT_PRIVATE_KEY) as token
+    }
 
-    // validateRefreshJwt(token:string){
-    //     return jwt.verify(token, process.env.REFRESH_JWT_PRIVATE_KEY) as token
-    // }
+    validateRefreshJwt(token:string){
+        return jwt.verify(token, process.env.REFRESH_JWT_PRIVATE_KEY) as token
+    }
 
-    // decodeToken(token):token{
-    //     let tokens = jwt.decode(token) as token
-    //     return tokens
-    // }
-
-    // async invalidateRefreshJwt(userid){
-    //     await this.userjwtIndex.deleteWhere({ user: userid })
-    // }
+    decodeToken(token):token{
+        let tokens = jwt.decode(token) as token
+        return tokens
+    }
 
 }
