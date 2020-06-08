@@ -11,12 +11,11 @@ sudo yum install nginx
 sudo mv ngxapp.conf /etc/nginx/conf.d/
 sudo restorecon  /etc/nginx/conf.d/
 sudo restorecon  /etc/nginx/conf.d/*
-sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/server.key -out /etc/nginx/server.crt
+sudo cat /var/log/audit/audit.log | grep nginx | grep denied | audit2allow -M mynginx 
+sudo semodule -i mynginx.pp
 npm install pm2 -g
 pm2 start dist/main.js -i max
 sudo service nginx start
-sudo cat /var/log/audit/audit.log | grep nginx | grep denied | audit2allow -M mynginx 
-sudo semodule -i mynginx.pp
 
 
 service nginx status
