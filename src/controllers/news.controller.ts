@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
-import { User as U } from '../entities/user';
+import { User as U } from '../entities';
 import { JwtGuard } from "../guards/jwt.guard";
 import { NewsModelService, postNewsDTO, updateNewsDTO } from "../services/news-model.service";
 import { User } from '../user.decorator';

@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { User as U } from "../entities/user";
+import { User as U } from "../entities";
 import { JwtGuard } from "../guards/jwt.guard";
 import { PcrcModelService, postUserPcrcDTO } from "../services/pcrc-model.service";
 import { deleteUserDTO, updateUserRolDTO, UserModelService } from "../services/user-model.service";

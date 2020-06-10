@@ -64,6 +64,8 @@ import { ArticleChangesIndex } from "./indices/articlesChangesIndex";
 import { NotificationsGateway } from "./webSockets/notifications.gateway";
 import { DbService } from './services/db.service';
 import { UserjwtModelService } from './services/userjwt.service';
+import { PerfilesController } from './controllers/perfiles.controller';
+import { PermisionsModelService } from './services/permisions-model.service';
 import * as mysql from "mysql2/promise";
 
 @Module({
@@ -101,7 +103,8 @@ import * as mysql from "mysql2/promise";
     ClientesController,
     DirectoresController,
     GerentesController,
-    CoordinadoresController
+    CoordinadoresController,
+    PerfilesController
   ],
   providers: [  
     LdapService,
@@ -157,6 +160,7 @@ import * as mysql from "mysql2/promise";
     },
     DbService,
     UserjwtModelService,
+    PermisionsModelService,
   ],
 })
 export class AppModule {  }

@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import * as jwt from "jsonwebtoken";
 import { ExtractJwt, Strategy as jwStrategy } from 'passport-jwt';
 import * as ldapStrategy from 'passport-ldapauth';
-import { User } from "../entities/user";
+import { User } from "../entities";
 import { user, UserIndex } from "../indices/userIndex";
 import { userjwtIndex } from "../indices/userjwtIndex";
 import { UserModelService } from "../services/user-model.service";

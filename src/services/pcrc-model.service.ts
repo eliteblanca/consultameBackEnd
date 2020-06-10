@@ -1,15 +1,48 @@
 import { ConflictException, Injectable, NotAcceptableException } from '@nestjs/common';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString, IsAlphanumeric, IsNumberString, IsOptional } from 'class-validator';
 import * as R from 'remeda';
 import * as sqlstring from 'sqlstring';
 import { createQueryBuilder, getManager } from 'typeorm';
 import { UserIndex } from "../indices/userIndex";
 import { Personal } from "../jarvisEntities/personal.entity";
 import { UserModelService } from "../services/user-model.service";
+import { DbService } from "../services/db.service"
+
+@Injectable()
+export class UserjwtModelService {
+    constructor(
+        private db:DbService
+    ) { }
+
+    crearJWT = async (userId:string) => {
+        return await this.db.NIK(`CALL crear_jwt(?)`,[userId])
+    }
+
+    borrarJWT = async (userId:string) => {
+        return await this.db.NIK(`CALL borrar_jwt(?)`,[userId])
+    }
+
+    getJWT = async (userId) =>{
+        return await this.db.NIK(`CALL get_jwt(?)`,[userId])
+    }
+
+}
 export class postUserPcrcDTO {
 
     @IsNotEmpty({ message: 'debes proporcionar un pcrc' })
     public pcrc: string;
+
+}
+
+export class postBaseDTO {
+
+    @IsNotEmpty()
+    @IsString()
+    nombre:string
+
+    @IsOptional()
+    @IsNumberString()
+    parentId:string
 
 }
 
@@ -26,10 +59,13 @@ export type cliente = {
 @Injectable()
 export class PcrcModelService {
 
-    // constructor(
-    //     private userIndex: UserIndex,
-    //     private userModel: UserModelService
-    // ) { }
+    constructor(
+        private db:DbService
+    ) { }
+
+    createBase = async (nombre:string, parentId:string = null) => {
+        return await this.db.NIK('call crear_base(?, ?)',[nombre, parentId])
+    }
 
     // private sortBy = (obj, key) => {
     //     return obj.sort(function (a, b) {

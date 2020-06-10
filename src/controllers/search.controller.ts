@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
-import { User as U } from '../entities/user';
+import { User as U } from '../entities';
 import { JwtGuard } from "../guards/jwt.guard";
 import { newSearchDTO, SearchModelService } from "../services/search-model.service";
 import { User } from '../user.decorator';

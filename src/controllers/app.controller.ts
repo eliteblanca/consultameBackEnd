@@ -10,7 +10,7 @@ import { RefreshJwtGuard } from "../guards/refreshjwt.guard";
 import { userjwtIndex } from "../indices/userjwtIndex";
 import { JwtGuard } from "../guards/jwt.guard";
 import { User } from '../user.decorator';
-import { User as U } from '../entities/user';
+import { User as U } from '../entities';
 class user {
     "sub": string
     "name": string

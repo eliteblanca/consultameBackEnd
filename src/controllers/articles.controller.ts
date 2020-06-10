@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { User as U } from '../entities/user';
+import { User as U } from '../entities';
 import { JwtGuard } from "../guards/jwt.guard";
 import { articleDTO, ArticlesModelService, articleViewsDTO, SingleArticleDTO } from '../services/articles-model.service';
 import { SearchModelService } from '../services/search-model.service';

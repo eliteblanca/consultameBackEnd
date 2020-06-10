@@ -4,3 +4,13 @@ export type userRaw = {
     creation_date: string
     documento: string
 }
+
+export class User {
+    "sub":string
+    "name":string
+    "rol":string
+}
+export type perfil = {
+    id:number
+    nombre:string
+}

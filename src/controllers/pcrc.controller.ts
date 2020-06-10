@@ -1,8 +1,8 @@
-import { BadRequestException, Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
-import { User as U } from '../entities/user';
+import { BadRequestException, Controller, Get, Param, Query, UseGuards, Post, Body, HttpCode } from '@nestjs/common';
+import { User as U } from '../entities';
 import { JwtGuard } from "../guards/jwt.guard";
 import { CategoriesModelService } from "../services/categories-model.service";
-import { PcrcModelService } from '../services/pcrc-model.service';
+import { PcrcModelService, postBaseDTO } from '../services/pcrc-model.service';
 import { User } from '../user.decorator';
 import { ArticlesModelService } from "./../services/articles-model.service";
 import { NewsModelService } from "./../services/news-model.service";
@@ -12,13 +12,25 @@ import { SearchModelService } from "./../services/search-model.service";
 @Controller('api/pcrc')
 export class PcrcController {
 
-    // constructor(
-    //     private pcrcModel: PcrcModelService,
-    //     private categoriesModel: CategoriesModelService,
-    //     private searchModel: SearchModelService,
-    //     private articlesModel: ArticlesModelService,
-    //     private newsModel: NewsModelService,
-    // ) { }
+    constructor(
+        private pcrcModel: PcrcModelService,
+        private categoriesModel: CategoriesModelService,
+        private searchModel: SearchModelService,
+        private articlesModel: ArticlesModelService,
+        private newsModel: NewsModelService,
+    ) { }
+
+    @UseGuards(JwtGuard)
+    @HttpCode(200)
+    @Post('')    
+    async createBase(
+        @Body() baseDTO:postBaseDTO
+    ){
+        let result = await this.pcrcModel.createBase(baseDTO.nombre, baseDTO.parentId)
+        return {
+            status:'created'
+        }
+    }
 
     // @UseGuards(JwtGuard)
     // @Get()
