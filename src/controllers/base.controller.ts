@@ -2,18 +2,18 @@ import { BadRequestException, Controller, Get, Param, Query, UseGuards, Post, Bo
 import { User as U } from '../entities';
 import { JwtGuard } from "../guards/jwt.guard";
 import { CategoriesModelService } from "../services/categories-model.service";
-import { PcrcModelService, postBaseDTO } from '../services/pcrc-model.service';
+import { BaseModelService, postBaseDTO, postSubBaseDTO } from '../services/base-model.service';
 import { User } from '../user.decorator';
-import { ArticlesModelService } from "./../services/articles-model.service";
-import { NewsModelService } from "./../services/news-model.service";
-import { SearchModelService } from "./../services/search-model.service";
+import { ArticlesModelService } from "../services/articles-model.service";
+import { NewsModelService } from "../services/news-model.service";
+import { SearchModelService } from "../services/search-model.service";
 
 
 @Controller('api/pcrc')
 export class PcrcController {
 
     constructor(
-        private pcrcModel: PcrcModelService,
+        private pcrcModel: BaseModelService,
         private categoriesModel: CategoriesModelService,
         private searchModel: SearchModelService,
         private articlesModel: ArticlesModelService,
@@ -22,21 +22,39 @@ export class PcrcController {
 
     @UseGuards(JwtGuard)
     @HttpCode(200)
-    @Post('')    
+    @Post('')
     async createBase(
-        @Body() baseDTO:postBaseDTO
+        @Body() baseDTO:postBaseDTO,
+        @User() user:U
     ){
-        let result = await this.pcrcModel.createBase(baseDTO.nombre, baseDTO.parentId)
+        let result = await this.pcrcModel.createBase(baseDTO.nombre, baseDTO.subaseNombre, user.sub)
+
         return {
             status:'created'
         }
     }
 
-    // @UseGuards(JwtGuard)
-    // @Get()
-    // async getAllPcrc(): Promise<any> {
-    //     return this.pcrcModel.getAllPcrc()
-    // }
+    @UseGuards(JwtGuard)
+    @Get()
+    async getAllBases(
+        @User() user:U
+    ): Promise<any> {
+        return this.pcrcModel.getUserBases(user.sub)
+    }
+
+    @UseGuards(JwtGuard)
+    @HttpCode(200)
+    @Post(':id/sub')
+    async createSubBase(
+        @Body() baseDTO:postSubBaseDTO,
+        @User() user:U
+    ){
+        let result = await this.pcrcModel.createSubBase(baseDTO.nombre, baseDTO.parentId, user.sub )
+
+        return {
+            status:'created'
+        }
+    }
 
     // @UseGuards(JwtGuard)
     // @Get(':idPcrc/usuarios')

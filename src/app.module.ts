@@ -8,7 +8,7 @@ import { CategoriesController } from './controllers/categories.controller';
 import { CommentsController } from './controllers/comments.controller';
 import { EsClientController } from './controllers/es-client.controller';
 import { NewsController } from './controllers/news.controller';
-import { PcrcController } from './controllers/pcrc.controller';
+import { PcrcController } from './controllers/base.controller';
 import { searchController } from './controllers/search.controller';
 import { UploadController } from './controllers/upload.controller';
 import { UsersController } from './controllers/users.controller';
@@ -43,7 +43,7 @@ import { CategoriesModelService } from './services/categories-model.service';
 import { CommentsModelService } from './services/comments-model.service';
 import { EsClientService } from './services/es-client.service';
 import { NewsModelService } from './services/news-model.service';
-import { PcrcModelService } from "./services/pcrc-model.service";
+import { BaseModelService } from "./services/base-model.service";
 import { S3BucketService } from './services/s3-bucket.service';
 import { SearchModelService } from './services/search-model.service';
 import { UserModelService } from './services/user-model.service';
@@ -66,6 +66,7 @@ import { DbService } from './services/db.service';
 import { UserjwtModelService } from './services/userjwt.service';
 import { PerfilesController } from './controllers/perfiles.controller';
 import { PermisionsModelService } from './services/permisions-model.service';
+import { PermisosController } from './controllers/permisos.controller';
 import * as mysql from "mysql2/promise";
 
 @Module({
@@ -104,7 +105,8 @@ import * as mysql from "mysql2/promise";
     DirectoresController,
     GerentesController,
     CoordinadoresController,
-    PerfilesController
+    PerfilesController,
+    PermisosController
   ],
   providers: [  
     LdapService,
@@ -117,7 +119,7 @@ import * as mysql from "mysql2/promise";
     ArticleEventsModelService,
     CargosModelService,
     CommentsModelService,
-    PcrcModelService, 
+    BaseModelService, 
     ArticleIndex,
     CategoriesIndex,
     SearchsIndex,

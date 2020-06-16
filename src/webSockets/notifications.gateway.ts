@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, MessageBody, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket } from '@nestjs/websockets';
 import { Socket } from "socket.io";
-import { PcrcModelService } from "../services/pcrc-model.service";
+import { BaseModelService } from "../services/base-model.service";
 import { NotificationsModelService } from "../services/notifications-model.service";
 import { notification } from "../indices/notificationsIndex";
 import { UsersesionsModelService } from "../services/usersesions-model.service";

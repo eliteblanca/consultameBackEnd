@@ -2,7 +2,7 @@ import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { IsNotEmpty } from 'class-validator';
 import { news, NewsIndex } from "../indices/newsIndex";
 import { ArticleIndex, Article } from "../indices/articleIndex";
-import { PcrcModelService } from "../services/pcrc-model.service";
+import { BaseModelService } from "./base-model.service";
 import { ArticlesModelService } from "../services/articles-model.service";
 import { ArticleChangesIndex } from "../indices/articlesChangesIndex";
 import { ArticleEventsModelService } from "../services/articleEvents-model.service";

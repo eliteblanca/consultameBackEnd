@@ -12,7 +12,7 @@ import { FavoriteUserIndex } from '../indices/favoritesUserIndex';
 import { LikeUserIndex } from '../indices/likeUserIndex';
 import { CargosModelService } from "../services/cargos-model.service";
 import { CategoriesModelService } from '../services/categories-model.service';
-import { PcrcModelService } from "../services/pcrc-model.service";
+import { BaseModelService } from "./base-model.service";
 import { S3BucketService } from '../services/s3-bucket.service';
 import { ArticleEventsModelService } from "./articleEvents-model.service";
 import { UsersesionsIndex } from "../indices/usersesionsIndex";

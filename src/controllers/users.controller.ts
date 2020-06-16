@@ -1,21 +1,22 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, HttpCode } from '@nestjs/common';
 import { User as U } from "../entities";
 import { JwtGuard } from "../guards/jwt.guard";
-import { PcrcModelService, postUserPcrcDTO } from "../services/pcrc-model.service";
+import { BaseModelService, postUserPcrcDTO } from "../services/base-model.service";
 import { deleteUserDTO, updateUserRolDTO, UserModelService } from "../services/user-model.service";
 import { User } from "../user.decorator";
 import { UsersesionsModelService, sesionDTO, updateSesionDTO } from "../services/usersesions-model.service";
 import { UserNotificationsModelService, userNotificationDTO } from "../services/userNotifications-model.service";
-
+import { asignarPerfilDTO, PermisionsModelService } from '../services/permisions-model.service'
 @Controller('api/users')
 export class UsersController {
 
     constructor(
         private userModel: UserModelService,
-        private pcrcModel:PcrcModelService,
-        private usersesionsModel:UsersesionsModelService,
-        private userNotificationsModel:UserNotificationsModelService,
-    ) { }
+        private baseModel: BaseModelService,
+        private usersesionsModel: UsersesionsModelService,
+        private userNotificationsModel: UserNotificationsModelService,
+        private permisionsModel: PermisionsModelService,
+        ) { }
 
     // @UseGuards(JwtGuard)
     // @Get()
@@ -27,11 +28,46 @@ export class UsersController {
     // }
 
     // @UseGuards(JwtGuard)
-    @Get(':id')
-    async getSingleUser(
-        @Param('id') documento: string
+    // @Get(':id')
+    // async getSingleUser(
+    //     @Param('id') documento: string
+    // ) {
+    //     return await this.userModel.getUserByDocumento(documento);
+    // }
+
+    @Post(':id/perfiles')
+    @UseGuards(JwtGuard)
+    @HttpCode(200)
+    async asignPerfilToUser(
+        @Param('id') userId: string,
+        @Body() perfil: asignarPerfilDTO
     ) {
-        return await this.userModel.getUserByDocumento(documento);        
+        await this.permisionsModel.asignarPerfil(userId, perfil.perfil)
+        return {
+            status:'created'
+        }
+    }
+
+    @Get(':id/perfiles')
+    @UseGuards(JwtGuard)
+    @HttpCode(200)
+    async getUserPerfiles(
+        @Param('id') userId: string
+    ) {
+        return await this.permisionsModel.getUserPerfiles(userId)
+    }
+
+    @Delete(':id/perfiles/:idPerfil')
+    @UseGuards(JwtGuard)
+    @HttpCode(200)
+    async disasignPerfilToUser(
+        @Param('id') userId: string,
+        @Param('idPerfil') perfilId: string,
+    ) {
+        await this.permisionsModel.desasignarPerfil(userId, perfilId)
+        return {
+            status:'deleted'
+        }
     }
 
     // @UseGuards(JwtGuard)
@@ -76,15 +112,13 @@ export class UsersController {
     //     return this.userModel.getUserFavorites(user.sub,from,size);
     // }
 
-    // @UseGuards(JwtGuard)
-    // @Get(':cedula/pcrc')
-    // getUserPcrc(        
-    //     @User() user: U,
-    //     @Param('cedula') cedula:string
-    // ): any {
-    //     console.log(user)
-    //     return this.pcrcModel.getUserPcrc(cedula)
-    // }
+    @UseGuards(JwtGuard)
+    @Get(':idUser/pcrc')
+    getUserPcrc(        
+        @Param('idUser') idUser:string
+    ): any {
+        return this.baseModel.getUserBases(idUser)
+    }
 
     // @UseGuards(JwtGuard)
     // @Post(':cedula/pcrc')

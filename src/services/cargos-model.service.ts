@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { createQueryBuilder } from 'typeorm';
 import { getManager } from "typeorm";
 import * as sqlstring from 'sqlstring';
-import { cliente, PcrcModelService } from "../services/pcrc-model.service";
+import { base, BaseModelService } from "./base-model.service";
 import * as R from 'remeda';
 
 export type personData = {

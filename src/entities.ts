@@ -10,7 +10,15 @@ export class User {
     "name":string
     "rol":string
 }
+
 export type perfil = {
     id:number
     nombre:string
+}
+
+export type baseRaw = {
+    parentId:number,
+    parentNombre:string,
+    subBaseId:number,
+    subBaseNombre:string
 }

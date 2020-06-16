@@ -19,10 +19,12 @@ export class permisoDTO {
     @IsNotEmpty()
     @IsString()	
     objeto:string
+}
 
+export class asignarPerfilDTO {
     @IsNotEmpty()
     @IsString()	
-    detalle:string
+    perfil:string
 }
 
 @Injectable()
@@ -47,9 +49,33 @@ export class PermisionsModelService {
     borrarPerfil = async (id:string) => {
         return await this.db.NIK(`CALL borrar_perfil(?)`,[id])
     }
-
+    
     asignarPermiso = async (idPerfil:string, permiso:permisoDTO) => {
-        
+        return await this.db.NIK(`CALL asignar_permiso(?, ?, ?)`,[idPerfil, permiso.objeto, permiso.accion])
+    }
+    
+    borrarPermiso = async (idPermiso:string) => {
+        return await this.db.NIK(`CALL borrar_permiso(?)`,[idPermiso])
+    }
+
+    getPermisos = async (idPerfil:string) => {
+        return await this.db.NIK(`CALL get_pemisos_perfil(?)`,[idPerfil])
+    }
+
+    actualizarPermiso = async (idPermiso:string, permiso:permisoDTO ) => {
+        return await this.db.NIK(`CALL actualizar_permiso(?, ?, ?)`,[idPermiso, permiso.accion, permiso.objeto ])
+    }
+    
+    asignarPerfil = async (userId:string, perfilId:string) => {
+        return await this.db.NIK(`CALL asignar_perfil(?, ?)`,[userId, perfilId])
+    }
+
+    desasignarPerfil = async (userId:string, perfilId:string) => {
+        return await this.db.NIK(`CALL desasignar_perfil(?, ?)`,[userId, perfilId])
+    }
+
+    getUserPerfiles = async (userId:string):Promise<perfil[]> => {
+        return await this.db.NIK(`CALL get_usuario_perfiles(?)`,[userId])
     }
 
 }

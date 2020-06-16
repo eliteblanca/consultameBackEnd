@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, Post, UseGuards, Get, Put, Param, Delete } from '@nestjs/common';
 import { JwtGuard } from "../guards/jwt.guard";
-import { perfilDTO, PermisionsModelService } from "../services/permisions-model.service";
+import { perfilDTO, PermisionsModelService, permisoDTO } from "../services/permisions-model.service";
 
 
 @Controller('api/perfiles')
@@ -45,18 +45,29 @@ export class PerfilesController {
     ){
         return await this.permisionsModel.borrarPerfil(idPerfil)
     }
-    
+
     @UseGuards(JwtGuard)
     @HttpCode(200)
     @Post(':id/permisos')
     async asignarPermiso(
-        @Body() perfilDTO:perfilDTO,
+        @Body() permisoDTO:permisoDTO,
         @Param('id') idPerfil:string
     ){
-        let result = await this.permisionsModel.crearPerfil(perfilDTO.nombre)
+        let result = await this.permisionsModel.asignarPermiso(idPerfil ,permisoDTO)
         return {
             status:'created'
         }
     }
+
+    @UseGuards(JwtGuard)
+    @HttpCode(200)
+    @Get(':id/permisos')
+    async getPermisos(
+        @Param('id') idPerfil:string
+    ){
+        return await this.permisionsModel.getPermisos(idPerfil)
+    }
+
+    
 
 }

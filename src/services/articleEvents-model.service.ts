@@ -7,7 +7,7 @@ import { ArticleStateIndex } from "../indices/articleStatesIndex";
 import { CargosModelService } from "./cargos-model.service";
 import { FavoriteStatesIndex } from "../indices/favoriteStatesIndex";
 import { ArticlesViewsIndex, articleView } from "../indices/articleViewsIndex";
-import { PcrcModelService, cliente } from "../services/pcrc-model.service";
+import { BaseModelService, base } from "./base-model.service";
 import { CommentsIndexService } from "../indices/commentsIndex.service";
 import { CategoriesModelService } from "../services/categories-model.service";
 import { category } from "../indices/categoriesIndex";

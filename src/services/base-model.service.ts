@@ -5,8 +5,9 @@ import * as sqlstring from 'sqlstring';
 import { createQueryBuilder, getManager } from 'typeorm';
 import { UserIndex } from "../indices/userIndex";
 import { Personal } from "../jarvisEntities/personal.entity";
-import { UserModelService } from "../services/user-model.service";
-import { DbService } from "../services/db.service"
+import { UserModelService } from "./user-model.service";
+import { DbService } from "./db.service"
+import { baseRaw } from "../entities";
 
 @Injectable()
 export class UserjwtModelService {
@@ -40,33 +41,48 @@ export class postBaseDTO {
     @IsString()
     nombre:string
 
-    @IsOptional()
-    @IsNumberString()
-    parentId:string
+    @IsNotEmpty()
+    @IsString()
+    subaseNombre:string
 
 }
 
-export type cliente = {
-    id_dp_clientes: number;
-    cliente: string;
-    pcrcs: {
-        id_dp_pcrc: number;
-        pcrc: string;
-        cod_pcrc: string;
+export class postSubBaseDTO {
+
+    @IsNotEmpty()
+    @IsString()
+    nombre:string
+    
+    @IsNotEmpty()
+    @IsString()
+    parentId:string
+
+
+}
+
+export type base = {
+    id: number;
+    nombre: string;
+    subBases: {
+        id: number;
+        nombre: string;
     }[]
 }
 
 @Injectable()
-export class PcrcModelService {
+export class BaseModelService {
 
     constructor(
         private db:DbService
     ) { }
 
-    createBase = async (nombre:string, parentId:string = null) => {
-        return await this.db.NIK('call crear_base(?, ?)',[nombre, parentId])
+    createBase = async (nombre:string, nombreSubBase:string, creatorId:string) => {
+        return await this.db.NIK('call crear_base(?, ?, ?)',[nombre, nombreSubBase, creatorId])
     }
-
+    
+    createSubBase = async (nombreSubBase:string, parentId:string, creatorId:string) => {
+        return await this.db.NIK('call crear_sub_base(?, ?, ?)',[nombreSubBase, parentId, creatorId])
+    }
     // private sortBy = (obj, key) => {
     //     return obj.sort(function (a, b) {
     //         var textA = a[key];
@@ -95,45 +111,38 @@ export class PcrcModelService {
     //     return result
     // }
 
-    // // getUserPcrc = async (cedula: string): Promise<cliente[]> => {
+    getUserBases = async (userId: string): Promise<base[]> => {
 
-    // //     if (cedula == '1036673423') {
-    // //         let result = await this.getAllPcrc()
-    // //         return this.sortBy(result, 'cliente')
-    // //     }
+        let rawBases:baseRaw[] = await this.db.NIK('call get_user_bases(?)',[userId])
 
-    // //     let user = await this.userIndex.where({ cedula: cedula }, '0', '1')
+        console.log(rawBases)
 
-    // //     if (!!user.length) {
+        var bases:base[] = []
 
-    // //         if (user[0].pcrc.includes('todos')) {
-    // //             return await this.getAllPcrc()
-    // //         } else if (user[0].pcrc.length) {
-    // //             let pcrcsPorDefecto = await this.getDefaultsPcrc(cedula)
+        rawBases.forEach((baseRaw, index) => {
+            var baseIndex = bases.findIndex(base => base.id == baseRaw.parentId)
 
-    // //             let idsPcrcsPorDefecto = R.flatten(pcrcsPorDefecto.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
+            if(baseIndex != -1){
+                bases[baseIndex].subBases.push({id:baseRaw.subBaseId, nombre:baseRaw.subBaseNombre})
+            } else {
+                var newBase:base = {
+                    id:baseRaw.parentId,
+                    nombre:baseRaw.parentNombre,
+                    subBases:[
+                        {
+                            id:baseRaw.subBaseId,
+                            nombre:baseRaw.subBaseNombre
+                        }
+                    ]
+                }
 
-    // //             let idsPcrcsDeUsuario = [...new Set(idsPcrcsPorDefecto.concat(user[0].pcrc))]// quitar duplicadps [1,1,2,2] = [1,2]
+                bases.push(newBase)
+            }
+        })
 
-    // //             let pcrcsConCliente = await createQueryBuilder<cliente>('Clientes')
-    // //                 .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
-    // //                 .where('pcrc.estado = 1')
-    // //                 .andWhere('Clientes.estado = 1')
-    // //                 .andWhere('pcrc.id_dp_pcrc IN (:...idsPcrc)', { idsPcrc: idsPcrcsDeUsuario })
-    // //                 .select(['Clientes.id_dp_clientes', 'Clientes.cliente', 'pcrc.id_dp_pcrc', 'pcrc.cod_pcrc', 'pcrc.pcrc'])
-    // //                 .getMany()
-
-    // //             return this.sortBy([...pcrcsConCliente], 'cliente')
-
-    // //         } else {
-                
-    // //             return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')
-    // //         }
-            
-    // //     } else {
-    // //         return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')
-    // //     }
-    // // }
+        return bases
+        // return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')
+    }
 
     // private getDefaultsPcrc = async (cedula: string):Promise<cliente[]> => {
 
@@ -185,99 +194,13 @@ export class PcrcModelService {
     //     return clientes
     // }
 
-    // postUserPcrc = async (cedula: string, idPcrc: string, cedulaUsuarioAdmin: string) => {
-
-    //     if (idPcrc == 'todos') {
-
-    //         let user = await this.userIndex.where({ cedula: cedula })
-
-    //         if (user.length > 0) {
-
-    //             let adminPcrc = await this.getUserPcrc(cedulaUsuarioAdmin)
-
-    //             let UserPcrc = await this.getUserPcrc(cedula)
-
-    //             let UserPcrcIds = R.flatten(UserPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
-
-    //             let admiPpcrcIds = R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
-
-    //             let duplicateQuit = [...new Set(UserPcrcIds.concat(admiPpcrcIds))]// quitar duplicadps
-
-    //             await this.userIndex.updatePartialDocument(cedula, { pcrc: duplicateQuit })
-
-    //             return { status: 'created' }
-
-    //         } else {
-
-    //             let jarvisInfo = await this.userModel.getJarvisUser(cedula)
-
-    //             let adminPcrc = await this.getUserPcrc(cedulaUsuarioAdmin)
-
-    //             let admiPpcrcIds = R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
-
-    //             let newUser = await this.userModel.createUser({
-    //                 cedula: cedula,
-    //                 nombre: jarvisInfo.nombre_completo,
-    //                 pcrc: admiPpcrcIds,
-    //             })
-
-    //             return { status: 'created' }
-    //         }
-
-    //     } else {
-
-    //         let existingUserPcrc = await this.getUserPcrc(cedula)            
-
-    //         if (existingUserPcrc.some(cliente => cliente.pcrcs.some(pcrc => pcrc.id_dp_pcrc.toString() == idPcrc))) {
-    //             throw new ConflictException('el usuario ya tiene acceso a este pcrc')
-    //         } else {
-    //             let existingPcrc = await createQueryBuilder<cliente>('Clientes')
-    //                 .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
-    //                 .where('pcrc.estado = 1')
-    //                 .andWhere('Clientes.estado = 1')
-    //                 .andWhere('pcrc.id_dp_pcrc = :idPcrc', { idPcrc: idPcrc })
-    //                 .select(['Clientes.id_dp_clientes', 'Clientes.cliente', 'pcrc.id_dp_pcrc', 'pcrc.cod_pcrc', 'pcrc.pcrc'])
-    //                 .getOne()
-
-    //             if (!!!existingPcrc) {
-    //                 throw new NotAcceptableException('el pcrc no existe')
-    //             } else {
-
-
-    //                 let usuarioExiste = await this.userIndex.where({ cedula: cedula })
-
-    //                 if (usuarioExiste.length > 0) {
-
-    //                     let updateQuery = {
-    //                         'source': 'ctx._source.pcrc.add(params.pcrc)',
-    //                         'lang': 'painless',
-    //                         'params': {
-    //                             'pcrc': idPcrc
-    //                         }
-    //                     };
-
-    //                     await this.userIndex.updateScript(cedula, updateQuery);
-
-    //                 } else {
-
-    //                     let datosPersonales = await createQueryBuilder("datosPersonales")
-    //                         .where('datosPersonales.documento = :cedula', { cedula: cedula })
-    //                         .getOne()
-
-    //                     return await this.userModel.createUser({
-    //                         cedula: cedula,
-    //                         nombre: datosPersonales['nombre_completo'],
-    //                         pcrc: [idPcrc],
-    //                         rol: 'user'
-    //                     })
-                        
-    //                 }
-    //             }
-
-    //             return { status: 'created' }
-    //         }
-    //     }
-    // }
+    postUserPcrc = async (userId: string, baseId: string, cedulaUsuarioAdmin: string) => {
+        if (baseId == 'todos') {
+            return await this.db.NIK('call asign_all_bases_from_user(?, ?)',[cedulaUsuarioAdmin, userId])
+        } else {
+            return await this.db.NIK('call asign_base_to_user(?, ?)',[userId, baseId])
+        }
+    }
 
     // deleteUserPcrc = async (cedula: string, pcrc: string, cedulaUsuarioAdmin: string) => {
 
