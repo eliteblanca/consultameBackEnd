@@ -16,24 +16,24 @@ export class UsersController {
         private usersesionsModel: UsersesionsModelService,
         private userNotificationsModel: UserNotificationsModelService,
         private permisionsModel: PermisionsModelService,
-        ) { }
+        ) {  }
 
-    // @UseGuards(JwtGuard)
-    // @Get()
-    // getUsers(
-    //     @Query('query') query:string,
-    //     @Query('pcrcId') pcrcId:string
-    // ): any {
-    //     return this.userModel.searchUsers(query, pcrcId);        
-    // }
+    @UseGuards(JwtGuard)
+    @Get()
+    getUsers(
+        @Query('query') query:string,
+        @Query('pcrcId') pcrcId:string
+    ): any {
+        return this.userModel.searchUsers(query, pcrcId);        
+    }
 
-    // @UseGuards(JwtGuard)
-    // @Get(':id')
-    // async getSingleUser(
-    //     @Param('id') documento: string
-    // ) {
-    //     return await this.userModel.getUserByDocumento(documento);
-    // }
+    @UseGuards(JwtGuard)
+    @Get(':id')
+    async getSingleUser(
+        @Param('id') user_id: string
+    ) {
+        return await this.userModel.getUserByDocumento(documento);
+    }
 
     @Post(':id/perfiles')
     @UseGuards(JwtGuard)
@@ -120,29 +120,35 @@ export class UsersController {
         return this.baseModel.getUserBases(idUser)
     }
 
-    // @UseGuards(JwtGuard)
-    // @Post(':cedula/pcrc')
-    // async postUserPcrc(
-    //     @Param('cedula') cedula:string,
-    //     @Body() body:postUserPcrcDTO,
-    //     @User() user: U
-    // ){
-    //     try {
-    //         return await this.pcrcModel.postUserPcrc(cedula, body.pcrc, user.sub)
-    //     } catch(error) {
-    //         console.log(error)
-    //     }
-    // }
+    @UseGuards(JwtGuard)
+    @HttpCode(200)
+    @Post(':userId/pcrc')
+    async postUserPcrc(
+        @Param('userId') userId:string,
+        @Body() body:postUserPcrcDTO,
+        @User() user: U
+    ){
+        return await this.baseModel.postUserBase(userId, body.pcrc, user.sub)
+    }
 
-    // @UseGuards(JwtGuard)
-    // @Delete(':cedula/pcrc/:pcrc')
-    // deleteUserPcrc(
-    //     @Param('cedula') cedula:string,
-    //     @Param('pcrc') pcrc:string,
-    //     @User() user: U
-    // ): any {
-    //     return this.pcrcModel.deleteUserPcrc(cedula, pcrc, user.sub)
-    // }
+    @UseGuards(JwtGuard)
+    @Delete(':user_id/pcrc/:base_id')
+    deleteUserPcrc(
+        @Param('user_id') idUser:string,
+        @Param('base_id') baseId:string,
+        @User() user: U
+    ): any {
+        return this.baseModel.deleteUserBase(idUser, baseId)
+    }
+
+    @UseGuards(JwtGuard)
+    @Delete(':user_id/pcrc')
+    deleteAllUserPcrc(
+        @Param('user_id') idUser:string,
+        @User() user: U
+    ): any {
+        return this.baseModel.deleteUserBase(idUser, 'todos', user.sub)
+    }
 
     // @UseGuards(JwtGuard)
     // @Post('me/sesion')

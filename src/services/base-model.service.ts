@@ -30,7 +30,8 @@ export class UserjwtModelService {
 }
 export class postUserPcrcDTO {
 
-    @IsNotEmpty({ message: 'debes proporcionar un pcrc' })
+    @IsNotEmpty()
+    @IsString()
     public pcrc: string;
 
 }
@@ -83,13 +84,14 @@ export class BaseModelService {
     createSubBase = async (nombreSubBase:string, parentId:string, creatorId:string) => {
         return await this.db.NIK('call crear_sub_base(?, ?, ?)',[nombreSubBase, parentId, creatorId])
     }
-    // private sortBy = (obj, key) => {
-    //     return obj.sort(function (a, b) {
-    //         var textA = a[key];
-    //         var textB = b[key];
-    //         return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-    //     })
-    // }
+
+    private sortBy = (obj, key) => {
+        return obj.sort(function (a, b) {
+            var textA = a[key];
+            var textB = b[key];
+            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+        })
+    }
 
     // getAllPcrc = async () => {
     //     return await createQueryBuilder<cliente>('Clientes')
@@ -115,7 +117,6 @@ export class BaseModelService {
 
         let rawBases:baseRaw[] = await this.db.NIK('call get_user_bases(?)',[userId])
 
-        console.log(rawBases)
 
         var bases:base[] = []
 
@@ -140,8 +141,7 @@ export class BaseModelService {
             }
         })
 
-        return bases
-        // return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')
+        return this.sortBy(await bases, 'nombre')
     }
 
     // private getDefaultsPcrc = async (cedula: string):Promise<cliente[]> => {
@@ -194,52 +194,22 @@ export class BaseModelService {
     //     return clientes
     // }
 
-    postUserPcrc = async (userId: string, baseId: string, cedulaUsuarioAdmin: string) => {
+    postUserBase = async (userId: string, baseId: string, cedulaUsuarioAdmin: string) => {
         if (baseId == 'todos') {
             return await this.db.NIK('call asign_all_bases_from_user(?, ?)',[cedulaUsuarioAdmin, userId])
         } else {
             return await this.db.NIK('call asign_base_to_user(?, ?)',[userId, baseId])
         }
     }
-
-    // deleteUserPcrc = async (cedula: string, pcrc: string, cedulaUsuarioAdmin: string) => {
-
-    //     if (pcrc == 'todos') {
-
-
-    //         let adminPcrc = await this.getUserPcrc(cedulaUsuarioAdmin)
-
-    //         let UserPcrc = await this.getUserPcrc(cedula)
-
-    //         let UserPcrcIds = R.flatten(UserPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
-
-    //         let admiPpcrcIds = R.flatten(adminPcrc.map(cliente => cliente.pcrcs.map(pcrc => pcrc.id_dp_pcrc.toString())))
-
-    //         let difference = UserPcrcIds.filter(x => !admiPpcrcIds.includes(x))
-
-    //         await this.userIndex.updatePartialDocument(cedula, { pcrc: difference })
-
-    //     } else {
-
-    //         let user = await this.userIndex.getById(cedula)
-
-    //         let index = user.pcrc.findIndex(pcrc => pcrc == pcrc)
-
-    //         if (index >= 0) {
-
-    //             let updateQuery = {
-    //                 'source': 'ctx._source.pcrc.remove(' + index + ')',
-    //                 'lang': 'painless'
-    //             }
-
-    //             try {
-    //                 return await this.userIndex.updateScript(cedula, updateQuery)
-    //             } catch (error) {
-    //                 console.log(error.meta.body.error)
-    //             }
-    //         }
-    //     }
-    // }
+    
+    deleteUserBase = async (user_id: string, base_id: string, idUsuarioAdmin?: string) => {
+        if (base_id == 'todos') {
+            console.log(idUsuarioAdmin, user_id)
+            return await this.db.NIK('call des_asignar_todas_bases(?, ?)',[idUsuarioAdmin, user_id])
+        } else {
+            return await this.db.NIK('call desasignar_base(?, ?)',[user_id, base_id])
+        }
+    }
 
     // getPcrcUsers = async (idPcrc: string) => {
 

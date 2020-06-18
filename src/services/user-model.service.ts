@@ -40,8 +40,12 @@ export class UserModelService {
         return await this.db.NIK(`call crear_usuario(?,?)`,[nombre, documento])
     }
 
-    public async getUserByDocumento(documento:string):Promise<userRaw[]>{
-        return await this.db.NIK('call get_usuario(?)',[documento])
+    public async getUserByUserName(userName:string):Promise<userRaw[]>{
+        return await this.db.NIK('call get_usuario_by_username(?)',[userName])
+    }
+
+    public async getUserById(userName:string):Promise<userRaw[]>{
+        return await this.db.NIK('call get_usuario_by_username(?)',[userName])
     }
 
     // public getJarvisUser = async (cedula: string) => {
@@ -112,68 +116,9 @@ export class UserModelService {
     //     return await this.articleIndex.where({ favorites:  userId, state:'published'  }, from, size, { orderby: 'publicationDate', order: 'desc' })
     // }
 
-    // public searchUsers = async (query: string, pcrcId:string) => {
-    //     const entityManager = getManager();
-        
-    //     let jarvisUsers: { documento: string, nombre: string }[] = []
-
-    //     if(pcrcId){
-    //         jarvisUsers = await entityManager.query(
-    //             sqlstring.format(`
-    //                 select 
-    //                 a.documento,
-    //                 a.nombre_completo as nombre 
-    //                 from dp_datos_generales a
-    //                 inner join dp_distribucion_personal b
-    //                 on a.documento = b.documento
-    //                 inner join dp_pcrc c
-    //                 on b.cod_pcrc = c.cod_pcrc
-    //                 where replace(lower(CONCAT(a.primer_nombre,' ',a.segundo_nombre, ' ', a.primer_apellido,' ', a.segundo_apellido)),' ','')
-    //                 like(concat('%',replace(lower('${query}'),' ',''),'%'))
-    //                 and YEAR(b.fecha_actual) = YEAR(NOW())
-    //                 and MONTH(b.fecha_actual) = MONTH(NOW())
-    //                 and c.id_dp_pcrc = '${pcrcId}'
-    //             `))
-
-    //     } else {
-
-    //         console.log(query)
-
-    //         jarvisUsers = await entityManager.query(
-    //             sqlstring.format(`
-    //                 select a.documento, a.nombre_completo as nombre from dp_datos_generales a
-    //                 where replace(lower(CONCAT(a.primer_nombre,' ',a.segundo_nombre, ' ', a.primer_apellido,' ', a.segundo_apellido)),' ','')
-    //                 like(concat('%',replace(lower('${query}'),' ',''),'%'))
-    //             `))
-    //     }
-
-
-    //     let existingUsers = await this.userIndex.query({
-    //         query: {
-    //             "terms": {
-    //                 "cedula": jarvisUsers.map(result => result.documento)
-    //             }
-    //         }
-    //     });
-
-    //     let newJarvisUsers = jarvisUsers.map(user => {
-    //         let existingUser = existingUsers.find(existingUser => existingUser.cedula == user.documento)
-            
-    //         if (existingUser) {
-    //             let { id, ...userSinId } = existingUser;
-    //             return userSinId
-    //         } else {
-    //             return {
-    //                 cedula: user.documento,
-    //                 nombre: user.nombre,
-    //                 rol: "user",
-    //                 pcrc: [],
-    //             }
-    //         }
-    //     })
-
-    //     return newJarvisUsers
-    // }
+    public searchUsers = async (query: string, baseId:string) => {
+        return await this.db.NIK('call buscar_usuario(?, ?)',[query, baseId])
+    }
 
     
 }

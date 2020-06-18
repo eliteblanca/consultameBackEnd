@@ -31,7 +31,7 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
 
     async validate(ldapUserInfo) {
 
-        var user = await this.userModel.getUserByDocumento(ldapUserInfo.postOfficeBox)
+        var user = await this.userModel.getUserByUserName(ldapUserInfo.sAMAccountName)
 
         if (await user.length > 0) {
 
