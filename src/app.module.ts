@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MorganModule, MorganInterceptor } from 'nest-morgan';
 import { AppController } from './controllers/app.controller';
 import { ArticlesController } from './controllers/articles.controller';
 import { CategoriesController } from './controllers/categories.controller';
@@ -52,7 +51,6 @@ import { ArticleEventsModelService } from "./services/articleEvents-model.servic
 import { UsersesionsModelService } from "./services/usersesions-model.service";
 import { NotificationsModelService } from "./services/notifications-model.service";
 
-import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ReportsController } from './controllers/reports.controller';
 import { CargosModelService } from "./services/cargos-model.service";
 import { ReportsModelService } from './services/reports-model.service';
@@ -87,7 +85,6 @@ import { NotificationsGateway } from "./webSockets/notifications.gateway";
       ],
       synchronize: false,
     }),
-    MorganModule.forRoot()
   ],
   controllers: [
     AppController,
@@ -138,10 +135,6 @@ import { NotificationsGateway } from "./webSockets/notifications.gateway";
     ArticleChangesIndex,
     userjwtIndex,
     NotificationsIndex,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: MorganInterceptor('tiny'),
-    },
     ReportsModelService,
     NotificationsGateway,
     NotificationsModelService,
