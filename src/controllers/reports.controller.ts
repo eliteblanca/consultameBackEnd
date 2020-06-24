@@ -55,6 +55,17 @@ export class ReportsController {
     }
 
     @UseGuards(JwtGuard)
+    @Post('views/list')
+    async getViewsList(
+        @Query('date') date:string,
+        @Query('minduration') minDuration:string,
+        @Query('maxduration') maxDuration:string,
+        @Body() filters
+    ): Promise<any> {
+        return this.articleEventsModel.getViewsBy(date, filters.filters, parseInt(minDuration), parseInt(maxDuration))
+    }
+
+    @UseGuards(JwtGuard)
     @Post('comments')
     async getCommets(
         @Query('dateto') dateTo:number,
