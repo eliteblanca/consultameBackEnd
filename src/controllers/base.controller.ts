@@ -13,7 +13,7 @@ import { SearchModelService } from "../services/search-model.service";
 export class PcrcController {
 
     constructor(
-        private pcrcModel: BaseModelService,
+        private baseModel: BaseModelService,
         private categoriesModel: CategoriesModelService,
         private searchModel: SearchModelService,
         private articlesModel: ArticlesModelService,
@@ -27,7 +27,7 @@ export class PcrcController {
         @Body() baseDTO:postBaseDTO,
         @User() user:U
     ){
-        let result = await this.pcrcModel.createBase(baseDTO.nombre, baseDTO.subaseNombre, user.sub)
+        let result = await this.baseModel.createBase(baseDTO.nombre, baseDTO.subaseNombre, user.sub)
 
         return {
             status:'created'
@@ -39,7 +39,7 @@ export class PcrcController {
     async getAllBases(
         @User() user:U
     ): Promise<any> {
-        return this.pcrcModel.getUserBases(user.sub)
+        return this.baseModel.getUserBases(user.sub)
     }
 
     @UseGuards(JwtGuard)
@@ -49,28 +49,20 @@ export class PcrcController {
         @Body() baseDTO:postSubBaseDTO,
         @User() user:U
     ){
-        let result = await this.pcrcModel.createSubBase(baseDTO.nombre, baseDTO.parentId, user.sub )
+        let result = await this.baseModel.createSubBase(baseDTO.nombre, baseDTO.parentId, user.sub )
 
         return {
             status:'created'
         }
     }
 
-    // @UseGuards(JwtGuard)
-    // @Get(':idPcrc/usuarios')
-    // async getUsuarios(
-    //     @Param('idPcrc') idPcrc: string
-    // ): Promise<any> {
-    //     return this.pcrcModel.getPcrcUsers(idPcrc)
-    // }
-
-    // @UseGuards(JwtGuard)
-    // @Get(':idPcrc/cliente')
-    // async getClienteOfPcrc(
-    //     @Param('idPcrc') idPcrc: string
-    // ): Promise<any> {
-    //     return this.pcrcModel.getClienteOfPcrc(idPcrc)
-    // }
+    @UseGuards(JwtGuard)
+    @Get(':id_base/usuarios')
+    async getUsuarios(
+        @Param('id_base') idBase: string
+    ): Promise<any> {
+        return this.baseModel.getBaseUsers(idBase)
+    }
 
     // @UseGuards(JwtGuard)
     // @Get(':idPcrc/categories')

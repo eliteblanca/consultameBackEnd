@@ -33,10 +33,10 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
 
         var user = await this.userModel.getUserByUserName(ldapUserInfo.sAMAccountName)
 
-        if (await user.length > 0) {
+        if (!!user) {
 
             return {
-                "sub": user[0].id,
+                "sub": user.id,
                 "name": ldapUserInfo.name,
             }
 

@@ -1,5 +1,5 @@
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { IsByteLength, IsIn, IsNotEmpty } from "class-validator";
+import { IsByteLength, IsIn, IsNotEmpty, IsString } from "class-validator";
 import * as R from 'remeda';
 import * as sqlstring from 'sqlstring';
 import { createQueryBuilder, getManager } from 'typeorm';
@@ -19,8 +19,17 @@ import { userRaw } from "../entities";
 }
 
 export class deleteUserDTO {
-    @IsByteLength(0, 512, { message: "has proporcionado un id invalido" })
     public id: string
+}
+
+export class createUserDTO {
+    @IsNotEmpty()
+    @IsString()
+    nombre:string;
+
+    @IsNotEmpty()
+    @IsString()
+    documento:string;
 }
 
 
@@ -35,17 +44,19 @@ export class UserModelService {
         private db:DbService
     ) { }
 
-    public async createUser(nombre:string, documento:string): Promise<user & { id: string; }> {
-        console.log(nombre, documento)
-        return await this.db.NIK(`call crear_usuario(?,?)`,[nombre, documento])
+    public async createUser(nombre:string, documento:string): Promise<userRaw> {
+        let result = await this.db.NIK(`call crear_usuario(?,?)`,[nombre, documento])
+        return result[0]
     }
 
-    public async getUserByUserName(userName:string):Promise<userRaw[]>{
-        return await this.db.NIK('call get_usuario_by_username(?)',[userName])
+    public async getUserByUserName(userName:string):Promise<userRaw>{
+        let result = await this.db.NIK('call get_usuario_by_username(?)',[userName])
+        return result[0]
     }
 
-    public async getUserById(userName:string):Promise<userRaw[]>{
-        return await this.db.NIK('call get_usuario_by_username(?)',[userName])
+    public async getUserById(userId:string):Promise<userRaw>{
+        let result = await this.db.NIK('call get_usuario_by_id(?)',[userId])
+        return result[0]
     }
 
     // public getJarvisUser = async (cedula: string) => {
@@ -90,17 +101,9 @@ export class UserModelService {
     //     }
     // }
 
-    // public async deleteUser(userId: string): Promise<any> {
-    //     try {
-    //         return await this.userIndex.delete(userId)
-    //     } catch (error) {
-    //         if (error && error.meta && error.meta.body && error.meta.statusCode == 404) {
-    //             throw new NotFoundException('usuario no encontrado')
-    //         } else {
-    //             console.log(error.meta.body)
-    //         }
-    //     }
-    // }
+    public async deleteUser(userId: string): Promise<any> {
+        return await this.db.NIK('call borrar_usario(?)',[userId])
+    }
 
     // public async getUserLikes(userId: string): Promise<any> {
     //     let result = await this.likeUserIndex.where({ user: userId, type: 'like' })

@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Http
 import { User as U } from "../entities";
 import { JwtGuard } from "../guards/jwt.guard";
 import { BaseModelService, postUserPcrcDTO } from "../services/base-model.service";
-import { deleteUserDTO, updateUserRolDTO, UserModelService } from "../services/user-model.service";
+import { deleteUserDTO, updateUserRolDTO, UserModelService, createUserDTO } from "../services/user-model.service";
 import { User } from "../user.decorator";
 import { UsersesionsModelService, sesionDTO, updateSesionDTO } from "../services/usersesions-model.service";
 import { UserNotificationsModelService, userNotificationDTO } from "../services/userNotifications-model.service";
@@ -28,11 +28,28 @@ export class UsersController {
     }
 
     @UseGuards(JwtGuard)
+    @Post()
+    @HttpCode(200)
+    createUser(
+        @Body() userDto:createUserDTO,
+    ): any {
+        return this.userModel.createUser(userDto.nombre, userDto.documento);        
+    }
+
+    @UseGuards(JwtGuard)
     @Get(':id')
     async getSingleUser(
         @Param('id') user_id: string
     ) {
-        return await this.userModel.getUserByDocumento(documento);
+        return await this.userModel.getUserById(user_id);
+    }
+
+    @UseGuards(JwtGuard)
+    @Delete(':id')
+    async deleteSingleUser(
+        @Param('id') user_id: string
+    ) {
+        return await this.userModel.deleteUser(user_id);
     }
 
     @Post(':id/perfiles')
@@ -69,23 +86,6 @@ export class UsersController {
             status:'deleted'
         }
     }
-
-    // @UseGuards(JwtGuard)
-    // @Delete(':id')
-    // deleteUser(
-    //     @Param() params: deleteUserDTO
-    // ): any {
-    //     return this.userModel.deleteUser(params.id);
-    // }
-
-    // @UseGuards(JwtGuard)
-    // @Put(':idUsuario')
-    // actualizarUsuario(
-    //     @Body() newUser: updateUserRolDTO,
-    //     @Param('idUsuario') idUsuario: string
-    // ): Promise<any> {
-    //     return this.userModel.updateUserRol(idUsuario, newUser);
-    // }
 
     // @UseGuards(JwtGuard)
     // @Get('me/likes')

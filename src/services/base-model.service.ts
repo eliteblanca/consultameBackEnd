@@ -93,6 +93,8 @@ export class BaseModelService {
         })
     }
 
+
+    
     // getAllPcrc = async () => {
     //     return await createQueryBuilder<cliente>('Clientes')
     //         .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
@@ -211,75 +213,9 @@ export class BaseModelService {
         }
     }
 
-    // getPcrcUsers = async (idPcrc: string) => {
-
-    //     const entityManager = getManager();
-
-    //     let jarvisUsers: { documento: string, nombre: string }[] = await entityManager.query(
-    //                 sqlstring.format(`
-    //                     select
-    //                     c.documento,
-    //                     c.nombre_completo as nombre
-    //                     from dp_pcrc a
-    //                     inner join dp_distribucion_personal b
-    //                     on a.cod_pcrc = b.cod_pcrc
-    //                     inner join dp_datos_generales c
-    //                     on b.documento = c.documento
-    //                     where a.id_dp_pcrc = '${idPcrc}'
-    //                     and YEAR(b.fecha_actual) = YEAR(NOW())
-    //                     and MONTH(b.fecha_actual) = MONTH(NOW())
-    //                 `))
-
-    //     let existingUsers = await this.userIndex.query({
-    //         query: {
-    //             "terms": {
-    //                 "cedula": jarvisUsers.map(result => result.documento)
-    //             }
-    //         }
-    //     });
-
-    //     let newJarvisUsers = jarvisUsers.map(user => {
-    //         let existingUser = existingUsers.find(existingUser => existingUser.cedula == user.documento)
-
-    //         if (existingUser) {
-    //             return existingUser
-    //         } else {
-    //             return {
-    //                 cedula: user.documento,
-    //                 nombre: user.nombre,
-    //                 rol: 'user',
-    //                 pcrc: [idPcrc],
-    //             }
-
-    //         }
-
-    //     })
-
-    //     let extraUsers = await this.userIndex.query({
-    //         query: {
-    //             bool: {
-    //                 must: [
-    //                     {
-    //                         terms: {
-    //                             pcrc: [ idPcrc, 'todos' ]
-    //                         }
-    //                     }
-    //                 ]
-    //             }
-    //         }
-    //     });
-
-    //     return newJarvisUsers.concat(extraUsers).sort((a, b) => {
-    //         if (a.nombre > b.nombre) {
-    //             return 1;
-    //         }
-    //         if (a.nombre < b.nombre) {
-    //             return -1;
-    //         }
-    //         // a must be equal to b
-    //         return 0;
-    //     })
-    // }
+    getBaseUsers = async (baseId: string) => {
+        return await this.db.NIK('call get_base_users(?)',[baseId])
+    }
 
     // getPcrcInfo = async (idPcrc:string) => {
 
