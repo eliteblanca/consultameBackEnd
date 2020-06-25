@@ -64,13 +64,13 @@ export class PcrcController {
         return this.baseModel.getBaseUsers(idBase)
     }
 
-    // @UseGuards(JwtGuard)
-    // @Get(':idPcrc/categories')
-    // async getPcrcCategories(
-    //     @Param('idPcrc') idPcrc: string
-    // ): Promise<any> {
-    //     return this.categoriesModel.getCategories(idPcrc)
-    // }
+    @UseGuards(JwtGuard)
+    @Get(':idPcrc/categories')
+    async getPcrcCategories(
+        @Param('idPcrc') idPcrc: string
+    ): Promise<any> {
+        return this.categoriesModel.getCategories(idPcrc)
+    }
 
     // @UseGuards(JwtGuard)
     // @Get(':idPcrc/articles')

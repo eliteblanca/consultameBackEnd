@@ -1,8 +1,10 @@
 import { forwardRef, Inject, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
-import { IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, Length } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, Length, ValidateIf } from 'class-validator';
 import { ArticleIndex } from "../indices/articleIndex";
 import { CategoriesIndex, category } from "../indices/categoriesIndex";
 import { ArticlesModelService } from "./articles-model.service";
+import { DbService } from "./db.service"
+import { categoryRaw } from "../entities";
 import * as async from 'async';
 import * as R from 'remeda';
 
@@ -14,23 +16,26 @@ export class getCategoryParams {
 export class newCategoryDTO {
 
     @IsNotEmpty({ message: "Debes proporcionar un nombre para la categoria" })
+    @IsString()
     public name: string;
 
-    @IsPositive({ message: "Debes proporcionar un numero positivo" })
-    @IsInt({ message: "Debes proporcionar un numero entero" })
-    public position: number;
+    @IsNotEmpty()
+    public position: string;
 
     @IsOptional()
-    @IsString({ message: "Debes proporcionar un nombre valido para el icono" })
-    @Length(3, 150, { message: "debes proporcionar un icono valido" })
+    @IsNotEmpty()
+    @IsString()
     public icon: string;
 
-    @IsOptional()
-    @Length(20, 20, { message: "debes proporcionar un id valido" })
-    public group: string;
-
-    @IsNotEmpty({ message: "Debes proporcionar un pcrc en el que agregar la categoria" })
+    @ValidateIf(o => !!!o.group)
+    @IsNotEmpty()
+    @IsString()
     public pcrc: string
+    
+    @IsOptional()
+    @IsString()
+    @IsNotEmpty()
+    public group: string;
 }
 
 export class udpateCategoryDTO {
@@ -49,12 +54,13 @@ export class udpateCategoryDTO {
 
 @Injectable()
 export class CategoriesModelService {
-    // constructor(
-    //     private categoriesIndex: CategoriesIndex,
-    //     private articleIndex: ArticleIndex,
-    //     @Inject(forwardRef(() => ArticlesModelService))
-    //     private articlesModel: ArticlesModelService
-    // ) { }
+    constructor(
+        private db:DbService
+        // private categoriesIndex: CategoriesIndex,
+        // private articleIndex: ArticleIndex,
+        // @Inject(forwardRef(() => ArticlesModelService))
+        // private articlesModel: ArticlesModelService
+    ) { }
 
     // private sortBy = (obj, key) => {
     //     return obj.sort(function(a, b) {
@@ -83,48 +89,14 @@ export class CategoriesModelService {
     //     return await this.categoriesIndex.getById(categoryId)
     // }
 
-    // public async createCategory(newCategory: newCategoryDTO): Promise<category & { id: string; }> {
-    //     try {
-    //         // --> comprueba si la linea existe
-    //         // let subline = await this.sublinesIndex.getById(newCategory.sublinea)
-    //     } catch (error) {
-    //         if (error.meta.statusCode == 404) {
-    //             throw new NotAcceptableException('el pcrc no existe');
-    //         } else {
-    //             console.log(error)
-    //         }
-    //     }
-
-    //     try {
-    //         // --> comprueba si la categoria padre existe
-    //         if (newCategory.group) {
-    //             let group = await this.getCategory(newCategory.group)
-    //         }
-    //     } catch (error) {
-    //         if (error.meta.statusCode == 404) {
-    //             throw new NotAcceptableException('la categoria no existe');
-    //         } else {
-    //             console.log(error)
-    //         }
-    //     }
-
-    //     let result = await this.categoriesIndex.create(newCategory)
-
-    //     return result
-
-    // }
-
-    // public async getCategories(pcrcId: string): Promise<(category & { id: string; })[]> {
-    //     try {
-    //         return this.sortBy(await this.categoriesIndex.where({ pcrc: pcrcId }),'name')
-    //     } catch (error) {
-    //         if (error && error.meta && error.meta.body && error.meta.statusCode == 404) {
-    //             throw new NotFoundException('pcrc no encontrado')
-    //         } else {
-    //             console.log(error)
-    //         }
-    //     }
-    // }
+    public async createCategory(newCategory: newCategoryDTO): Promise<any> {
+        let result = await this.db.NIK(`CALL crear_categoria(?,?,?,?,?)`,[newCategory.name, newCategory.position, newCategory.icon, newCategory.pcrc, newCategory.group])
+        return result
+    }
+    
+    public async getCategories(baseId: string): Promise<categoryRaw[]> {
+        return await this.db.NIK(`CALL get_base_categorias(?)`,[baseId])
+    }
 
     // private async getCategoriesByGroup(categoryId): Promise<(category & { id: string; })[]> {
     //     return await this.categoriesIndex.where({ group: categoryId })

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Query, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Query, BadRequestException, HttpCode } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ArticlesModelService } from '../services/articles-model.service';
 import { CategoriesModelService, newCategoryDTO, udpateCategoryDTO } from '../services/categories-model.service';
@@ -7,18 +7,19 @@ import { JwtGuard } from "../guards/jwt.guard";
 @Controller('api/categories')
 export class CategoriesController {
 
-    // constructor(
-    //     private categoriesModel: CategoriesModelService,
-    //     private articlesModel: ArticlesModelService
-    // ) { }
+    constructor(
+        private categoriesModel: CategoriesModelService,
+        // private articlesModel: ArticlesModelService
+    ) { }
 
-    // @UseGuards(JwtGuard)
-    // @Post()
-    // createCategory(
-    //     @Body() Body: newCategoryDTO
-    // ): Promise<any> {
-    //     return this.categoriesModel.createCategory(Body);
-    // }
+    @UseGuards(JwtGuard)
+    @HttpCode(200)
+    @Post()
+    createCategory(
+        @Body() Body: newCategoryDTO
+    ): Promise<any> {
+        return this.categoriesModel.createCategory(Body);
+    }
 
     // @UseGuards(JwtGuard)
     // @Delete(':id')
