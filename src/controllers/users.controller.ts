@@ -74,7 +74,6 @@ export class UsersController {
         @User() user: U,
         @Param('cedula') cedula:string
     ): any {
-        console.log(user)
         return this.pcrcModel.getUserPcrc(cedula)
     }
 

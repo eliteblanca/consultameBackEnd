@@ -21,8 +21,6 @@ export class SearchsIndex extends Esindex<search> {
     //14
     public create = async (doc: search, id?: string): Promise<search & { id: string; }> => {
 
-        console.log('pruebass')
-
         let result: ApiResponse
 
         doc.query = {

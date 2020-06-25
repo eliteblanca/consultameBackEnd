@@ -50,8 +50,6 @@ export class NotificationsGateway  implements OnGatewayInit, OnGatewayConnection
        this.notificationsModel.getNotificationsByDate(lastConnection.logout, (new Date()).getTime(), data+'/'+socket.handshake.query.cedula)
       ])      
 
-      console.log(result)
-
       return R.flatten(result)
 
     }else{

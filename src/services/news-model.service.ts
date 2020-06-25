@@ -188,19 +188,6 @@ export class NewsModelService {
                 articleEvent = 'borrador creado'
             }
 
-            console.log({
-                articulo: creationResult.id,
-                articlecontent: news.obj,
-                categoria: newArticle.category,
-                cliente: newArticle.cliente,
-                pcrc: newArticle.pcrc,
-                event: articleEvent,
-                eventDate: (new Date()).getTime(),
-                previoustate: previousState,
-                user: userId,
-                articlestate: news.state
-            })
-
             if(!!news.obj){
                 await this.articleChangesIndex.create({
                     articulo: creationResult.id,
