@@ -166,8 +166,6 @@ export class ArticlesModelService {
 
     public async createArticle(article: articleDTO, creator: string): Promise<Article & { id: string }> {
 
-        console.log(article)
-
         let pcrc: string = null
         let cliente: { id: number; cliente: string; }
 

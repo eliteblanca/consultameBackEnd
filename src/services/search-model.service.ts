@@ -38,9 +38,6 @@ export class SearchModelService extends GenericModel {
 
             let fraseCorregida = await this.getDidYouMean(input)
 
-            console.log(input)
-            console.log(fraseCorregida)
-
             let query = {
                 suggest: {
                     sugerencias : {

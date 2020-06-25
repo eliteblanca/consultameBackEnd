@@ -102,13 +102,9 @@ export class S3BucketService {
 
     deleteImage = async (key:any) => {
 
-        console.log(key)
-
         let params = { Bucket: process.env.BUCKET_NAME, Key: `${key}` };
 
         let deleteResult = await this.s3Client.deleteObject(params).promise();
-
-        console.log(deleteResult)
 
         return deleteResult
     }
