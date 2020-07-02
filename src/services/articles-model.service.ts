@@ -500,6 +500,8 @@ export class ArticlesModelService {
             await this.S3BucketService.deleteFile(id, fileName)
         })
 
+        await this.deleteArticleImagenes(article.obj, id)
+
         await this.articleIndex.updatePartialDocument(id, { state:'deleted' })
 
         await this.favoriteUserIndex.deleteWhere({ article: id })
@@ -661,45 +663,7 @@ export class ArticlesModelService {
 
     }
 
-    public async compareDeletedImages(articleId:string, newQuillsObj:string){
-        let oldQuillObj = (await this.articleIndex.getById(articleId)).obj
-
-        let oldQuillObjImages = JSON.parse(oldQuillObj).ops.map((action, index) => {
-            if(action?.insert?.image){
-                if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
-                    return action.insert.image
-                }
-            }
-
-            return null
-
-        }).filter( data => data )
-
-        let newQuillsObjImages = JSON.parse(newQuillsObj).ops.map((action, index) => {
-            if(action?.insert?.image){
-                if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
-                    return action.insert.image
-                }
-            }
-
-            return null
-
-        }).filter( data => data )
-
-        //http://localhost:3001/files/WtNf1XAB7zOoFg7QvT75/WtNf1XAB7zOoFg7QvT751584127786529
-        var imagesTodelete = oldQuillObjImages.filter( key => {
-            return !newQuillsObjImages.includes(key)
-        })
-
-        let imageDeletePromises = imagesTodelete.map((s3Key:string) =>{
-            return async () => {
-                return await this.S3BucketService.deleteImage(s3Key)
-            }
-        })
-
-        let result = await async.parallel(imageDeletePromises)
-
-    }
+  
 
     public updateArticleState = async (articleInfo:  Omit<ArticleState, 'initialDate'|'finalDate'|'initialDateUser'|'finalDateUser'|'state'>, newState:string, userId:string) => {
         let currentArticleStates = await this.articleStateIndex.where({ articulo: articleInfo.articulo })
@@ -854,51 +818,8 @@ export class ArticlesModelService {
         }
     }
 
-    public async prueba(from , size, id): Promise<any> {
-
-        if(id){
-            var articuloaux = [ await this.articleIndex.getById(id) ]
-        } else {
-            var articuloaux =  await this.articleIndex.where({ state:'published' }, from, '1', { orderby: 'modificationDate', order: 'desc' });
-        }
-
-        let quillJsObj:any        
-        if(articuloaux.length > 0){
-            quillJsObj = JSON.parse(articuloaux[0].obj).ops    
-
-            var quillJsObjUpdate = await async.map(quillJsObj, async action => {
-                if(action.insert?.image){
-                    if(!action.insert.image.startsWith('/files/')){
-
-                        let imageUrl = action.insert.image.replace('http://multiconsultabanco.multienlace.com.co','172.20.1.34:80')
-                        imageUrl = action.insert.image.replace(imageUrl,'172.20.1.32')
-
-                        let imageResponse = await axios.get(imageUrl, {
-                          responseType: 'arraybuffer'
-                        })
-        
-                        let base64String = Buffer.from(imageResponse.data, 'binary').toString('base64')
-        
-                        let uploadResult = await this.S3BucketService.uploadImage(base64String, articuloaux[0].id)
-                        
-                        return { insert:{ image: `/files/${uploadResult.Key }` } }               
-    
-                    } else {
-                        return action
-                    }
-    
-    
-                } else {
-                    return action
-                }
-            })
-    
-            let updateresult =await this.articleIndex.updatePartialDocument(articuloaux[0].id,{ obj:JSON.stringify({ ops: quillJsObjUpdate}) })
-
-            return updateresult
-
-        }
-
+    public async prueba(id): Promise<any> {
+        return await this.S3BucketService.deleteImage('Lh_XEHMByBFDprp_iGfJ1593715427663')           
     }
 
     async updateArticleImages(articleId:string, quillJsObjString?:string) {
@@ -908,7 +829,7 @@ export class ArticlesModelService {
         if(!quillJsObjString){
 
             let article = await this.articleIndex.getById(articleId)
-            
+
             quillJsObj = JSON.parse(article.obj).ops
 
         } else {
@@ -917,65 +838,62 @@ export class ArticlesModelService {
 
         }
 
-        var base64Strings = quillJsObj.map((action, index) => {
+        let base64Strings = await async.map(quillJsObj, async (action, index) => {
+
+            let actionAux = action 
 
             if(action?.insert?.image){
                 if((action.insert.image as string).startsWith('data:image/',0) ){
-                    return { originalIndex:index, base64string: action.insert.image }
+
+                    let uploadResult = await this.S3BucketService.uploadImage(action.insert.image, articleId)
+
+                    actionAux.insert.image = `/files/` + uploadResult.Key
+
+                }
+
+                if((action.insert.image as string).startsWith('http://multiconsultabanco',0) ){
+                    let result = await axios.get(action.insert.image, {
+                        responseType: 'arraybuffer'
+                    })
+    
+                    let base64 = new Buffer(result.data, 'binary').toString('base64')
+    
+                    let uploadResult = await this.S3BucketService.uploadImage("data:image/jpeg;base64,"+base64, articleId)
+
+                    actionAux.insert.image = `/files/` + uploadResult.Key
                 }
             }
 
-            return null
-
-        }).filter( data => data )
-
-        let result = await async.map(base64Strings, async stringData => {
-
-            let uploadResult = await this.S3BucketService.uploadImage(stringData.base64string, articleId)
-
-            return { ...stringData, uploadResult: uploadResult }
-
+            return action
         })
 
-        result.forEach(element => {
-            quillJsObj[element.originalIndex] = { insert:{ image: `/files/` + element.uploadResult.Key } }
-        });
-
-        
         if(quillJsObjString){
-            
-            return JSON.stringify({ ops: quillJsObj })
-            
+
+            return JSON.stringify({ ops: base64Strings })
+
         } else {            
 
-            let updateArticleResult = await this.articleIndex.updatePartialDocument(articleId,{ obj: JSON.stringify({ ops: quillJsObj }) })
-    
+            let updateArticleResult = await this.articleIndex.updatePartialDocument(articleId,{ obj: JSON.stringify({ ops: base64Strings }) })
+
             return updateArticleResult
         }
 
-
     }
 
-    async deleteArticleImagenes(articleId:string) {
+    async deleteArticleImagenes(oldQuillObj:any, articleId:string) {
 
-        let article = await this.articleIndex.getById(articleId)
-
-        let quillJsObj = JSON.parse(article.obj).ops
-
-
-        var base64Strings = quillJsObj.map((action, index) => {
-
+        let oldQuillObjImages = JSON.parse(oldQuillObj).ops.map((action, index) => {
             if(action?.insert?.image){
                 if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
-                    return action.insert.image
+                    return action.insert.image.replace(`/files/`,'')
                 }
             }
 
             return null
 
-        }).filter( data => data )        
+        }).filter( data => data )    
 
-        let imageDeletePromises = base64Strings.map((s3Key:string) =>{
+        let imageDeletePromises = oldQuillObjImages.map((s3Key:string) =>{
             return async () => {
                 return await this.S3BucketService.deleteImage(s3Key)
             }
@@ -984,6 +902,45 @@ export class ArticlesModelService {
         let result = await async.parallel(imageDeletePromises)
 
         return result
+
+    }
+
+    public async compareDeletedImages(articleId:string, newQuillsObj:string){
+        let oldQuillObj = (await this.articleIndex.getById(articleId)).obj
+
+        let oldQuillObjImages = JSON.parse(oldQuillObj).ops.map((action, index) => {
+            if(action?.insert?.image){
+                if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
+                    return action.insert.image.replace(`/files/`,'')
+                }
+            }
+
+            return null
+
+        }).filter( data => data )
+
+        let newQuillsObjImages = JSON.parse(newQuillsObj).ops.map((action, index) => {
+            if(action?.insert?.image){
+                if( (action.insert.image as string).startsWith(`/files/${articleId}/${articleId}`,0) ) {
+                    return action.insert.image.replace(`/files/`,'')
+                }
+            }
+
+            return null
+
+        }).filter( data => data )
+
+        var imagesTodelete = oldQuillObjImages.filter( key => {
+            return !newQuillsObjImages.includes(key)
+        })
+
+        let imageDeletePromises = imagesTodelete.map((s3Key:string) =>{
+            return async () => {
+                return await this.S3BucketService.deleteImage(s3Key)
+            }
+        })
+
+        let result = await async.parallel(imageDeletePromises)
 
     }
 

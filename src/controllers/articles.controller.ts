@@ -18,12 +18,10 @@ export class ArticlesController {
 
     @Get('prueba')
     async getPrueba(
-        @Query('from') from,
-        @Query('to') to,
         @Query('idarticulo') idarticulo
     ): Promise<any> {
         try {
-            return this.articlesModel.prueba(from, to, idarticulo);
+            return this.articlesModel.prueba(idarticulo);
         } catch (error) {
             throw error;
         }
