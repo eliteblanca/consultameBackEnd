@@ -105,29 +105,4 @@ export class AppController {
         return req.user
     }
 
-    @Post('validateCaptcha')
-    async validateCaptcha(
-        @Body() body: { token: string }
-    ) {
-
-        var RECAPTCHA_KEY = process.env.RECAPTCHA_KEY
-
-
-        const axiosInstance = axios.create({
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false
-            })
-        });
-
-
-        let googleResponse = await axiosInstance.post('https://www.google.com/recaptcha/api/siteverify',
-            qs.stringify({
-                secret: RECAPTCHA_KEY,
-                response: body.token
-            })
-        )
-
-        return googleResponse.data
-
-    }
 }
