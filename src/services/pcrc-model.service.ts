@@ -40,12 +40,63 @@ export class PcrcModelService {
     }
 
     getAllPcrc = async () => {
-        return await createQueryBuilder<cliente>('Clientes')
-            .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
-            .where('pcrc.estado = 1')
-            .andWhere('Clientes.estado = 1')
-            .select(['Clientes.id_dp_clientes', 'Clientes.cliente', 'pcrc.id_dp_pcrc', 'pcrc.cod_pcrc', 'pcrc.pcrc'])
-            .getMany()
+        const entityManager = getManager();
+
+        let rows:{
+            id_dp_pcrc:number,
+            cod_pcrc:string,
+            pcrc:string,
+            id_dp_clientes:number,
+            cliente:string }[] = await entityManager.query(
+            sqlstring.format(`
+                    select 
+                    a.id_dp_pcrc,
+                    a.cod_pcrc,
+                    a.pcrc,
+                    b.id_dp_clientes,
+                    b.cliente
+                from
+                dp_pcrc a
+                inner join dp_clientes b
+                on a.id_dp_clientes = b.id_dp_clientes
+                where 
+                (
+                    a.estado = 1
+                    and 
+                    b.estado = 1                    
+                )
+                or
+                a.id_dp_pcrc = 78
+        
+            `))
+
+        let clientes:cliente[] = []
+
+        rows.forEach(row => {
+            let clienteId = clientes.findIndex(cliente => cliente.id_dp_clientes == row.id_dp_clientes)
+
+            if(clienteId == -1){
+                clientes.push({
+                    cliente:row.cliente,
+                    id_dp_clientes:row.id_dp_clientes,
+                    pcrcs:[
+                        { 
+                            cod_pcrc:row.cod_pcrc,
+                            id_dp_pcrc:row.id_dp_pcrc,
+                            pcrc:row.pcrc
+                        }
+                    ]
+                })
+            } else {
+                clientes[clienteId].pcrcs.push({
+                    cod_pcrc:row.cod_pcrc,
+                    id_dp_pcrc:row.id_dp_pcrc,
+                    pcrc:row.pcrc
+                })
+            }
+        })
+
+        return clientes
     }
 
     getClienteOfPcrc = async (idPcrc): Promise<{ id: number; cliente: string; }> => {
@@ -79,13 +130,7 @@ export class PcrcModelService {
 
                 let idsPcrcsDeUsuario = [...new Set(idsPcrcsPorDefecto.concat(user[0].pcrc))]// quitar duplicadps [1,1,2,2] = [1,2]
 
-                let pcrcsConCliente = await createQueryBuilder<cliente>('Clientes')
-                    .innerJoinAndSelect('Clientes.pcrcs', 'pcrc')
-                    .where('pcrc.estado = 1')
-                    .andWhere('Clientes.estado = 1')
-                    .andWhere('pcrc.id_dp_pcrc IN (:...idsPcrc)', { idsPcrc: idsPcrcsDeUsuario })
-                    .select(['Clientes.id_dp_clientes', 'Clientes.cliente', 'pcrc.id_dp_pcrc', 'pcrc.cod_pcrc', 'pcrc.pcrc'])
-                    .getMany()
+                let pcrcsConCliente = await this.getPcrcConCliente(idsPcrcsDeUsuario)
 
                 return this.sortBy([...pcrcsConCliente], 'cliente')
 
@@ -97,6 +142,67 @@ export class PcrcModelService {
         } else {
             return this.sortBy(await this.getDefaultsPcrc(cedula), 'cliente')
         }
+    }
+
+    getPcrcConCliente = async (idsPcrc:string[]) => {
+        const entityManager = getManager();
+
+        let rows:{
+            id_dp_pcrc:number,
+            cod_pcrc:string,
+            pcrc:string,
+            id_dp_clientes:number,
+            cliente:string }[] = await entityManager.query(
+            sqlstring.format(`
+                    select 
+                    a.id_dp_pcrc,
+                    a.cod_pcrc,
+                    a.pcrc,
+                    b.id_dp_clientes,
+                    b.cliente
+                from
+                dp_pcrc a
+                inner join dp_clientes b
+                on a.id_dp_clientes = b.id_dp_clientes
+                where 
+                (
+                    a.estado = 1
+                    and 
+                    b.estado = 1
+                    and a.id_dp_pcrc in(${ idsPcrc.join(',') })
+                )
+                or
+                a.id_dp_pcrc = 78
+        
+            `))
+
+        let clientes:cliente[] = []
+
+        rows.forEach(row => {
+            let clienteId = clientes.findIndex(cliente => cliente.id_dp_clientes == row.id_dp_clientes)
+
+            if(clienteId == -1){
+                clientes.push({
+                    cliente:row.cliente,
+                    id_dp_clientes:row.id_dp_clientes,
+                    pcrcs:[
+                        { 
+                            cod_pcrc:row.cod_pcrc,
+                            id_dp_pcrc:row.id_dp_pcrc,
+                            pcrc:row.pcrc
+                        }
+                    ]
+                })
+            } else {
+                clientes[clienteId].pcrcs.push({
+                    cod_pcrc:row.cod_pcrc,
+                    id_dp_pcrc:row.id_dp_pcrc,
+                    pcrc:row.pcrc
+                })
+            }
+        })
+
+        return clientes
     }
 
     private getDefaultsPcrc = async (cedula: string):Promise<cliente[]> => {
