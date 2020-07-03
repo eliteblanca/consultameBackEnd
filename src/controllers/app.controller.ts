@@ -10,6 +10,9 @@ import { userjwtIndex } from "../indices/userjwtIndex";
 import { JwtGuard } from "../guards/jwt.guard";
 import { User } from '../user.decorator';
 import { User as U } from '../entities/user';
+import { MockLdapGuard } from "../guards/mock-ldap.guard";
+
+
 class user {
     "sub": string
     "name": string
@@ -26,7 +29,7 @@ export class AppController {
         private userjwtIndex: userjwtIndex,
     ) { }
 
-    @UseGuards(AuthGuard('ldap'))
+    @UseGuards(MockLdapGuard)
     @Post('authenticate')
     async login(@Req() req, @Res() res: Response) {
 
