@@ -661,9 +661,7 @@ export class ArticlesModelService {
 
         await this.articleIndex.updatePartialDocument(id, newArticle);
 
-    }
-
-  
+    }  
 
     public updateArticleState = async (articleInfo:  Omit<ArticleState, 'initialDate'|'finalDate'|'initialDateUser'|'finalDateUser'|'state'>, newState:string, userId:string) => {
         let currentArticleStates = await this.articleStateIndex.where({ articulo: articleInfo.articulo })
@@ -851,7 +849,7 @@ export class ArticlesModelService {
 
                 }
 
-                if((action.insert.image as string).startsWith('http://multiconsultabanco',0) ){
+                if((action.insert.image as string).startsWith('http://multiconsulta',0) ){
                     let result = await axios.get(action.insert.image, {
                         responseType: 'arraybuffer'
                     })
