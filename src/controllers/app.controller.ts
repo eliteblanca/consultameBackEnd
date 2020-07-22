@@ -10,6 +10,7 @@ import { userjwtIndex } from "../indices/userjwtIndex";
 import { JwtGuard } from "../guards/jwt.guard";
 import { User } from '../user.decorator';
 import { User as U } from '../entities/user';
+import { auth2 } from '../services/auth2.service';
 
 
 class user {
@@ -26,11 +27,16 @@ export class AppController {
     constructor(
         private authService: LdapService,
         private userjwtIndex: userjwtIndex,
+        private auth:auth2
     ) { }
 
-    @UseGuards(AuthGuard('ldap'))
+  
     @Post('authenticate')
     async login(@Req() req, @Res() res: Response) {
+
+       let data=await this.auth.CallUser(res.req.body.username,res.req.body.password);
+       
+       if(data.code==='200'){
 
         if(process.env.NODE_ENV == 'production'){
             let tokens = {
@@ -53,8 +59,9 @@ export class AppController {
         } else {
 
             let tokens = {
-                token: this.authService.generateJwt({ name:"julian andres vargas", rol:'admin', sub:"1036673423" }),
-                refreshToken: this.authService.generateRefresh_token({ name:"julian andres vargas", rol:'admin', sub:"1036673423" })
+                code:'200',
+                token: this.authService.generateJwt({ name:data.username, rol:data.roles, sub:data.id }),
+                refreshToken: this.authService.generateRefresh_token({ name:data.username, rol:data.roles, sub:data.id})
             }
 
             let decodedRefresh = this.authService.decodeToken(tokens.refreshToken)
@@ -64,12 +71,20 @@ export class AppController {
                 expires: new Date(decodedRefresh.exp * 1000)
             })
 
-            await this.userjwtIndex.deleteWhere({ user: "1036673423" })
+            await this.userjwtIndex.deleteWhere({ user: data.id })
 
-            await this.userjwtIndex.create({ user: "1036673423" })
+            await this.userjwtIndex.create({ user: data.id })
 
             res.send(tokens)
+
         }
+
+    }else{
+
+        res.send(data);
+
+    }
+
     }
 
     @UseGuards(JwtGuard)
@@ -105,6 +120,12 @@ export class AppController {
     @Get('me')
     currentUser(@Req() req): Promise<user> {
         return req.user
+    }
+
+
+    @Get('prueba')
+    prueba(){
+        return 'prueba';
     }
 
 }

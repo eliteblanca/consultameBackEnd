@@ -18,6 +18,7 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
         private UserIndex: UserIndex,
         private userjwtIndex: userjwtIndex,
     ) {
+        
         super({
             server: {
                 url: 'ldap://172.20.1.220',
@@ -27,11 +28,14 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
                 searchBase: 'dc=multienlace,dc=com,dc=co'
             }
         });
+     
     }
 
     async validate(ldapUserInfo) {
+   
         var user = await this.UserIndex.where( { cedula: ldapUserInfo.postOfficeBox })
 
+    
         if (user.length > 0) {
 
             return {
@@ -41,6 +45,12 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
             }
 
         } else {
+
+            console.log({
+                "sub": newuser.id,
+                "name": ldapUserInfo.name,
+                "rol": newuser.rol
+            })
 
             var newuser = await this.userModel.createUser({
                 cedula: ldapUserInfo.postOfficeBox,
@@ -57,6 +67,8 @@ export class LdapService extends PassportStrategy(ldapStrategy, 'ldap') {
 
         }
     }
+
+    
 
     generateJwt(user: { sub: string, name: string, rol: user['rol'] }) {
         return jwt.sign(

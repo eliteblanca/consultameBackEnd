@@ -61,6 +61,8 @@ import { GerentesController } from './controllers/gerentes.controller';
 import { CoordinadoresController } from './controllers/coordinadores.controller';
 import { ArticleChangesIndex } from "./indices/articlesChangesIndex";
 import { NotificationsGateway } from "./webSockets/notifications.gateway";
+import { auth2 } from './services/auth2.service';
+
 
 @Module({
   imports: [
@@ -85,7 +87,8 @@ import { NotificationsGateway } from "./webSockets/notifications.gateway";
         CentrosCostos
       ],
       synchronize: false,
-    })
+    }),
+  
   ],
   controllers: [
     AppController,
@@ -143,6 +146,7 @@ import { NotificationsGateway } from "./webSockets/notifications.gateway";
     UsersesionsIndex,
     UsernotificationsIndex,
     UserNotificationsModelService,
+    auth2
   ],
 })
 export class AppModule {  }
