@@ -63,9 +63,11 @@ export class UsersController {
     getSelfFavorites(
         @User() user: U,
         @Query('from') from: string,
-        @Query('size') size: string
+        @Query('size') size: string,
+        @Query('pcrc') pcrcId: string,
+
     ): any {
-        return this.userModel.getUserFavorites(user.sub,from,size);
+        return this.userModel.getUserFavorites(user.sub, from, size, pcrcId);
     }
 
     @UseGuards(JwtGuard)

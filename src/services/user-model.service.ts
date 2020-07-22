@@ -101,8 +101,8 @@ export class UserModelService {
         return R.map(result, (dislikeUser: likeUser) => dislikeUser.article)
     }
 
-    public async getUserFavorites(userId: string, from: string, size: string): Promise<(Article & { id: string; })[]> {
-        return await this.articleIndex.where({ favorites:  userId, state:'published'  }, from, size, { orderby: 'publicationDate', order: 'desc' })
+    public async getUserFavorites(userId: string, from: string, size: string, pcrcId:string): Promise<(Article & { id: string; })[]> {
+        return await this.articleIndex.where({ favorites:  userId, state:'published', pcrc:pcrcId }, from, size, { orderby: 'publicationDate', order: 'desc' })
     }
 
     public searchUsers = async (query: string, pcrcId:string) => {
